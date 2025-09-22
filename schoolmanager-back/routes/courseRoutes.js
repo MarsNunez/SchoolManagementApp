@@ -76,10 +76,8 @@ router.delete("/:courseId", async (req, res) => {
     }
 
     res.json({ message: "Course deleted successfully" });
-  } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Error deleting course", error: error.message });
+  } catch (e) {
+    res.status(500).json({ message: "Error deleting course", e: e.message });
   }
 });
 
