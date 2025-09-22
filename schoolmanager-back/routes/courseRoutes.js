@@ -3,7 +3,6 @@ import { CourseModel } from "../models/Course.js";
 
 const router = express.Router();
 
-// GET ALL COURSES
 router.get("/", async (req, res) => {
   try {
     const courses = await CourseModel.find({});
@@ -76,9 +75,14 @@ router.delete("/:courseId", async (req, res) => {
     }
 
     res.json({ message: "Course deleted successfully" });
-  } catch (e) {
-    res.status(500).json({ message: "Error deleting course", e: e.message });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Error deleting course", error: error.message });
   }
 });
 
-export { router as courseRoutes };
+const courseRoutes = router;
+
+export { courseRoutes };
+export default courseRoutes;
