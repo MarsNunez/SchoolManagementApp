@@ -48,6 +48,10 @@ const TeacherSchema = new Schema(
       default:
         "https://png.pngitem.com/pimgs/s/678-6785836_my-account-icon-png-png-download-instagram-profile.png",
     },
+    current_teaching_courses: {
+      type: String,
+      trim: true,
+    },
   },
   {
     timestamps: true,

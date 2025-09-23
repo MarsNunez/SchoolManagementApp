@@ -20,9 +20,8 @@ const CourseSchema = new Schema(
       default: "Description here.",
       trim: true,
     },
-    instructor: {
-      type: String,
-      required: true,
+    instructor_id: {
+      type: Number,
       trim: true,
     },
     duration: {
