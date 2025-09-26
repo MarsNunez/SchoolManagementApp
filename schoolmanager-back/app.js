@@ -3,6 +3,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import { courseRoutes } from "./routes/courseRoutes.js";
 import { teacherRoutes } from "./routes/teacherRoutes.js";
+import { parentRoutes } from "./routes/parentRoutes.js";
 
 dotenv.config();
 
@@ -12,6 +13,7 @@ app.use(cors());
 app.use(express.json());
 app.use("/courses", courseRoutes);
 app.use("/teachers", teacherRoutes);
+app.use("/parents", parentRoutes);
 
 app.get("/", (req, res) => {
   res.status(200).send("Backend server is up...");
