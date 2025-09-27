@@ -27,7 +27,7 @@ const TeacherSchema = new Schema(
       trim: true,
     },
     specialties: {
-      type: String,
+      type: [String],
       required: true,
       trim: true,
     },
@@ -45,11 +45,10 @@ const TeacherSchema = new Schema(
     photo: {
       type: String,
       trim: true,
-      default:
-        "https://png.pngitem.com/pimgs/s/678-6785836_my-account-icon-png-png-download-instagram-profile.png",
+      default: "",
     },
     current_teaching_courses: {
-      type: String,
+      type: [String],
       trim: true,
     },
   },
