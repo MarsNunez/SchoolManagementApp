@@ -17,11 +17,11 @@ const CourseSchema = new Schema(
     },
     description: {
       type: String,
-      default: "Sin descripción.",
+      default: "Sin descripción",
       trim: true,
     },
-    instructor_id: {
-      type: Number,
+    teacher_id: {
+      type: String,
       trim: true,
     },
     duration: {
