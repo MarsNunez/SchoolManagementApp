@@ -21,7 +21,7 @@ const TeacherSchema = new Schema(
       trim: true,
     },
     dni: {
-      type: String,
+      type: Number,
       required: true,
       unique: true,
       trim: true,

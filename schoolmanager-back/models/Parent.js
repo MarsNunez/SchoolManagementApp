@@ -21,7 +21,7 @@ const ParentSchema = new Schema(
       trim: true,
     },
     dni: {
-      type: String,
+      type: Number,
       required: true,
       unique: true,
       trim: true,
@@ -34,7 +34,7 @@ const ParentSchema = new Schema(
       trim: true,
     },
     phone: {
-      type: String,
+      type: Number,
       trim: true,
     },
     address: {

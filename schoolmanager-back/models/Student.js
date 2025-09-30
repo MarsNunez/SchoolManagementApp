@@ -10,6 +10,10 @@ const StudentSchema = new Schema(
       unique: true,
       trim: true,
     },
+    parents_id: {
+      type: [String],
+      default: [],
+    },
     name: {
       type: String,
       required: true,
@@ -21,7 +25,7 @@ const StudentSchema = new Schema(
       trim: true,
     },
     dni: {
-      type: String,
+      type: Number,
       required: true,
       unique: true,
       trim: true,
@@ -43,10 +47,6 @@ const StudentSchema = new Schema(
     address: {
       type: String,
       trim: true,
-    },
-    id_parents: {
-      type: [String],
-      default: [],
     },
     current_courses: {
       type: [String],
