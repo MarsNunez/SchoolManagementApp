@@ -17,7 +17,7 @@ const CourseSchema = new Schema(
     },
     description: {
       type: String,
-      default: "Sin descripción",
+      default: "Sin descripción.",
       trim: true,
     },
     teacher_id: {
