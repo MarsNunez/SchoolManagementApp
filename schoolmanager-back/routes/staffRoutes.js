@@ -1,13 +1,22 @@
 import express from "express";
+import bcrypt from "bcryptjs";
 import { StaffModel } from "../models/Staff.js";
 
 const router = express.Router();
+
+const sanitizeStaff = (staffDoc) => {
+  if (!staffDoc) return staffDoc;
+  const staffObject = staffDoc.toObject ? staffDoc.toObject() : staffDoc;
+  const { password, ...rest } = staffObject;
+  return rest;
+};
 
 // GET ALL STAFF
 router.get("/", async (req, res) => {
   try {
     const staff = await StaffModel.find();
-    res.json(staff);
+    const sanitized = staff.map((member) => sanitizeStaff(member));
+    res.json(sanitized);
   } catch (error) {
     res
       .status(500)
@@ -24,7 +33,7 @@ router.get("/:staffId", async (req, res) => {
     if (!staffMember) {
       return res.status(404).json({ message: "Staff member not found" });
     }
-    res.json(staffMember);
+    res.json(sanitizeStaff(staffMember));
   } catch (error) {
     res
       .status(500)
@@ -33,10 +42,21 @@ router.get("/:staffId", async (req, res) => {
 });
 
 // POST A NEW STAFF MEMBER
+// IMPORTANTE: UN MIEMBRO DEL STAFF SE CREA EN authRoutes
 router.post("/", async (req, res) => {
   try {
-    const staffMember = await StaffModel.create(req.body);
-    res.status(201).json(staffMember);
+    const payload = { ...req.body };
+
+    if (!payload.password) {
+      return res.status(400).json({
+        message: "Password is required to create a staff member",
+      });
+    }
+
+    payload.password = await bcrypt.hash(payload.password, 10);
+
+    const staffMember = await StaffModel.create(payload);
+    res.status(201).json(sanitizeStaff(staffMember));
   } catch (error) {
     res
       .status(400)
@@ -47,9 +67,15 @@ router.post("/", async (req, res) => {
 // UPDATE STAFF MEMBER BY staffId
 router.put("/:staffId", async (req, res) => {
   try {
+    const payload = { ...req.body };
+
+    if (payload.password) {
+      payload.password = await bcrypt.hash(payload.password, 10);
+    }
+
     const staffMember = await StaffModel.findOneAndUpdate(
       { staff_id: req.params.staffId },
-      req.body,
+      payload,
       { new: true, runValidators: true }
     );
 
@@ -57,7 +83,7 @@ router.put("/:staffId", async (req, res) => {
       return res.status(404).json({ message: "Staff member not found" });
     }
 
-    res.json(staffMember);
+    res.json(sanitizeStaff(staffMember));
   } catch (error) {
     res
       .status(400)
