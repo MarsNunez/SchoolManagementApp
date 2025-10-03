@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+
 import { postRoutes } from "./routes/postRoutes.js";
 import { staffRoutes } from "./routes/staffRoutes.js";
 import { syllabusRoutes } from "./routes/syllabusRoutes.js";
