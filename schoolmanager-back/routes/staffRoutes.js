@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { StaffModel } from "../models/Staff.js";
 import { requireStaffAuth } from "../middlewares/staffAuthMiddleware.js";
+import { requireRole } from "../middlewares/roleMiddleware.js";
 
 const router = express.Router();
 
@@ -136,7 +137,7 @@ router.post("/login", async (req, res) => {
 router.use(requireStaffAuth);
 
 // GET ALL STAFF
-router.get("/", async (req, res) => {
+router.get("/", requireRole("admin"), async (req, res) => {
   try {
     const staff = await StaffModel.find();
     const sanitized = staff.map((member) => sanitizeStaff(member));
@@ -149,7 +150,7 @@ router.get("/", async (req, res) => {
 });
 
 // GET STAFF MEMBER BY staffId
-router.get("/:staffId", async (req, res) => {
+router.get("/:staffId", requireRole("admin"), async (req, res) => {
   try {
     const staffMember = await StaffModel.findOne({
       staff_id: req.params.staffId,
@@ -166,7 +167,7 @@ router.get("/:staffId", async (req, res) => {
 });
 
 // UPDATE STAFF MEMBER BY staffId
-router.put("/:staffId", async (req, res) => {
+router.put("/:staffId", requireRole("admin"), async (req, res) => {
   try {
     const payload = { ...req.body };
 
@@ -193,7 +194,7 @@ router.put("/:staffId", async (req, res) => {
 });
 
 // DELETE STAFF MEMBER BY staffId
-router.delete("/:staffId", async (req, res) => {
+router.delete("/:staffId", requireRole("admin"), async (req, res) => {
   try {
     const staffMember = await StaffModel.findOneAndDelete({
       staff_id: req.params.staffId,
