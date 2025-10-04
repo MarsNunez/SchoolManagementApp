@@ -7,9 +7,6 @@ import { requireRole } from "../middlewares/roleMiddleware.js";
 
 const router = express.Router();
 
-// NOTAS:
-// ROLES: Admin -> Secceratria -> Porfesor / Esdudiante / Padre
-
 const sanitizeStaff = (staffDoc) => {
   if (!staffDoc) return staffDoc;
   const staffObject = staffDoc.toObject ? staffDoc.toObject() : staffDoc;
@@ -36,8 +33,51 @@ const createAuthResponse = (staff) => ({
   staff: sanitizeStaff(staff),
 });
 
+// LOGIN STAFF MEMBER
+router.post("/login", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({
+        code: "LOGIN_VALIDATION_ERROR",
+        message: "email and password are required",
+      });
+    }
+
+    const staff = await StaffModel.findOne({ email });
+
+    if (!staff) {
+      return res.status(401).json({
+        code: "LOGIN_INVALID_CREDENTIALS",
+        message: "Invalid email or password",
+      });
+    }
+
+    const isMatch = await bcrypt.compare(password, staff.password);
+
+    if (!isMatch) {
+      return res.status(401).json({
+        code: "LOGIN_INVALID_CREDENTIALS",
+        message: "Invalid email or password",
+      });
+    }
+
+    return res.status(200).json(createAuthResponse(staff));
+  } catch (error) {
+    const status = error.message === "JWT_SECRET is not configured" ? 500 : 400;
+    return res.status(status).json({
+      code: "LOGIN_FAILED",
+      message: "Error logging in",
+      details: error.message,
+    });
+  }
+});
+
+router.use(requireStaffAuth);
+
 // REGISTER STAFF MEMBER
-router.post("/register", async (req, res) => {
+router.post("/register", requireRole("admin"), async (req, res) => {
   try {
     const { staff_id, name, lastname, dni, email, password, role, state } =
       req.body;
@@ -92,49 +132,6 @@ router.post("/register", async (req, res) => {
     });
   }
 });
-
-// LOGIN STAFF MEMBER
-router.post("/login", async (req, res) => {
-  try {
-    const { email, password } = req.body;
-
-    if (!email || !password) {
-      return res.status(400).json({
-        code: "LOGIN_VALIDATION_ERROR",
-        message: "email and password are required",
-      });
-    }
-
-    const staff = await StaffModel.findOne({ email });
-
-    if (!staff) {
-      return res.status(401).json({
-        code: "LOGIN_INVALID_CREDENTIALS",
-        message: "Invalid email or password",
-      });
-    }
-
-    const isMatch = await bcrypt.compare(password, staff.password);
-
-    if (!isMatch) {
-      return res.status(401).json({
-        code: "LOGIN_INVALID_CREDENTIALS",
-        message: "Invalid email or password",
-      });
-    }
-
-    return res.status(200).json(createAuthResponse(staff));
-  } catch (error) {
-    const status = error.message === "JWT_SECRET is not configured" ? 500 : 400;
-    return res.status(status).json({
-      code: "LOGIN_FAILED",
-      message: "Error logging in",
-      details: error.message,
-    });
-  }
-});
-
-router.use(requireStaffAuth);
 
 // GET ALL STAFF
 router.get("/", requireRole("admin"), async (req, res) => {

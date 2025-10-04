@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 
+import { courseRoutes } from "./routes/courseRoutes.js";
 import { postRoutes } from "./routes/postRoutes.js";
 import { staffRoutes } from "./routes/staffRoutes.js";
 import { syllabusRoutes } from "./routes/syllabusRoutes.js";
@@ -16,6 +17,7 @@ const app = express();
 
 app.use(cors());
 app.use(express.json());
+app.use("/courses", courseRoutes);
 app.use("/posts", postRoutes);
 app.use("/staff", staffRoutes);
 app.use("/syllabuses", syllabusRoutes);
