@@ -29,7 +29,7 @@ router.get(
         course_id: req.params.courseId,
       });
       if (!course) {
-        return res.status(404).json({ message: "Course not found" });
+        return res.status(404).json({ message: "Course not found." });
       }
       res.json(course);
     } catch (error) {
