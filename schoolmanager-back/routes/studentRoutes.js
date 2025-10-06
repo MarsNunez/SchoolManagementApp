@@ -1,10 +1,13 @@
 import express from "express";
 import { StudentModel } from "../models/Student.js";
+import { requireRole } from "../middlewares/roleMiddleware.js";
+import { requireStaffAuth } from "../middlewares/staffAuthMiddleware.js";
 
 const router = express.Router();
+router.use(requireStaffAuth);
 
 // GET ALL STUDENTS
-router.get("/", async (req, res) => {
+router.get("/", requireRole("admin", "secretary"), async (req, res) => {
   try {
     const students = await StudentModel.find();
     res.json(students);
@@ -16,24 +19,28 @@ router.get("/", async (req, res) => {
 });
 
 // GET A STUDENT BY studentId
-router.get("/:studentId", async (req, res) => {
-  try {
-    const student = await StudentModel.findOne({
-      student_id: req.params.studentId,
-    });
-    if (!student) {
-      return res.status(404).json({ message: "Student not found" });
+router.get(
+  "/:studentId",
+  requireRole("admin", "secretary"),
+  async (req, res) => {
+    try {
+      const student = await StudentModel.findOne({
+        student_id: req.params.studentId,
+      });
+      if (!student) {
+        return res.status(404).json({ message: "Student not found" });
+      }
+      res.json(student);
+    } catch (error) {
+      res
+        .status(500)
+        .json({ message: "Error fetching student", error: error.message });
     }
-    res.json(student);
-  } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Error fetching student", error: error.message });
   }
-});
+);
 
 // POST A NEW STUDENT
-router.post("/", async (req, res) => {
+router.post("/", requireRole("admin", "secretary"), async (req, res) => {
   try {
     const student = await StudentModel.create(req.body);
     res.status(201).json(student);
@@ -45,43 +52,51 @@ router.post("/", async (req, res) => {
 });
 
 // UPDATE A STUDENT BY studentId
-router.put("/:studentId", async (req, res) => {
-  try {
-    const student = await StudentModel.findOneAndUpdate(
-      { student_id: req.params.studentId },
-      req.body,
-      { new: true, runValidators: true }
-    );
+router.put(
+  "/:studentId",
+  requireRole("admin", "secretary"),
+  async (req, res) => {
+    try {
+      const student = await StudentModel.findOneAndUpdate(
+        { student_id: req.params.studentId },
+        req.body,
+        { new: true, runValidators: true }
+      );
 
-    if (!student) {
-      return res.status(404).json({ message: "Student not found" });
+      if (!student) {
+        return res.status(404).json({ message: "Student not found" });
+      }
+
+      res.json(student);
+    } catch (error) {
+      res
+        .status(400)
+        .json({ message: "Error updating student", error: error.message });
     }
-
-    res.json(student);
-  } catch (error) {
-    res
-      .status(400)
-      .json({ message: "Error updating student", error: error.message });
   }
-});
+);
 
 // DELETE A STUDENT BY studentId
-router.delete("/:studentId", async (req, res) => {
-  try {
-    const student = await StudentModel.findOneAndDelete({
-      student_id: req.params.studentId,
-    });
-    if (!student) {
-      return res.status(404).json({ message: "Student not found" });
-    }
+router.delete(
+  "/:studentId",
+  requireRole("admin", "secretary"),
+  async (req, res) => {
+    try {
+      const student = await StudentModel.findOneAndDelete({
+        student_id: req.params.studentId,
+      });
+      if (!student) {
+        return res.status(404).json({ message: "Student not found" });
+      }
 
-    res.json({ message: "Student deleted successfully" });
-  } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Error deleting student", error: error.message });
+      res.json({ message: "Student deleted successfully" });
+    } catch (error) {
+      res
+        .status(500)
+        .json({ message: "Error deleting student", error: error.message });
+    }
   }
-});
+);
 
 const studentRoutes = router;
 

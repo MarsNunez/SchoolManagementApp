@@ -1,10 +1,12 @@
 import express from "express";
 import { ParentModel } from "../models/Parent.js";
+import { requireStaffAuth } from "../middlewares/staffAuthMiddleware.js";
 
 const router = express.Router();
+router.use(requireStaffAuth);
 
 // GET ALL PARENTS
-router.get("/", async (req, res) => {
+router.get("/", requireRole("admin", "secretary"), async (req, res) => {
   try {
     const parents = await ParentModel.find();
     res.json(parents);
@@ -16,24 +18,28 @@ router.get("/", async (req, res) => {
 });
 
 // GET A PARENT BY parentId
-router.get("/:parentId", async (req, res) => {
-  try {
-    const parent = await ParentModel.findOne({
-      parent_id: req.params.parentId,
-    });
-    if (!parent) {
-      return res.status(404).json({ message: "Parent not found" });
+router.get(
+  "/:parentId",
+  requireRole("admin", "secretary"),
+  async (req, res) => {
+    try {
+      const parent = await ParentModel.findOne({
+        parent_id: req.params.parentId,
+      });
+      if (!parent) {
+        return res.status(404).json({ message: "Parent not found" });
+      }
+      res.json(parent);
+    } catch (error) {
+      res
+        .status(500)
+        .json({ message: "Error fetching parent", error: error.message });
     }
-    res.json(parent);
-  } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Error fetching parent", error: error.message });
   }
-});
+);
 
 // POST A NEW PARENT
-router.post("/", async (req, res) => {
+router.post("/", requireRole("admin", "secretary"), async (req, res) => {
   try {
     const parent = await ParentModel.create(req.body);
     res.status(201).json(parent);
@@ -45,43 +51,51 @@ router.post("/", async (req, res) => {
 });
 
 // UPDATE A PARENT BY parentId
-router.put("/:parentId", async (req, res) => {
-  try {
-    const parent = await ParentModel.findOneAndUpdate(
-      { parent_id: req.params.parentId },
-      req.body,
-      { new: true, runValidators: true }
-    );
+router.put(
+  "/:parentId",
+  requireRole("admin", "secretary"),
+  async (req, res) => {
+    try {
+      const parent = await ParentModel.findOneAndUpdate(
+        { parent_id: req.params.parentId },
+        req.body,
+        { new: true, runValidators: true }
+      );
 
-    if (!parent) {
-      return res.status(404).json({ message: "Parent not found" });
+      if (!parent) {
+        return res.status(404).json({ message: "Parent not found" });
+      }
+
+      res.json(parent);
+    } catch (error) {
+      res
+        .status(400)
+        .json({ message: "Error updating parent", error: error.message });
     }
-
-    res.json(parent);
-  } catch (error) {
-    res
-      .status(400)
-      .json({ message: "Error updating parent", error: error.message });
   }
-});
+);
 
 // DELETE A PARENT BY parentId
-router.delete("/:parentId", async (req, res) => {
-  try {
-    const parent = await ParentModel.findOneAndDelete({
-      parent_id: req.params.parentId,
-    });
-    if (!parent) {
-      return res.status(404).json({ message: "Parent not found" });
-    }
+router.delete(
+  "/:parentId",
+  requireRole("admin", "secretary"),
+  async (req, res) => {
+    try {
+      const parent = await ParentModel.findOneAndDelete({
+        parent_id: req.params.parentId,
+      });
+      if (!parent) {
+        return res.status(404).json({ message: "Parent not found" });
+      }
 
-    res.json({ message: "Parent deleted successfully" });
-  } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Error deleting parent", error: error.message });
+      res.json({ message: "Parent deleted successfully" });
+    } catch (error) {
+      res
+        .status(500)
+        .json({ message: "Error deleting parent", error: error.message });
+    }
   }
-});
+);
 
 const parentRoutes = router;
 
