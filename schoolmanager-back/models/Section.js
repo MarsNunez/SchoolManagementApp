@@ -45,4 +45,4 @@ const SectionSchema = new Schema(
   }
 );
 
-export const SectionModel = mongoose.model("sections", SectionSchema);
+export const SectionModel = mongoose.model("Section", SectionSchema);

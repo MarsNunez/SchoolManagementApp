@@ -37,6 +37,10 @@ const StaffSchema = new Schema(
       type: String,
       required: true,
     },
+    creator_id: {
+      type: String,
+      ref: "Staff",
+    },
     role: {
       type: String,
       required: true,
@@ -53,4 +57,4 @@ const StaffSchema = new Schema(
   }
 );
 
-export const StaffModel = mongoose.model("staff", StaffSchema);
+export const StaffModel = mongoose.model("Staff", StaffSchema);

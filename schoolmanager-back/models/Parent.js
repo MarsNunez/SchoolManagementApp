@@ -48,4 +48,4 @@ const ParentSchema = new Schema(
   }
 );
 
-export const ParentModel = mongoose.model("parents", ParentSchema);
+export const ParentModel = mongoose.model("Parent", ParentSchema);

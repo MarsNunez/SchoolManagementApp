@@ -31,4 +31,4 @@ const SyllabusSchema = new Schema(
   }
 );
 
-export const SyllabusModel = mongoose.model("syllabuses", SyllabusSchema);
+export const SyllabusModel = mongoose.model("Syllabus", SyllabusSchema);

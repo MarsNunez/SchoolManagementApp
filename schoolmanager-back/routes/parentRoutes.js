@@ -1,6 +1,7 @@
 import express from "express";
 import { ParentModel } from "../models/Parent.js";
 import { requireStaffAuth } from "../middlewares/staffAuthMiddleware.js";
+import { requireRole } from "../middlewares/roleMiddleware.js";
 
 const router = express.Router();
 router.use(requireStaffAuth);

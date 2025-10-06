@@ -22,7 +22,7 @@ const PostSchema = new Schema(
     creator_id: {
       type: String,
       required: true,
-      trim: true,
+      ref: "Teacher",
     },
   },
   {
@@ -30,4 +30,4 @@ const PostSchema = new Schema(
   }
 );
 
-export const PostModel = mongoose.model("posts", PostSchema);
+export const PostModel = mongoose.model("Post", PostSchema);

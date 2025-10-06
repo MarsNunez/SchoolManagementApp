@@ -21,7 +21,7 @@ const CourseSchema = new Schema(
     },
     teacher_id: {
       type: String,
-      trim: true,
+      ref: "Teacher",
     },
     duration: {
       type: Number,
@@ -34,4 +34,4 @@ const CourseSchema = new Schema(
   }
 );
 
-export const CourseModel = mongoose.model("courses", CourseSchema);
+export const CourseModel = mongoose.model("Course", CourseSchema);
