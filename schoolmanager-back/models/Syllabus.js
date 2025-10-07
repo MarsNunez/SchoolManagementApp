@@ -20,11 +20,13 @@ const SyllabusSchema = new Schema(
       required: true,
       min: 0,
     },
-    courses: {
-      type: [String],
-      default: [],
-      trim: true,
-    },
+    courses: [
+      {
+        type: String,
+        ref: "Course",
+        default: [],
+      },
+    ],
   },
   {
     timestamps: true,

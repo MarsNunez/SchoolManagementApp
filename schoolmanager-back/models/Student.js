@@ -10,10 +10,13 @@ const StudentSchema = new Schema(
       unique: true,
       trim: true,
     },
-    parents_id: {
-      type: [String],
-      default: [],
-    },
+    parents_id: [
+      {
+        type: String,
+        ref: "Parent",
+        default: [],
+      },
+    ],
     name: {
       type: String,
       required: true,
@@ -48,10 +51,13 @@ const StudentSchema = new Schema(
       type: String,
       trim: true,
     },
-    current_courses: {
-      type: [String],
-      default: [],
-    },
+    current_courses: [
+      {
+        type: String,
+        ref: "Course",
+        default: [],
+      },
+    ],
   },
   {
     timestamps: true,

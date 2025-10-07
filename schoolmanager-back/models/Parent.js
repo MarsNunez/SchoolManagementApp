@@ -42,6 +42,12 @@ const ParentSchema = new Schema(
       type: String,
       trim: true,
     },
+    registered_children: [
+      {
+        type: String,
+        ref: "Student",
+      },
+    ],
   },
   {
     timestamps: true,

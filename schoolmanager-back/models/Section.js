@@ -17,11 +17,12 @@ const SectionSchema = new Schema(
     },
     syllabus_id: {
       type: String,
+      ref: "Syllabus",
       required: true,
-      trim: true,
     },
     teacher_id: {
       type: String,
+      ref: "Teacher",
       required: true,
       trim: true,
     },
@@ -36,8 +37,8 @@ const SectionSchema = new Schema(
       min: 0,
     },
     current_capacity: {
-      type: [String],
-      default: [],
+      type: Number,
+      default: 0,
     },
   },
   {

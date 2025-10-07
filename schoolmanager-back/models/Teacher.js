@@ -52,6 +52,7 @@ const TeacherSchema = new Schema(
       {
         type: String,
         ref: "Course",
+        default: [],
       },
     ],
   },
