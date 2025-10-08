@@ -17,7 +17,7 @@ export const requireStaffAuth = async (req, res, next) => {
     if (!staff) {
       return res
         .status(401)
-        .json({ code: "AUTH_INVALID", message: "Staff not found" });
+        .json({ code: "AUTH_INVALID", message: "Staff not found." });
     }
 
     req.staff = {
