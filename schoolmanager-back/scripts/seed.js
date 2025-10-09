@@ -107,6 +107,7 @@ const seed = async () => {
         phone: "+51987654321",
         current_teaching_courses: ["course-math-01", "course-physics-01"],
       },
+
       {
         teacher_id: "teacher-002",
         name: "Carolina",
@@ -150,7 +151,8 @@ const seed = async () => {
       {
         course_id: "course-history-01",
         title: "Historia del Peru",
-        description: "Repaso cronologico desde las culturas preincas hasta la republica.",
+        description:
+          "Repaso cronologico desde las culturas preincas hasta la republica.",
         teacher_id: "teacher-002",
         duration: 56,
       },
@@ -422,7 +424,8 @@ const seed = async () => {
     const postSeed = [
       {
         title: "Inicio de ano escolar",
-        content: "Bienvenidos al ano academico 2025. Revisen los horarios adjuntos.",
+        content:
+          "Bienvenidos al ano academico 2025. Revisen los horarios adjuntos.",
         links: [
           "https://colegio.edu/horarios-2025.pdf",
           "https://colegio.edu/reglamento.pdf",
@@ -431,13 +434,15 @@ const seed = async () => {
       },
       {
         title: "Reunion de padres",
-        content: "Se convoca a reunion informativa el proximo viernes a las 7 pm.",
+        content:
+          "Se convoca a reunion informativa el proximo viernes a las 7 pm.",
         links: ["https://colegio.edu/agenda-reunion"],
         creator_id: "teacher-002",
       },
       {
         title: "Proyecto de laboratorio",
-        content: "Los alumnos de ciencias presentaran sus proyectos finales la proxima semana.",
+        content:
+          "Los alumnos de ciencias presentaran sus proyectos finales la proxima semana.",
         links: ["https://colegio.edu/proyectos-ciencias"],
         creator_id: "teacher-003",
       },
