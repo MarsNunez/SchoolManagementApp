@@ -25,7 +25,6 @@ const ParentSchema = new Schema(
       required: true,
       unique: true,
       trim: true,
-      max: 8,
     },
     email: {
       type: String,
