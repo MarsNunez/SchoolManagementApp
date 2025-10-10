@@ -24,3 +24,15 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+@utility input {
+  @apply rounded-lg border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 px-3 py-2 outline-none focus:ring-2 focus:ring-indigo-500;
+}
+
+@utility btn-primary {
+  @apply rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 text-sm font-medium transition-colors disabled:opacity-60 disabled:cursor-not-allowed;
+}
+
+@utility btn-danger {
+  @apply rounded-lg bg-red-600 hover:bg-red-700 text-white px-3 py-2 text-sm font-medium transition-colors;
+}

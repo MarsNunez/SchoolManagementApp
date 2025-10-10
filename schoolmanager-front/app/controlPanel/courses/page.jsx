@@ -1,0 +1,126 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { fetchJSON } from "@/lib/api";
+
+export default function CoursesPage() {
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  const [form, setForm] = useState({
+    course_id: "",
+    title: "",
+    description: "",
+    teacher_id: "",
+    duration: "",
+  });
+  const [submitting, setSubmitting] = useState(false);
+  const [editingId, setEditingId] = useState("");
+
+  const load = async () => {
+    try {
+      setLoading(true);
+      const data = await fetchJSON("/courses");
+      setItems(data);
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => { load(); }, []);
+
+  const resetForm = () => { setEditingId(""); setForm({ course_id:"", title:"", description:"", teacher_id:"", duration:"" }); };
+
+  const submitItem = async (e) => {
+    e.preventDefault();
+    setSubmitting(true);
+    setError("");
+    try {
+      const payload = { ...form, duration: Number(form.duration) };
+      if (editingId) {
+        await fetchJSON(`/courses/${editingId}`, { method: "PUT", body: JSON.stringify(payload) });
+      } else {
+        await fetchJSON("/courses", { method: "POST", body: JSON.stringify(payload) });
+      }
+      resetForm();
+      await load();
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const remove = async (course_id) => {
+    if (!confirm(`Delete ${course_id}?`)) return;
+    try {
+      await fetchJSON(`/courses/${course_id}`, { method: "DELETE" });
+      await load();
+    } catch (e) {
+      alert(e.message);
+    }
+  };
+
+  return (
+    <main className="min-h-dvh p-6">
+      <div className="mx-auto max-w-6xl space-y-6">
+        <header>
+          <h1 className="text-2xl font-semibold">Courses</h1>
+          <p className="text-sm text-neutral-500">List, create and manage courses</p>
+        </header>
+
+        <section className="rounded-2xl border border-neutral-200/60 dark:border-neutral-800 bg-white/70 dark:bg-neutral-900/60 shadow-sm">
+          <form onSubmit={submitItem} className="p-4 grid gap-3 sm:grid-cols-3">
+            <input className="input" placeholder="course_id" value={form.course_id} onChange={(e)=>setForm({...form, course_id:e.target.value})} />
+            <input className="input" placeholder="title" value={form.title} onChange={(e)=>setForm({...form, title:e.target.value})} />
+            <input className="input" placeholder="teacher_id" value={form.teacher_id} onChange={(e)=>setForm({...form, teacher_id:e.target.value})} />
+            <input className="input sm:col-span-2" placeholder="description" value={form.description} onChange={(e)=>setForm({...form, description:e.target.value})} />
+            <input className="input" placeholder="duration (hours)" type="number" value={form.duration} onChange={(e)=>setForm({...form, duration:e.target.value})} />
+            {error && <div className="sm:col-span-3 text-sm text-red-600">{error}</div>}
+            <div className="flex gap-2">
+              <button disabled={submitting} className="btn-primary">{submitting ? (editingId?"Saving...":"Creating...") : (editingId?"Save":"Create")}</button>
+              {editingId && (
+                <button type="button" onClick={resetForm} className="rounded-lg px-3 py-2 text-sm border border-neutral-300 dark:border-neutral-700">Cancel</button>
+              )}
+            </div>
+          </form>
+        </section>
+
+        <section className="rounded-2xl border border-neutral-200/60 dark:border-neutral-800 bg-white/70 dark:bg-neutral-900/60 shadow-sm overflow-x-auto">
+          {loading ? (
+            <div className="p-6 text-sm text-neutral-500">Loading...</div>
+          ) : (
+            <table className="w-full text-sm">
+              <thead className="text-left border-b border-neutral-200/60 dark:border-neutral-800">
+                <tr>
+                  <th className="p-3">ID</th>
+                  <th className="p-3">Title</th>
+                  <th className="p-3">Teacher</th>
+                  <th className="p-3">Duration</th>
+                  <th className="p-3">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {items.map((c) => (
+                  <tr key={c.course_id} className="border-b last:border-none border-neutral-100 dark:border-neutral-800">
+                    <td className="p-3 whitespace-nowrap">{c.course_id}</td>
+                    <td className="p-3 whitespace-nowrap">{c.title}</td>
+                    <td className="p-3 whitespace-nowrap">{c.teacher_id}</td>
+                    <td className="p-3 whitespace-nowrap">{c.duration}</td>
+                    <td className="p-3 flex gap-2">
+                      <button onClick={() => { setEditingId(c.course_id); setForm({ course_id:c.course_id, title:c.title||"", description:c.description||"", teacher_id:c.teacher_id||"", duration:String(c.duration||"") }); }} className="rounded-lg px-3 py-2 text-sm border border-neutral-300 dark:border-neutral-700">Edit</button>
+                      <button onClick={() => remove(c.course_id)} className="btn-danger">Delete</button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </section>
+      </div>
+    </main>
+  );
+}
