@@ -37,7 +37,7 @@ const seed = async () => {
       {
         staff_id: "staff-001",
         name: "Lucia",
-        lastname: "Ramirez",
+        lastname: "Ramirezz",
         dni: 70234561,
         email: "lucia.ramirez@colegio.edu",
         password: "StaffAdmin#1",
