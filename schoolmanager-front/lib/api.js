@@ -1,4 +1,5 @@
-export const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+export const API_URL =
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
 export const getToken = () => {
   if (typeof window === "undefined") return null;
@@ -25,4 +26,3 @@ export async function fetchJSON(path, options = {}) {
   }
   return data;
 }
-

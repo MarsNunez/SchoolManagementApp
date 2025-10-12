@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { fetchJSON } from "@/lib/api";
+import { fetchJSON, authHeaders } from "@/lib/api";
 
 export default function CoursesPage() {
   const [items, setItems] = useState([]);
@@ -21,7 +21,7 @@ export default function CoursesPage() {
   const load = async () => {
     try {
       setLoading(true);
-      const data = await fetchJSON("/courses");
+      const data = await fetchJSON("/courses", { headers: { ...authHeaders() } });
       setItems(data);
     } catch (e) {
       setError(e.message);
@@ -41,9 +41,9 @@ export default function CoursesPage() {
     try {
       const payload = { ...form, duration: Number(form.duration) };
       if (editingId) {
-        await fetchJSON(`/courses/${editingId}`, { method: "PUT", body: JSON.stringify(payload) });
+        await fetchJSON(`/courses/${editingId}`, { method: "PUT", headers: { ...authHeaders() }, body: JSON.stringify(payload) });
       } else {
-        await fetchJSON("/courses", { method: "POST", body: JSON.stringify(payload) });
+        await fetchJSON("/courses", { method: "POST", headers: { ...authHeaders() }, body: JSON.stringify(payload) });
       }
       resetForm();
       await load();
@@ -57,7 +57,7 @@ export default function CoursesPage() {
   const remove = async (course_id) => {
     if (!confirm(`Delete ${course_id}?`)) return;
     try {
-      await fetchJSON(`/courses/${course_id}`, { method: "DELETE" });
+      await fetchJSON(`/courses/${course_id}`, { method: "DELETE", headers: { ...authHeaders() } });
       await load();
     } catch (e) {
       alert(e.message);
