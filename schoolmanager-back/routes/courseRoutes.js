@@ -43,12 +43,25 @@ router.get(
 // CREATE COURSE
 router.post("/", requireRole("admin", "secretary"), async (req, res) => {
   try {
-    const course = await CourseModel.create(req.body);
+    const generateUniqueCourseId = async () => {
+      for (let i = 0; i < 10; i++) {
+        const num = Math.floor(Math.random() * 1_000_000)
+          .toString()
+          .padStart(6, "0");
+        const candidate = `CUR-${num}`;
+        const exists = await CourseModel.exists({ course_id: candidate });
+        if (!exists) return candidate;
+      }
+      throw new Error("Could not generate unique course_id");
+    };
+
+    const course_id = await generateUniqueCourseId();
+    const body = { ...req.body, course_id };
+    const course = await CourseModel.create(body);
     res.status(201).json(course);
   } catch (error) {
-    res
-      .status(400)
-      .json({ message: "Error creating course", error: error.message });
+    const status = error.message?.includes("course_id") ? 409 : 400;
+    res.status(status).json({ message: "Error creating course", error: error.message });
   }
 });
 

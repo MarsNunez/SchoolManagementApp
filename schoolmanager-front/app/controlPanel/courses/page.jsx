@@ -9,7 +9,6 @@ export default function CoursesPage() {
   const [error, setError] = useState("");
 
   const [form, setForm] = useState({
-    course_id: "",
     title: "",
     description: "",
     teacher_id: "",
@@ -32,14 +31,20 @@ export default function CoursesPage() {
 
   useEffect(() => { load(); }, []);
 
-  const resetForm = () => { setEditingId(""); setForm({ course_id:"", title:"", description:"", teacher_id:"", duration:"" }); };
+  const resetForm = () => { setEditingId(""); setForm({ title:"", description:"", teacher_id:"", duration:"" }); };
 
   const submitItem = async (e) => {
     e.preventDefault();
     setSubmitting(true);
     setError("");
     try {
-      const payload = { ...form, duration: Number(form.duration) };
+      if (!form.title || form.title.trim() === "") throw new Error("Title is required");
+      const parsedDuration = Number(form.duration);
+      if (!Number.isFinite(parsedDuration) || parsedDuration < 0) {
+        throw new Error("Duration must be a non-negative number");
+      }
+      const { title, description, teacher_id } = form;
+      const payload = { title, description, teacher_id, duration: parsedDuration };
       if (editingId) {
         await fetchJSON(`/courses/${editingId}`, { method: "PUT", headers: { ...authHeaders() }, body: JSON.stringify(payload) });
       } else {
@@ -74,7 +79,6 @@ export default function CoursesPage() {
 
         <section className="rounded-2xl border border-neutral-200/60 dark:border-neutral-800 bg-white/70 dark:bg-neutral-900/60 shadow-sm">
           <form onSubmit={submitItem} className="p-4 grid gap-3 sm:grid-cols-3">
-            <input className="input" placeholder="course_id" value={form.course_id} onChange={(e)=>setForm({...form, course_id:e.target.value})} />
             <input className="input" placeholder="title" value={form.title} onChange={(e)=>setForm({...form, title:e.target.value})} />
             <input className="input" placeholder="teacher_id" value={form.teacher_id} onChange={(e)=>setForm({...form, teacher_id:e.target.value})} />
             <input className="input sm:col-span-2" placeholder="description" value={form.description} onChange={(e)=>setForm({...form, description:e.target.value})} />
@@ -111,7 +115,7 @@ export default function CoursesPage() {
                     <td className="p-3 whitespace-nowrap">{c.teacher_id}</td>
                     <td className="p-3 whitespace-nowrap">{c.duration}</td>
                     <td className="p-3 flex gap-2">
-                      <button onClick={() => { setEditingId(c.course_id); setForm({ course_id:c.course_id, title:c.title||"", description:c.description||"", teacher_id:c.teacher_id||"", duration:String(c.duration||"") }); }} className="rounded-lg px-3 py-2 text-sm border border-neutral-300 dark:border-neutral-700">Edit</button>
+                      <button onClick={() => { setEditingId(c.course_id); setForm({ title:c.title||"", description:c.description||"", teacher_id:c.teacher_id||"", duration:String(c.duration||"") }); }} className="rounded-lg px-3 py-2 text-sm border border-neutral-300 dark:border-neutral-700">Edit</button>
                       <button onClick={() => remove(c.course_id)} className="btn-danger">Delete</button>
                     </td>
                   </tr>

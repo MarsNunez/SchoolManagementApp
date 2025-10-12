@@ -12,9 +12,10 @@ export const authHeaders = () => {
 };
 
 export async function fetchJSON(path, options = {}) {
+  const mergedHeaders = { "Content-Type": "application/json", ...(options.headers || {}) };
   const res = await fetch(`${API_URL}${path}`, {
-    headers: { "Content-Type": "application/json", ...(options.headers || {}) },
     ...options,
+    headers: mergedHeaders,
   });
   const data = await res.json().catch(() => ({}));
   if (!res.ok) {
