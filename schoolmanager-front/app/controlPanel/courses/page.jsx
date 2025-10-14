@@ -7,6 +7,7 @@ export default function CoursesPage() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [teachers, setTeachers] = useState([]);
 
   const [form, setForm] = useState({
     title: "",
@@ -34,6 +35,20 @@ export default function CoursesPage() {
 
   useEffect(() => {
     load();
+  }, []);
+
+  // Load teachers to populate the select options
+  useEffect(() => {
+    (async () => {
+      try {
+        const data = await fetchJSON("/teachers", {
+          headers: { ...authHeaders() },
+        });
+        setTeachers(Array.isArray(data) ? data : []);
+      } catch (e) {
+        console.warn("Failed to load teachers:", e.message);
+      }
+    })();
   }, []);
 
   const resetForm = () => {
@@ -132,12 +147,18 @@ export default function CoursesPage() {
                 <p className="mt-1 text-xs text-red-600">{fieldErrors.title}</p>
               )}
             </div>
-            <input
+            <select
               className="input"
-              placeholder="teacher_id"
               value={form.teacher_id}
               onChange={(e) => setForm({ ...form, teacher_id: e.target.value })}
-            />
+            >
+              <option value="">Select teacher (optional)</option>
+              {teachers.map((t) => (
+                <option key={t.teacher_id} value={t.teacher_id}>
+                  {t.teacher_id}
+                </option>
+              ))}
+            </select>
             <input
               className="input sm:col-span-2"
               placeholder="description"
