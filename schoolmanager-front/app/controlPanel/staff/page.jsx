@@ -9,7 +9,6 @@ export default function StaffPage() {
   const [error, setError] = useState("");
 
   const [form, setForm] = useState({
-    staff_id: "",
     name: "",
     lastname: "",
     dni: "",
@@ -35,7 +34,7 @@ export default function StaffPage() {
 
   useEffect(() => { load(); }, []);
 
-  const resetForm = () => { setEditingId(""); setForm({ staff_id:"", name:"", lastname:"", dni:"", email:"", password:"", role:"secretary", state:true }); };
+  const resetForm = () => { setEditingId(""); setForm({ name:"", lastname:"", dni:"", email:"", password:"", role:"secretary", state:true }); };
 
   const submitItem = async (e) => {
     e.preventDefault();
@@ -79,7 +78,6 @@ export default function StaffPage() {
 
         <section className="rounded-2xl border border-neutral-200/60 dark:border-neutral-800 bg-white/70 dark:bg-neutral-900/60 shadow-sm">
           <form onSubmit={submitItem} className="p-4 grid gap-3 sm:grid-cols-3">
-            <input className="input" placeholder="staff_id" value={form.staff_id} onChange={(e)=>setForm({...form, staff_id:e.target.value})} />
             <input className="input" placeholder="name" value={form.name} onChange={(e)=>setForm({...form, name:e.target.value})} />
             <input className="input" placeholder="lastname" value={form.lastname} onChange={(e)=>setForm({...form, lastname:e.target.value})} />
             <input className="input" placeholder="dni" type="number" value={form.dni} onChange={(e)=>setForm({...form, dni:e.target.value})} />
@@ -128,7 +126,7 @@ export default function StaffPage() {
                     <td className="p-3 whitespace-nowrap">{s.role}</td>
                     <td className="p-3 whitespace-nowrap">{String(s.state)}</td>
                     <td className="p-3 flex gap-2">
-                      <button onClick={() => { setEditingId(s.staff_id); setForm({ staff_id:s.staff_id, name:s.name||"", lastname:s.lastname||"", dni:String(s.dni||""), email:s.email||"", password:"", role:s.role||"secretary", state:!!s.state }); }} className="rounded-lg px-3 py-2 text-sm border border-neutral-300 dark:border-neutral-700">Edit</button>
+                      <button onClick={() => { setEditingId(s.staff_id); setForm({ name:s.name||"", lastname:s.lastname||"", dni:String(s.dni||""), email:s.email||"", password:"", role:s.role||"secretary", state:!!s.state }); }} className="rounded-lg px-3 py-2 text-sm border border-neutral-300 dark:border-neutral-700">Edit</button>
                       <button onClick={() => remove(s.staff_id)} className="btn-danger">Delete</button>
                     </td>
                   </tr>

@@ -79,27 +79,19 @@ router.use(requireStaffAuth);
 // REGISTER STAFF MEMBER
 router.post("/register", requireRole("admin"), async (req, res) => {
   try {
-    const { staff_id, name, lastname, dni, email, password, role, state } =
+    const { name, lastname, dni, email, password, role, state } =
       req.body;
 
-    if (
-      !staff_id ||
-      !name ||
-      !lastname ||
-      !dni ||
-      !email ||
-      !password ||
-      !role
-    ) {
+    if (!name || !lastname || !dni || !email || !password || !role) {
       return res.status(400).json({
         code: "REGISTER_VALIDATION_ERROR",
-        message:
-          "staff_id, name, lastname, dni, email, password and role are required",
+        message: "name, lastname, dni, email, password and role are required",
       });
     }
 
+    // Ensure email or dni are not already taken
     const existingStaff = await StaffModel.findOne({
-      $or: [{ staff_id }, { email }, { dni }],
+      $or: [{ email }, { dni }],
     });
 
     if (existingStaff) {
@@ -110,6 +102,21 @@ router.post("/register", requireRole("admin"), async (req, res) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Generate unique staff_id with format STF-XXXXXX
+    const generateUniqueStaffId = async () => {
+      for (let i = 0; i < 10; i++) {
+        const num = Math.floor(Math.random() * 1_000_000)
+          .toString()
+          .padStart(6, "0");
+        const candidate = `STF-${num}`;
+        const exists = await StaffModel.exists({ staff_id: candidate });
+        if (!exists) return candidate;
+      }
+      throw new Error("Could not generate unique staff_id");
+    };
+
+    const staff_id = await generateUniqueStaffId();
 
     const staff = await StaffModel.create({
       staff_id,
@@ -124,7 +131,11 @@ router.post("/register", requireRole("admin"), async (req, res) => {
 
     return res.status(201).json(createAuthResponse(staff));
   } catch (error) {
-    const status = error.message === "JWT_SECRET is not configured" ? 500 : 400;
+    const status =
+      error.message === "JWT_SECRET is not configured" ||
+      error.message === "Could not generate unique staff_id"
+        ? 500
+        : 400;
     return res.status(status).json({
       code: "REGISTER_FAILED",
       message: "Error creating staff member",
