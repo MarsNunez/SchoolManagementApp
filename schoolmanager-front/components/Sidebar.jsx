@@ -143,11 +143,13 @@ export default function Sidebar() {
       </div>
       <nav className="flex flex-col gap-1">
         <NavItem href="/" icon="fa-solid fa-house" label="Home" />
-        <NavItem
-          href="/controlPanel"
-          icon="fa-solid fa-table-columns"
-          label="Control Panel"
-        />
+        {isAuthed && (
+          <NavItem
+            href="/controlPanel"
+            icon="fa-solid fa-table-columns"
+            label="Control Panel"
+          />
+        )}
       </nav>
 
       {/* Spacer */}
