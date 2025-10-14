@@ -36,3 +36,11 @@ body {
 @utility btn-danger {
   @apply rounded-lg bg-red-600 hover:bg-red-700 text-white px-3 py-2 text-sm font-medium transition-colors;
 }
+
+@utility nav-link {
+  @apply rounded-lg px-3 py-2 text-sm text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors flex items-center gap-2;
+}
+
+@utility nav-link-active {
+  @apply bg-neutral-100 dark:bg-neutral-800 font-medium;
+}
