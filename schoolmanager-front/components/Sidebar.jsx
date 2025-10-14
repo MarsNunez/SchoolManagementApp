@@ -9,12 +9,31 @@ export default function Sidebar() {
   const router = useRouter();
   const [isAuthed, setIsAuthed] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
+  const [roleLabel, setRoleLabel] = useState("");
 
   useEffect(() => {
     if (typeof window !== "undefined") {
       const token = localStorage.getItem("authToken");
       setIsAuthed(!!token);
       setCollapsed(localStorage.getItem("sidebarCollapsed") === "1");
+      try {
+        const raw = localStorage.getItem("staffProfile");
+        if (raw) {
+          const prof = JSON.parse(raw);
+          const role = String(prof?.role || "").toLowerCase();
+          const map = {
+            admin: "Admin",
+            secretary: "Secretary",
+            teacher: "Teacher",
+            student: "Student",
+          };
+          setRoleLabel(map[role] || "");
+        } else {
+          setRoleLabel("");
+        }
+      } catch (_) {
+        setRoleLabel("");
+      }
     }
   }, [pathname]);
 
@@ -88,7 +107,9 @@ export default function Sidebar() {
         {!collapsed && (
           <div className="mr-auto">
             <div className="text-sm font-semibold">SchoolManager</div>
-            <div className="text-xs text-neutral-500">Overview</div>
+            <div className="text-xs text-neutral-600 dark:text-neutral-300 border border-neutral-500 rounded px-2 py-0.5 inline-flex items-center gap-1">
+              {roleLabel || (isAuthed ? "User" : "Guest")}
+            </div>
           </div>
         )}
         {!collapsed && (
