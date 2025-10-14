@@ -9,7 +9,6 @@ export default function TeachersPage() {
   const [error, setError] = useState("");
 
   const [form, setForm] = useState({
-    teacher_id: "",
     name: "",
     lastname: "",
     dni: "",
@@ -42,7 +41,6 @@ export default function TeachersPage() {
   const resetForm = () => {
     setEditingId("");
     setForm({
-      teacher_id: "",
       name: "",
       lastname: "",
       dni: "",
@@ -59,12 +57,16 @@ export default function TeachersPage() {
     setError("");
     try {
       const payload = {
-        ...form,
+        name: form.name,
+        lastname: form.lastname,
         dni: Number(form.dni),
         specialties: form.specialties
           .split(",")
           .map((s) => s.trim())
           .filter(Boolean),
+        email: form.email,
+        phone: form.phone,
+        photo: form.photo,
       };
       if (editingId) {
         await fetchJSON(`/teachers/${editingId}`, {
@@ -113,12 +115,6 @@ export default function TeachersPage() {
 
         <section className="rounded-2xl border border-neutral-200/60 dark:border-neutral-800 bg-white/70 dark:bg-neutral-900/60 shadow-sm">
           <form onSubmit={submitItem} className="p-4 grid gap-3 sm:grid-cols-3">
-            <input
-              className="input"
-              placeholder="teacher_id"
-              value={form.teacher_id}
-              onChange={(e) => setForm({ ...form, teacher_id: e.target.value })}
-            />
             <input
               className="input"
               placeholder="name"
@@ -224,7 +220,6 @@ export default function TeachersPage() {
                         onClick={() => {
                           setEditingId(t.teacher_id);
                           setForm({
-                            teacher_id: t.teacher_id,
                             name: t.name || "",
                             lastname: t.lastname || "",
                             dni: String(t.dni || ""),

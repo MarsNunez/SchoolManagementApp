@@ -39,14 +39,29 @@ router.get(
   }
 );
 
-// POST A NEW TEACHER
+// POST A NEW TEACHER (auto-generate teacher_id: TEA-XXXXXX)
 router.post("/", requireRole("admin", "secretary"), async (req, res) => {
   try {
-    const teacher = await TeacherModel.create(req.body);
+    const generateUniqueTeacherId = async () => {
+      for (let i = 0; i < 10; i++) {
+        const num = Math.floor(Math.random() * 1_000_000)
+          .toString()
+          .padStart(6, "0");
+        const candidate = `TEA-${num}`;
+        const exists = await TeacherModel.exists({ teacher_id: candidate });
+        if (!exists) return candidate;
+      }
+      throw new Error("Could not generate unique teacher_id");
+    };
+
+    const teacher_id = await generateUniqueTeacherId();
+    const body = { ...req.body, teacher_id };
+    const teacher = await TeacherModel.create(body);
     res.status(201).json(teacher);
   } catch (error) {
+    const status = error.message?.includes("teacher_id") ? 409 : 400;
     res
-      .status(400)
+      .status(status)
       .json({ message: "Error creating teacher", error: error.message });
   }
 });
