@@ -19,6 +19,16 @@ export async function fetchJSON(path, options = {}) {
   });
   const data = await res.json().catch(() => ({}));
   if (!res.ok) {
+    if (res.status === 401 && typeof window !== "undefined") {
+      try {
+        localStorage.removeItem("authToken");
+        localStorage.removeItem("staffProfile");
+      } catch {}
+      // Optional immediate redirect for unauthorized
+      if (!options?.suppressRedirect) {
+        try { window.location.assign("/login"); } catch {}
+      }
+    }
     const message = data?.message || data?.error || "Request failed";
     const err = new Error(message);
     err.status = res.status;

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { fetchJSON, authHeaders } from "@/lib/api";
+import Link from "next/link";
 
 export default function StaffPage() {
   const [items, setItems] = useState([]);
@@ -71,6 +72,12 @@ export default function StaffPage() {
   return (
     <main className="min-h-dvh p-6">
       <div className="mx-auto max-w-6xl space-y-6">
+        <div className="mb-2">
+          <Link href="/controlPanel" className="inline-flex items-center gap-2 rounded-lg border border-neutral-300 dark:border-neutral-700 px-3 py-1.5 text-sm hover:bg-neutral-100 dark:hover:bg-neutral-800">
+            <i className="fa-solid fa-arrow-left"></i>
+            Back
+          </Link>
+        </div>
         <header>
           <h1 className="text-2xl font-semibold">Staff</h1>
           <p className="text-sm text-neutral-500">Admins and secretaries management</p>

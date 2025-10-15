@@ -8,12 +8,26 @@ export default function ControlPanelLayout({ children }) {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    const token = typeof window !== "undefined" ? localStorage.getItem("authToken") : null;
+    const token =
+      typeof window !== "undefined" ? localStorage.getItem("authToken") : null;
     if (!token) {
       router.replace("/login");
-    } else {
-      setReady(true);
+      return;
     }
+    // Validate JWT expiry client-side (best effort)
+    try {
+      const [, payloadB64] = token.split(".");
+      const payload = JSON.parse(
+        atob(payloadB64.replace(/-/g, "+").replace(/_/g, "/"))
+      );
+      if (payload?.exp && Date.now() / 1000 > payload.exp) {
+        localStorage.removeItem("authToken");
+        localStorage.removeItem("staffProfile");
+        router.replace("/login");
+        return;
+      }
+    } catch {}
+    setReady(true);
   }, [router]);
 
   if (!ready) {
@@ -26,4 +40,3 @@ export default function ControlPanelLayout({ children }) {
 
   return <>{children}</>;
 }
-
