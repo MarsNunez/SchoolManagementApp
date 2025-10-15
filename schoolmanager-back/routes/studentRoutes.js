@@ -39,14 +39,29 @@ router.get(
   }
 );
 
-// POST A NEW STUDENT
+// POST A NEW STUDENT (auto-generate student_id: EST-XXXXXX)
 router.post("/", requireRole("admin", "secretary"), async (req, res) => {
   try {
-    const student = await StudentModel.create(req.body);
+    const generateUniqueStudentId = async () => {
+      for (let i = 0; i < 10; i++) {
+        const num = Math.floor(Math.random() * 1_000_000)
+          .toString()
+          .padStart(6, "0");
+        const candidate = `EST-${num}`;
+        const exists = await StudentModel.exists({ student_id: candidate });
+        if (!exists) return candidate;
+      }
+      throw new Error("Could not generate unique student_id");
+    };
+
+    const student_id = await generateUniqueStudentId();
+    const body = { ...req.body, student_id };
+    const student = await StudentModel.create(body);
     res.status(201).json(student);
   } catch (error) {
+    const status = error.message?.includes("student_id") ? 409 : 400;
     res
-      .status(400)
+      .status(status)
       .json({ message: "Error creating student", error: error.message });
   }
 });

@@ -6,7 +6,6 @@ import { StaffModel } from "../models/Staff.js";
 import { TeacherModel } from "../models/Teacher.js";
 import { CourseModel } from "../models/Course.js";
 import { SyllabusModel } from "../models/Syllabus.js";
-import { ParentModel } from "../models/Parent.js";
 import { StudentModel } from "../models/Student.js";
 import { SectionModel } from "../models/Section.js";
 import { PostModel } from "../models/Post.js";
@@ -27,7 +26,6 @@ const seed = async () => {
       TeacherModel.deleteMany({}),
       CourseModel.deleteMany({}),
       SyllabusModel.deleteMany({}),
-      ParentModel.deleteMany({}),
       StudentModel.deleteMany({}),
       SectionModel.deleteMany({}),
       PostModel.deleteMany({}),
@@ -240,56 +238,14 @@ const seed = async () => {
     await SyllabusModel.insertMany(syllabusSeed);
     console.log(`Inserted ${syllabusSeed.length} syllabuses`);
 
-    const parentSeed = [
-      {
-        parent_id: "parent-001",
-        name: "Ana",
-        lastname: "Torres",
-        dni: 45678901,
-        email: "ana.torres@familias.edu",
-        phone: 5198765401,
-        address: "Av. Primavera 123",
-        registered_children: ["student-001", "student-002"],
-      },
-      {
-        parent_id: "parent-002",
-        name: "Jorge",
-        lastname: "Campos",
-        dni: 45678902,
-        email: "jorge.campos@familias.edu",
-        phone: 5198765402,
-        address: "Jr. Los Geranios 456",
-        registered_children: ["student-003", "student-004"],
-      },
-      {
-        parent_id: "parent-003",
-        name: "Laura",
-        lastname: "Delgado",
-        dni: 45678903,
-        email: "laura.delgado@familias.edu",
-        phone: 5198765403,
-        address: "Calle Los Cerezos 789",
-        registered_children: ["student-005", "student-006"],
-      },
-      {
-        parent_id: "parent-004",
-        name: "Carlos",
-        lastname: "Ibanez",
-        dni: 45678904,
-        email: "carlos.ibanez@familias.edu",
-        phone: 5198765404,
-        address: "Pasaje Las Flores 321",
-        registered_children: ["student-007", "student-008"],
-      },
-    ];
-
-    await ParentModel.insertMany(parentSeed);
-    console.log(`Inserted ${parentSeed.length} parents`);
+    // Parents collection removed. Guardians are embedded in students.
 
     const studentSeed = [
       {
         student_id: "student-001",
-        parents_id: ["parent-001"],
+        guardians: [
+          { full_name: "Ana Torres", phone: "5198765401", email: "ana.torres@familias.edu" },
+        ],
         name: "Mateo",
         lastname: "Torres",
         dni: 30123451,
@@ -301,7 +257,9 @@ const seed = async () => {
       },
       {
         student_id: "student-002",
-        parents_id: ["parent-001"],
+        guardians: [
+          { full_name: "Ana Torres", phone: "5198765401", email: "ana.torres@familias.edu" },
+        ],
         name: "Valeria",
         lastname: "Torres",
         dni: 30123452,
@@ -313,7 +271,9 @@ const seed = async () => {
       },
       {
         student_id: "student-003",
-        parents_id: ["parent-002"],
+        guardians: [
+          { full_name: "Jorge Campos", phone: "5198765402", email: "jorge.campos@familias.edu" },
+        ],
         name: "Santiago",
         lastname: "Campos",
         dni: 30123453,
@@ -325,7 +285,9 @@ const seed = async () => {
       },
       {
         student_id: "student-004",
-        parents_id: ["parent-002"],
+        guardians: [
+          { full_name: "Jorge Campos", phone: "5198765402", email: "jorge.campos@familias.edu" },
+        ],
         name: "Luciana",
         lastname: "Campos",
         dni: 30123454,
@@ -337,7 +299,9 @@ const seed = async () => {
       },
       {
         student_id: "student-005",
-        parents_id: ["parent-003"],
+        guardians: [
+          { full_name: "Laura Delgado", phone: "5198765403", email: "laura.delgado@familias.edu" },
+        ],
         name: "Gabriel",
         lastname: "Delgado",
         dni: 30123455,
@@ -349,7 +313,9 @@ const seed = async () => {
       },
       {
         student_id: "student-006",
-        parents_id: ["parent-003"],
+        guardians: [
+          { full_name: "Laura Delgado", phone: "5198765403", email: "laura.delgado@familias.edu" },
+        ],
         name: "Isabella",
         lastname: "Delgado",
         dni: 30123456,
@@ -361,7 +327,9 @@ const seed = async () => {
       },
       {
         student_id: "student-007",
-        parents_id: ["parent-004"],
+        guardians: [
+          { full_name: "Carlos Ibanez", phone: "5198765404", email: "carlos.ibanez@familias.edu" },
+        ],
         name: "Andres",
         lastname: "Ibanez",
         dni: 30123457,
@@ -373,7 +341,9 @@ const seed = async () => {
       },
       {
         student_id: "student-008",
-        parents_id: ["parent-004"],
+        guardians: [
+          { full_name: "Carlos Ibanez", phone: "5198765404", email: "carlos.ibanez@familias.edu" },
+        ],
         name: "Renata",
         lastname: "Ibanez",
         dni: 30123458,

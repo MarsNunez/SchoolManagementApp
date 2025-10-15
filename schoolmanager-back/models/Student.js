@@ -10,11 +10,11 @@ const StudentSchema = new Schema(
       unique: true,
       trim: true,
     },
-    parents_id: [
+    guardians: [
       {
-        type: String,
-        ref: "Parent",
-        default: [],
+        full_name: { type: String, required: true, trim: true },
+        phone: { type: String, trim: true },
+        email: { type: String, required: true, lowercase: true, trim: true },
       },
     ],
     name: {
