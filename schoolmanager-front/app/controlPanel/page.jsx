@@ -7,6 +7,7 @@ export default function ControlPanel() {
     { href: "/controlPanel/teachers", title: "Teachers", desc: "Manage teacher records" , color: "bg-indigo-600"},
     { href: "/controlPanel/courses", title: "Courses", desc: "Create and edit courses" , color: "bg-blue-600"},
     { href: "/controlPanel/staff", title: "Staff", desc: "Admins and secretaries" , color: "bg-emerald-600"},
+    { href: "/controlPanel/students", title: "Students", desc: "Manage student records" , color: "bg-rose-600"},
   ];
 
   return (
@@ -35,4 +36,3 @@ export default function ControlPanel() {
     </main>
   );
 }
-
