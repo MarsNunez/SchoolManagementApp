@@ -78,7 +78,7 @@ const seed = async () => {
         lastname: "Lagos",
         dni: 71234565,
         email: "karen.lagos@colegio.edu",
-        password: "Secretaria#1",
+        password: "Secretaria#2",
         role: "secretary",
         state: true,
       },
@@ -244,7 +244,11 @@ const seed = async () => {
       {
         student_id: "student-001",
         guardians: [
-          { full_name: "Ana Torres", phone: "5198765401", email: "ana.torres@familias.edu" },
+          {
+            full_name: "Ana Torres",
+            phone: "5198765401",
+            email: "ana.torres@familias.edu",
+          },
         ],
         name: "Mateo",
         lastname: "Torres",
@@ -258,7 +262,11 @@ const seed = async () => {
       {
         student_id: "student-002",
         guardians: [
-          { full_name: "Ana Torres", phone: "5198765401", email: "ana.torres@familias.edu" },
+          {
+            full_name: "Ana Torres",
+            phone: "5198765401",
+            email: "ana.torres@familias.edu",
+          },
         ],
         name: "Valeria",
         lastname: "Torres",
@@ -272,7 +280,11 @@ const seed = async () => {
       {
         student_id: "student-003",
         guardians: [
-          { full_name: "Jorge Campos", phone: "5198765402", email: "jorge.campos@familias.edu" },
+          {
+            full_name: "Jorge Campos",
+            phone: "5198765402",
+            email: "jorge.campos@familias.edu",
+          },
         ],
         name: "Santiago",
         lastname: "Campos",
@@ -286,7 +298,11 @@ const seed = async () => {
       {
         student_id: "student-004",
         guardians: [
-          { full_name: "Jorge Campos", phone: "5198765402", email: "jorge.campos@familias.edu" },
+          {
+            full_name: "Jorge Campos",
+            phone: "5198765402",
+            email: "jorge.campos@familias.edu",
+          },
         ],
         name: "Luciana",
         lastname: "Campos",
@@ -300,7 +316,11 @@ const seed = async () => {
       {
         student_id: "student-005",
         guardians: [
-          { full_name: "Laura Delgado", phone: "5198765403", email: "laura.delgado@familias.edu" },
+          {
+            full_name: "Laura Delgado",
+            phone: "5198765403",
+            email: "laura.delgado@familias.edu",
+          },
         ],
         name: "Gabriel",
         lastname: "Delgado",
@@ -314,7 +334,11 @@ const seed = async () => {
       {
         student_id: "student-006",
         guardians: [
-          { full_name: "Laura Delgado", phone: "5198765403", email: "laura.delgado@familias.edu" },
+          {
+            full_name: "Laura Delgado",
+            phone: "5198765403",
+            email: "laura.delgado@familias.edu",
+          },
         ],
         name: "Isabella",
         lastname: "Delgado",
@@ -328,7 +352,11 @@ const seed = async () => {
       {
         student_id: "student-007",
         guardians: [
-          { full_name: "Carlos Ibanez", phone: "5198765404", email: "carlos.ibanez@familias.edu" },
+          {
+            full_name: "Carlos Ibanez",
+            phone: "5198765404",
+            email: "carlos.ibanez@familias.edu",
+          },
         ],
         name: "Andres",
         lastname: "Ibanez",
@@ -342,7 +370,11 @@ const seed = async () => {
       {
         student_id: "student-008",
         guardians: [
-          { full_name: "Carlos Ibanez", phone: "5198765404", email: "carlos.ibanez@familias.edu" },
+          {
+            full_name: "Carlos Ibanez",
+            phone: "5198765404",
+            email: "carlos.ibanez@familias.edu",
+          },
         ],
         name: "Renata",
         lastname: "Ibanez",
