@@ -15,9 +15,9 @@ const SectionSchema = new Schema(
       required: true,
       trim: true,
     },
-    syllabus_id: {
+    studyPlan_id: {
       type: String,
-      ref: "Syllabus",
+      ref: "StudyPlan",
       required: true,
     },
     teacher_id: {

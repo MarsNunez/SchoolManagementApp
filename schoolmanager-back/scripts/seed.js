@@ -5,7 +5,7 @@ import bcrypt from "bcryptjs";
 import { StaffModel } from "../models/Staff.js";
 import { TeacherModel } from "../models/Teacher.js";
 import { CourseModel } from "../models/Course.js";
-import { SyllabusModel } from "../models/Syllabus.js";
+import { StudyPlanModel } from "../models/StudyPlan.js";
 import { StudentModel } from "../models/Student.js";
 import { SectionModel } from "../models/Section.js";
 import { PostModel } from "../models/Post.js";
@@ -25,7 +25,7 @@ const seed = async () => {
       StaffModel.deleteMany({}),
       TeacherModel.deleteMany({}),
       CourseModel.deleteMany({}),
-      SyllabusModel.deleteMany({}),
+      StudyPlanModel.deleteMany({}),
       StudentModel.deleteMany({}),
       SectionModel.deleteMany({}),
       PostModel.deleteMany({}),
@@ -208,11 +208,15 @@ const seed = async () => {
     await CourseModel.insertMany(courseSeed);
     console.log(`Inserted ${courseSeed.length} courses`);
 
-    const syllabusSeed = [
+    const studyPlanSeed = [
       {
-        syllabus_id: "syllabus-2025-secundaria",
-        description: "Plan academico para secundaria 2025.",
-        year: 2025,
+        studyPlan_id: "studyplan-2025-secundaria-g5",
+        level: "secundaria",
+        version: 1,
+        effectiveFrom: new Date("2025-03-01"),
+        state: "active",
+        grade: 5,
+        minGrade: 12,
         courses: [
           "course-math-01",
           "course-physics-01",
@@ -222,9 +226,13 @@ const seed = async () => {
         ],
       },
       {
-        syllabus_id: "syllabus-2025-bachillerato",
-        description: "Plan de estudios bachillerato 2025.",
-        year: 2025,
+        studyPlan_id: "studyplan-2025-secundaria-g4",
+        level: "secundaria",
+        version: 1,
+        effectiveFrom: new Date("2025-03-01"),
+        state: "active",
+        grade: 4,
+        minGrade: 12,
         courses: [
           "course-history-01",
           "course-literature-01",
@@ -235,8 +243,8 @@ const seed = async () => {
       },
     ];
 
-    await SyllabusModel.insertMany(syllabusSeed);
-    console.log(`Inserted ${syllabusSeed.length} syllabuses`);
+    await StudyPlanModel.insertMany(studyPlanSeed);
+    console.log(`Inserted ${studyPlanSeed.length} study plans`);
 
     // Parents collection removed. Guardians are embedded in students.
 
@@ -394,7 +402,7 @@ const seed = async () => {
       {
         section_id: "section-2025-a",
         title: "Seccion 5A",
-        syllabus_id: "syllabus-2025-secundaria",
+        studyPlan_id: "studyplan-2025-secundaria-g5",
         teacher_id: "teacher-001",
         year: 2025,
         max_capacity: 30,
@@ -403,7 +411,7 @@ const seed = async () => {
       {
         section_id: "section-2025-b",
         title: "Seccion 5B",
-        syllabus_id: "syllabus-2025-bachillerato",
+        studyPlan_id: "studyplan-2025-secundaria-g5",
         teacher_id: "teacher-002",
         year: 2025,
         max_capacity: 30,
@@ -412,7 +420,7 @@ const seed = async () => {
       {
         section_id: "section-2025-c",
         title: "Seccion 4A",
-        syllabus_id: "syllabus-2025-secundaria",
+        studyPlan_id: "studyplan-2025-secundaria-g4",
         teacher_id: "teacher-003",
         year: 2025,
         max_capacity: 28,
