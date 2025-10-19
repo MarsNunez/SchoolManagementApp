@@ -1,10 +1,13 @@
 import express from "express";
 import { StudyPlanModel } from "../models/StudyPlan.js";
+import { requireStaffAuth } from "../middlewares/staffAuthMiddleware.js";
+import { requireRole } from "../middlewares/roleMiddleware.js";
 
 const router = express.Router();
+router.use(requireStaffAuth);
 
 // GET ALL STUDY PLANS
-router.get("/", async (req, res) => {
+router.get("/", requireRole("admin"), async (req, res) => {
   try {
     const studyPlans = await StudyPlanModel.find();
     res.json(studyPlans);
@@ -16,7 +19,7 @@ router.get("/", async (req, res) => {
 });
 
 // GET A STUDY PLAN BY studyPlanId
-router.get("/:studyPlanId", async (req, res) => {
+router.get("/:studyPlanId", requireRole("admin"), async (req, res) => {
   try {
     const studyPlan = await StudyPlanModel.findOne({
       studyPlan_id: req.params.studyPlanId,
@@ -33,7 +36,7 @@ router.get("/:studyPlanId", async (req, res) => {
 });
 
 // CREATE A STUDY PLAN
-router.post("/", async (req, res) => {
+router.post("/", requireRole("admin"), async (req, res) => {
   try {
     const body = { ...req.body, version: 1 };
     const studyPlan = await StudyPlanModel.create(body);
@@ -46,7 +49,7 @@ router.post("/", async (req, res) => {
 });
 
 // UPDATE A STUDY PLAN BY studyPlanId
-router.put("/:studyPlanId", async (req, res) => {
+router.put("/:studyPlanId", requireRole("admin"), async (req, res) => {
   try {
     const { version, ...data } = req.body;
     const studyPlan = await StudyPlanModel.findOneAndUpdate(
@@ -68,7 +71,7 @@ router.put("/:studyPlanId", async (req, res) => {
 });
 
 // DELETE A STUDY PLAN BY studyPlanId
-router.delete("/:studyPlanId", async (req, res) => {
+router.delete("/:studyPlanId", requireRole("admin"), async (req, res) => {
   try {
     const studyPlan = await StudyPlanModel.findOneAndDelete({
       studyPlan_id: req.params.studyPlanId,
