@@ -51,10 +51,27 @@ router.post("/", requireRole("admin"), async (req, res) => {
 // UPDATE A STUDY PLAN BY studyPlanId
 router.put("/:studyPlanId", requireRole("admin"), async (req, res) => {
   try {
-    const { version, ...data } = req.body;
+    const { version, ...rawData } = req.body;
+    const data = Object.fromEntries(
+      Object.entries(rawData).filter(([, value]) => value !== undefined)
+    );
+    if (Object.keys(data).length === 0) {
+      return res
+        .status(400)
+        .json({ message: "No valid fields provided for update" });
+    }
+
+    const onlyStateUpdate =
+      Object.keys(data).length === 1 && Object.prototype.hasOwnProperty.call(data, "state");
+
+    const updateOps = { $set: data };
+    if (!onlyStateUpdate) {
+      updateOps.$inc = { version: 1 };
+    }
+
     const studyPlan = await StudyPlanModel.findOneAndUpdate(
       { studyPlan_id: req.params.studyPlanId },
-      { $set: data, $inc: { version: 1 } },
+      updateOps,
       { new: true, runValidators: true }
     );
 

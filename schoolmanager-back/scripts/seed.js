@@ -37,8 +37,8 @@ const seed = async () => {
         name: "Lucia",
         lastname: "Ramirezz",
         dni: 70234561,
-        email: "lucia.ramirez@colegio.edu",
-        password: "StaffAdmin#1",
+        email: "1@1.com",
+        password: "1",
         role: "admin",
         state: true,
       },
@@ -402,7 +402,7 @@ const seed = async () => {
       {
         section_id: "section-2025-a",
         title: "Seccion 5A",
-        studyPlan_id: "studyplan-2025-secundaria-g5",
+        studyPlan_id: "studyplan-2025-secundaria",
         teacher_id: "teacher-001",
         year: 2025,
         max_capacity: 30,
@@ -411,7 +411,7 @@ const seed = async () => {
       {
         section_id: "section-2025-b",
         title: "Seccion 5B",
-        studyPlan_id: "studyplan-2025-secundaria-g5",
+        studyPlan_id: "studyplan-2025-primaria",
         teacher_id: "teacher-002",
         year: 2025,
         max_capacity: 30,
@@ -420,7 +420,7 @@ const seed = async () => {
       {
         section_id: "section-2025-c",
         title: "Seccion 4A",
-        studyPlan_id: "studyplan-2025-secundaria-g4",
+        studyPlan_id: "studyplan-2025-secundaria",
         teacher_id: "teacher-003",
         year: 2025,
         max_capacity: 28,
