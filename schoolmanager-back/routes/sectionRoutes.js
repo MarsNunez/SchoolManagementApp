@@ -3,6 +3,16 @@ import { SectionModel } from "../models/Section.js";
 
 const router = express.Router();
 
+const GROUPS = new Set(["A", "B", "C", "D", "E"]);
+
+const normalizeSectionPayload = (payload = {}) => {
+  const next = { ...payload };
+  if (typeof next.group === "string") {
+    next.group = next.group.trim().toUpperCase();
+  }
+  return next;
+};
+
 // GET ALL SECTIONS
 router.get("/", async (req, res) => {
   try {
@@ -35,7 +45,13 @@ router.get("/:sectionId", async (req, res) => {
 // POST A NEW SECTION
 router.post("/", async (req, res) => {
   try {
-    const section = await SectionModel.create(req.body);
+    const payload = normalizeSectionPayload(req.body);
+    if (!payload.group || !GROUPS.has(payload.group)) {
+      return res
+        .status(400)
+        .json({ message: "Invalid group. Allowed values are A, B, C, D, E." });
+    }
+    const section = await SectionModel.create(payload);
     res.status(201).json(section);
   } catch (error) {
     res
@@ -47,9 +63,19 @@ router.post("/", async (req, res) => {
 // UPDATE A SECTION BY sectionId
 router.put("/:sectionId", async (req, res) => {
   try {
+    const payload = normalizeSectionPayload(req.body);
+    if (
+      Object.prototype.hasOwnProperty.call(payload, "group") &&
+      payload.group &&
+      !GROUPS.has(payload.group)
+    ) {
+      return res
+        .status(400)
+        .json({ message: "Invalid group. Allowed values are A, B, C, D, E." });
+    }
     const section = await SectionModel.findOneAndUpdate(
       { section_id: req.params.sectionId },
-      req.body,
+      payload,
       { new: true, runValidators: true }
     );
 

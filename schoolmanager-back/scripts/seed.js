@@ -402,7 +402,8 @@ const seed = async () => {
       {
         section_id: "section-2025-a",
         title: "Seccion 5A",
-        studyPlan_id: "studyplan-2025-secundaria",
+        studyPlan_id: "studyplan-2025-secundaria-g5",
+        group: "A",
         teacher_id: "teacher-001",
         year: 2025,
         max_capacity: 30,
@@ -411,7 +412,8 @@ const seed = async () => {
       {
         section_id: "section-2025-b",
         title: "Seccion 5B",
-        studyPlan_id: "studyplan-2025-primaria",
+        studyPlan_id: "studyplan-2025-secundaria-g5",
+        group: "B",
         teacher_id: "teacher-002",
         year: 2025,
         max_capacity: 30,
@@ -420,7 +422,8 @@ const seed = async () => {
       {
         section_id: "section-2025-c",
         title: "Seccion 4A",
-        studyPlan_id: "studyplan-2025-secundaria",
+        studyPlan_id: "studyplan-2025-secundaria-g4",
+        group: "C",
         teacher_id: "teacher-003",
         year: 2025,
         max_capacity: 28,

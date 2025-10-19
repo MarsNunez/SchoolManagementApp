@@ -15,6 +15,13 @@ const SectionSchema = new Schema(
       required: true,
       trim: true,
     },
+    group: {
+      type: String,
+      required: true,
+      enum: ["A", "B", "C", "D", "E"],
+      uppercase: true,
+      trim: true,
+    },
     studyPlan_id: {
       type: String,
       ref: "StudyPlan",

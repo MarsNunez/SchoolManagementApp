@@ -34,6 +34,12 @@ export default function ControlPanel() {
       desc: "Manage curriculum plans",
       color: "bg-violet-600",
     },
+    {
+      href: "/controlPanel/sections",
+      title: "Sections",
+      desc: "Manage class sections",
+      color: "bg-amber-600",
+    },
   ];
 
   return (
