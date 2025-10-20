@@ -6,14 +6,7 @@ import { authHeaders, fetchJSON } from "@/lib/api";
 
 const GROUP_OPTIONS = ["A", "B", "C", "D", "E"];
 
-const toCourseString = (courses) =>
-  Array.isArray(courses) ? courses.join(", ") : "";
-
-const toCourseArray = (value) =>
-  value
-    .split(",")
-    .map((part) => part.trim())
-    .filter(Boolean);
+// Courses column/input no longer used
 
 const emptyForm = {
   section_id: "",
@@ -24,7 +17,6 @@ const emptyForm = {
   year: new Date().getFullYear().toString(),
   max_capacity: "",
   current_capacity: "",
-  courses: "",
 };
 
 export default function SectionsPage() {
@@ -124,7 +116,6 @@ export default function SectionsPage() {
         year: Number(form.year) || new Date().getFullYear(),
         max_capacity: maxCapNumber,
         current_capacity: currentCapNumber,
-        courses: form.courses ? toCourseArray(form.courses) : [],
       };
 
       if (editingId) {
@@ -294,14 +285,7 @@ export default function SectionsPage() {
                 }))
               }
             />
-            <textarea
-              className="input sm:col-span-4 min-h-24"
-              placeholder="courses (comma separated course ids)"
-              value={form.courses}
-              onChange={(e) =>
-                setForm((prev) => ({ ...prev, courses: e.target.value }))
-              }
-            />
+            {/* courses input removed */}
 
             {(error || capacityError) && (
               <div className="sm:col-span-4 text-sm text-red-600">
@@ -346,7 +330,7 @@ export default function SectionsPage() {
                   <th className="p-3">Teacher</th>
                   <th className="p-3">Year</th>
                   <th className="p-3">Capacity</th>
-                  <th className="p-3">Courses</th>
+                  {/* Courses column removed */}
                   <th className="p-3">Actions</th>
                 </tr>
               </thead>
@@ -370,12 +354,6 @@ export default function SectionsPage() {
                     <td className="p-3 whitespace-nowrap">{section.year}</td>
                     <td className="p-3 whitespace-nowrap">
                       {section.current_capacity}/{section.max_capacity}
-                    </td>
-                    <td className="p-3 whitespace-nowrap">
-                      {Array.isArray(section.courses) &&
-                      section.courses.length > 0
-                        ? section.courses.join(", ")
-                        : "—"}
                     </td>
                     <td className="p-3">
                       <div className="flex items-center gap-2">
