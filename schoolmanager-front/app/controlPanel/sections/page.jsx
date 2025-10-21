@@ -165,7 +165,6 @@ export default function SectionsPage() {
       year: String(section.year ?? ""),
       max_capacity: String(section.max_capacity ?? ""),
       current_capacity: String(section.current_capacity ?? ""),
-      courses: toCourseString(section.courses),
     });
   };
 
