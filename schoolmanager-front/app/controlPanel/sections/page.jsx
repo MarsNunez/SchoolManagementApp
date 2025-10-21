@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
@@ -189,10 +189,7 @@ export default function SectionsPage() {
         </header>
 
         <section className="rounded-2xl border border-neutral-200/60 dark:border-neutral-800 bg-white/70 dark:bg-neutral-900/60 shadow-sm">
-          <form
-            onSubmit={onSubmit}
-            className="p-4 grid gap-3 sm:grid-cols-4"
-          >
+          <form onSubmit={onSubmit} className="p-4 grid gap-3 sm:grid-cols-4">
             <input
               className="input"
               placeholder="section_id"
@@ -329,7 +326,6 @@ export default function SectionsPage() {
                   <th className="p-3">Teacher</th>
                   <th className="p-3">Year</th>
                   <th className="p-3">Capacity</th>
-                  {/* Courses column removed */}
                   <th className="p-3">Actions</th>
                 </tr>
               </thead>
@@ -343,7 +339,9 @@ export default function SectionsPage() {
                       {section.section_id}
                     </td>
                     <td className="p-3 whitespace-nowrap">{section.title}</td>
-                    <td className="p-3 whitespace-nowrap">{section.group}</td>
+                    <td className="p-3 whitespace-nowrap">
+                      <div className="border">{section.group}</div>
+                    </td>
                     <td className="p-3 whitespace-nowrap">
                       {section.studyPlan_id}
                     </td>
