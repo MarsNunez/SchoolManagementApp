@@ -9,6 +9,7 @@ import { studyPlanRoutes } from "./routes/studyPlanRoutes.js";
 import { sectionRoutes } from "./routes/sectionRoutes.js";
 import { teacherRoutes } from "./routes/teacherRoutes.js";
 import { studentRoutes } from "./routes/studentRoutes.js";
+import { parentRoutes } from "./routes/parentRoutes.js";
 
 dotenv.config();
 
@@ -23,6 +24,7 @@ app.use("/study-plans", studyPlanRoutes);
 app.use("/sections", sectionRoutes);
 app.use("/teachers", teacherRoutes);
 app.use("/students", studentRoutes);
+app.use("/parents", parentRoutes);
 
 app.get("/", (req, res) => {
   res.status(200).send("Backend server is up...");

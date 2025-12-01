@@ -43,7 +43,7 @@ export default function Sidebar() {
       localStorage.removeItem("staffProfile");
     }
     setIsAuthed(false);
-    router.push("/login");
+    router.push("/auth/login");
   };
 
   const toggleCollapsed = () => {
@@ -166,12 +166,20 @@ export default function Sidebar() {
       <nav className="flex flex-col text-[1rem]">
         <NavItem href="#" icon="fa-solid fa-gear" label="Settings" />
         {!isAuthed ? (
-          <NavItem
-            href="/login"
-            icon="fa-solid fa-right-to-bracket"
-            label="Login"
-            className="text-blue-600"
-          />
+          <>
+            <NavItem
+              href="/auth/login"
+              icon="fa-solid fa-right-to-bracket"
+              label="Login"
+              className="text-blue-600"
+            />
+            <NavItem
+              href="/auth/register"
+              icon="fa-solid fa-user-plus"
+              label="Register"
+              className="text-emerald-600"
+            />
+          </>
         ) : (
           <NavItem
             onClick={logout}

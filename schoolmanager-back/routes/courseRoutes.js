@@ -61,7 +61,9 @@ router.post("/", requireRole("admin", "secretary"), async (req, res) => {
     res.status(201).json(course);
   } catch (error) {
     const status = error.message?.includes("course_id") ? 409 : 400;
-    res.status(status).json({ message: "Error creating course", error: error.message });
+    res
+      .status(status)
+      .json({ message: "Error creating course", error: error.message });
   }
 });
 

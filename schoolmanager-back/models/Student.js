@@ -51,13 +51,11 @@ const StudentSchema = new Schema(
       type: String,
       trim: true,
     },
-    current_courses: [
-      {
-        type: String,
-        ref: "Course",
-        default: [],
-      },
-    ],
+    section_id: {
+      type: String,
+      ref: "Section",
+      trim: true,
+    },
   },
   {
     timestamps: true,

@@ -246,8 +246,6 @@ const seed = async () => {
     await StudyPlanModel.insertMany(studyPlanSeed);
     console.log(`Inserted ${studyPlanSeed.length} study plans`);
 
-    // Parents collection removed. Guardians are embedded in students.
-
     const studentSeed = [
       {
         student_id: "student-001",
@@ -265,7 +263,7 @@ const seed = async () => {
         email: "mateo.torres@alumnos.edu",
         phone: "+51911111111",
         address: "Av. Primavera 123",
-        current_courses: ["course-math-01", "course-english-01"],
+        section_id: "section-2025-a",
       },
       {
         student_id: "student-002",
@@ -283,7 +281,7 @@ const seed = async () => {
         email: "valeria.torres@alumnos.edu",
         phone: "+51911111112",
         address: "Av. Primavera 123",
-        current_courses: ["course-math-01", "course-art-01"],
+        section_id: "section-2025-a",
       },
       {
         student_id: "student-003",
@@ -301,7 +299,7 @@ const seed = async () => {
         email: "santiago.campos@alumnos.edu",
         phone: "+51911111113",
         address: "Jr. Los Geranios 456",
-        current_courses: ["course-physics-01", "course-tech-01"],
+        section_id: "section-2025-a",
       },
       {
         student_id: "student-004",
@@ -319,7 +317,7 @@ const seed = async () => {
         email: "luciana.campos@alumnos.edu",
         phone: "+51911111114",
         address: "Jr. Los Geranios 456",
-        current_courses: ["course-literature-01", "course-ethics-01"],
+        section_id: "section-2025-b",
       },
       {
         student_id: "student-005",
@@ -337,7 +335,7 @@ const seed = async () => {
         email: "gabriel.delgado@alumnos.edu",
         phone: "+51911111115",
         address: "Calle Los Cerezos 789",
-        current_courses: ["course-biology-01", "course-chemistry-01"],
+        section_id: "section-2025-b",
       },
       {
         student_id: "student-006",
@@ -355,7 +353,7 @@ const seed = async () => {
         email: "isabella.delgado@alumnos.edu",
         phone: "+51911111116",
         address: "Calle Los Cerezos 789",
-        current_courses: ["course-art-01", "course-english-01"],
+        section_id: "section-2025-b",
       },
       {
         student_id: "student-007",
@@ -373,7 +371,7 @@ const seed = async () => {
         email: "andres.ibanez@alumnos.edu",
         phone: "+51911111117",
         address: "Pasaje Las Flores 321",
-        current_courses: ["course-tech-01", "course-physics-01"],
+        section_id: "section-2025-c",
       },
       {
         student_id: "student-008",
@@ -391,7 +389,7 @@ const seed = async () => {
         email: "renata.ibanez@alumnos.edu",
         phone: "+51911111118",
         address: "Pasaje Las Flores 321",
-        current_courses: ["course-history-01", "course-literature-01"],
+        section_id: "section-2025-c",
       },
     ];
 
@@ -407,7 +405,7 @@ const seed = async () => {
         teacher_id: "teacher-001",
         year: 2025,
         max_capacity: 30,
-        current_capacity: 6,
+        current_capacity: 3,
       },
       {
         section_id: "section-2025-b",
@@ -417,7 +415,7 @@ const seed = async () => {
         teacher_id: "teacher-002",
         year: 2025,
         max_capacity: 30,
-        current_capacity: 6,
+        current_capacity: 3,
       },
       {
         section_id: "section-2025-c",
@@ -427,7 +425,7 @@ const seed = async () => {
         teacher_id: "teacher-003",
         year: 2025,
         max_capacity: 28,
-        current_capacity: 4,
+        current_capacity: 2,
       },
     ];
 

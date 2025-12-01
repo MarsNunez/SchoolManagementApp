@@ -19,12 +19,13 @@ export default function EditStudentPage() {
     email: "",
     phone: "",
     address: "",
-    current_courses: "",
+    section_id: "",
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [sections, setSections] = useState([]);
 
   const update = (key) => (e) => setForm((s) => ({ ...s, [key]: e.target.value }));
   const updateGuardian = (idx, key) => (e) => setForm((s) => {
@@ -50,7 +51,7 @@ export default function EditStudentPage() {
           email: data?.email || "",
           phone: data?.phone || "",
           address: data?.address || "",
-          current_courses: Array.isArray(data?.current_courses) ? data.current_courses.join(", ") : "",
+          section_id: data?.section_id || "",
         });
       } catch (e) {
         setError(e.message);
@@ -60,6 +61,17 @@ export default function EditStudentPage() {
     };
     if (studentId) load();
   }, [studentId]);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const data = await fetchJSON("/sections", { headers: { ...authHeaders() } });
+        setSections(Array.isArray(data) ? data : []);
+      } catch (e) {
+        console.warn("Failed to load sections", e.message);
+      }
+    })();
+  }, []);
 
   const onSubmit = async (e) => {
     e.preventDefault();
@@ -79,7 +91,7 @@ export default function EditStudentPage() {
         email: form.email,
         phone: form.phone,
         address: form.address,
-        current_courses: form.current_courses ? form.current_courses.split(",").map(s => s.trim()).filter(Boolean) : [],
+        section_id: form.section_id || undefined,
       };
 
       await fetchJSON(`/students/${studentId}`, {
@@ -164,8 +176,15 @@ export default function EditStudentPage() {
               </div>
 
               <div className="sm:col-span-2">
-                <label className="block text-sm mb-1">Current courses (comma separated)</label>
-                <input className="input w-full" value={form.current_courses} onChange={update("current_courses")} />
+                <label className="block text-sm mb-1">Section</label>
+                <select className="input w-full" value={form.section_id} onChange={update("section_id")}>
+                  <option value="">Select section (optional)</option>
+                  {sections.map((sec) => (
+                    <option key={sec.section_id} value={sec.section_id}>
+                      {sec.section_id}
+                    </option>
+                  ))}
+                </select>
               </div>
 
               {error && (
@@ -186,4 +205,3 @@ export default function EditStudentPage() {
     </main>
   );
 }
-

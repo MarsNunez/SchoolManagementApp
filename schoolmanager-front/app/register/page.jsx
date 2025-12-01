@@ -190,7 +190,7 @@ export default function RegisterPage() {
                 />
                 Active state
               </label>
-              <a className="text-emerald-600 hover:underline" href="/login">
+              <a className="text-emerald-600 hover:underline" href="/auth/login">
                 Already have an account?
               </a>
             </div>

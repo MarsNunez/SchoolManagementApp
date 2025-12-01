@@ -12,7 +12,10 @@ export const authHeaders = () => {
 };
 
 export async function fetchJSON(path, options = {}) {
-  const mergedHeaders = { "Content-Type": "application/json", ...(options.headers || {}) };
+  const mergedHeaders = {
+    "Content-Type": "application/json",
+    ...(options.headers || {}),
+  };
   const res = await fetch(`${API_URL}${path}`, {
     ...options,
     headers: mergedHeaders,
@@ -26,7 +29,9 @@ export async function fetchJSON(path, options = {}) {
       } catch {}
       // Optional immediate redirect for unauthorized
       if (!options?.suppressRedirect) {
-        try { window.location.assign("/login"); } catch {}
+        try {
+          window.location.assign("/auth/login");
+        } catch {}
       }
     }
     const message = data?.message || data?.error || "Request failed";

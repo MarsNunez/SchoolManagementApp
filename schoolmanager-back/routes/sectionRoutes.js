@@ -1,5 +1,7 @@
 import express from "express";
 import { SectionModel } from "../models/Section.js";
+import { requireStaffAuth } from "../middlewares/staffAuthMiddleware.js";
+import { requireRole } from "../middlewares/roleMiddleware.js";
 
 const router = express.Router();
 
@@ -13,8 +15,10 @@ const normalizeSectionPayload = (payload = {}) => {
   return next;
 };
 
+router.use(requireStaffAuth);
+
 // GET ALL SECTIONS
-router.get("/", async (req, res) => {
+router.get("/", requireRole("admin"), async (req, res) => {
   try {
     const sections = await SectionModel.find();
     res.json(sections);
@@ -26,7 +30,7 @@ router.get("/", async (req, res) => {
 });
 
 // GET A SECTION BY sectionId
-router.get("/:sectionId", async (req, res) => {
+router.get("/:sectionId", requireRole("admin"), async (req, res) => {
   try {
     const section = await SectionModel.findOne({
       section_id: req.params.sectionId,
@@ -43,7 +47,7 @@ router.get("/:sectionId", async (req, res) => {
 });
 
 // POST A NEW SECTION
-router.post("/", async (req, res) => {
+router.post("/", requireRole("admin"), async (req, res) => {
   try {
     const payload = normalizeSectionPayload(req.body);
     if (!payload.group || !GROUPS.has(payload.group)) {
@@ -61,7 +65,7 @@ router.post("/", async (req, res) => {
 });
 
 // UPDATE A SECTION BY sectionId
-router.put("/:sectionId", async (req, res) => {
+router.put("/:sectionId", requireRole("admin"), async (req, res) => {
   try {
     const payload = normalizeSectionPayload(req.body);
     if (
@@ -92,7 +96,7 @@ router.put("/:sectionId", async (req, res) => {
 });
 
 // DELETE A SECTION BY sectionId
-router.delete("/:sectionId", async (req, res) => {
+router.delete("/:sectionId", requireRole("admin"), async (req, res) => {
   try {
     const section = await SectionModel.findOneAndDelete({
       section_id: req.params.sectionId,

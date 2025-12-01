@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { fetchJSON, authHeaders } from "@/lib/api";
 
@@ -14,11 +14,12 @@ export default function NewStudentPage() {
     email: "",
     phone: "",
     address: "",
-    current_courses: "",
+    section_id: "",
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [sections, setSections] = useState([]);
 
   const update = (key) => (e) => setForm((s) => ({ ...s, [key]: e.target.value }));
   const updateGuardian = (idx, key) => (e) => setForm((s) => {
@@ -28,6 +29,17 @@ export default function NewStudentPage() {
   });
   const addGuardian = () => setForm((s) => ({ ...s, guardians: [...s.guardians, { full_name: "", phone: "", email: "" }] }));
   const removeGuardian = (idx) => setForm((s) => ({ ...s, guardians: s.guardians.filter((_, i) => i !== idx) }));
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const data = await fetchJSON("/sections", { headers: { ...authHeaders() } });
+        setSections(Array.isArray(data) ? data : []);
+      } catch (e) {
+        console.warn("Failed to load sections", e.message);
+      }
+    })();
+  }, []);
 
   const onSubmit = async (e) => {
     e.preventDefault();
@@ -50,9 +62,7 @@ export default function NewStudentPage() {
         phone: form.phone,
         address: form.address,
         guardians: form.guardians.filter(g => g.full_name && g.email).map(g => ({ full_name: g.full_name, phone: g.phone, email: g.email })),
-        current_courses: form.current_courses
-          ? form.current_courses.split(",").map((s) => s.trim()).filter(Boolean)
-          : [],
+        section_id: form.section_id || undefined,
       };
 
       await fetchJSON("/students", {
@@ -71,7 +81,7 @@ export default function NewStudentPage() {
         email: "",
         phone: "",
         address: "",
-        current_courses: "",
+        section_id: "",
       });
     } catch (e) {
       setError(e.message);
@@ -145,8 +155,15 @@ export default function NewStudentPage() {
               ))}
             </div>
             <div className="sm:col-span-2">
-              <label className="block text-sm mb-1">Current courses (comma separated)</label>
-              <input className="input w-full" placeholder="course-math-01, course-english-01" value={form.current_courses} onChange={update("current_courses")} />
+              <label className="block text-sm mb-1">Section</label>
+              <select className="input w-full" value={form.section_id} onChange={update("section_id")}>
+                <option value="">Select section (optional)</option>
+                {sections.map((sec) => (
+                  <option key={sec.section_id} value={sec.section_id}>
+                    {sec.section_id}
+                  </option>
+                ))}
+              </select>
             </div>
 
             {error && (

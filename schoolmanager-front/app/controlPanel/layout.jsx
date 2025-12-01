@@ -11,7 +11,7 @@ export default function ControlPanelLayout({ children }) {
     const token =
       typeof window !== "undefined" ? localStorage.getItem("authToken") : null;
     if (!token) {
-      router.replace("/login");
+      router.replace("/auth/login");
       return;
     }
     // Validate JWT expiry client-side (best effort)
@@ -23,7 +23,7 @@ export default function ControlPanelLayout({ children }) {
       if (payload?.exp && Date.now() / 1000 > payload.exp) {
         localStorage.removeItem("authToken");
         localStorage.removeItem("staffProfile");
-        router.replace("/login");
+        router.replace("/auth/login");
         return;
       }
     } catch {}

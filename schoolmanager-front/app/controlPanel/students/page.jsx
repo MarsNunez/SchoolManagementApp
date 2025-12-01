@@ -65,6 +65,7 @@ export default function StudentsPage() {
                   <th className="p-3">Name</th>
                   <th className="p-3">Email</th>
                   <th className="p-3">DNI</th>
+                  <th className="p-3">Section</th>
                   <th className="p-3">Actions</th>
                 </tr>
               </thead>
@@ -75,6 +76,7 @@ export default function StudentsPage() {
                     <td className="p-3 whitespace-nowrap">{s.name} {s.lastname}</td>
                     <td className="p-3 whitespace-nowrap">{s.email}</td>
                     <td className="p-3 whitespace-nowrap">{s.dni}</td>
+                    <td className="p-3 whitespace-nowrap">{s.section_id || "—"}</td>
                     <td className="p-3 flex gap-2">
                       <Link href={`/controlPanel/students/${s.student_id}`} className="rounded-lg px-3 py-2 text-sm border border-neutral-300 dark:border-neutral-700">Edit</Link>
                       <button onClick={() => remove(s.student_id)} className="btn-danger">Delete</button>
@@ -89,4 +91,3 @@ export default function StudentsPage() {
     </main>
   );
 }
-
