@@ -43,6 +43,11 @@ const StudyPlanSchema = new Schema(
       default: 12,
       min: 11,
     },
+    courses: {
+      type: [String],
+      ref: "Course",
+      default: [],
+    },
   },
   {
     timestamps: true,

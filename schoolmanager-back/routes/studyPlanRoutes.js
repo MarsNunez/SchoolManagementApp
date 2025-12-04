@@ -38,13 +38,30 @@ router.get("/:studyPlanId", requireRole("admin"), async (req, res) => {
 // CREATE A STUDY PLAN
 router.post("/", requireRole("admin"), async (req, res) => {
   try {
-    const body = { ...req.body, version: 1 };
+    const generateUniqueStudyPlanId = async () => {
+      for (let i = 0; i < 10; i++) {
+        const num = Math.floor(Math.random() * 1_000_000)
+          .toString()
+          .padStart(6, "0");
+        const candidate = `STP-${num}`;
+        const exists = await StudyPlanModel.exists({
+          studyPlan_id: candidate,
+        });
+        if (!exists) return candidate;
+      }
+      throw new Error("Could not generate unique studyPlan_id");
+    };
+
+    const studyPlan_id = await generateUniqueStudyPlanId();
+    const body = { ...req.body, studyPlan_id, version: 1 };
     const studyPlan = await StudyPlanModel.create(body);
     res.status(201).json(studyPlan);
   } catch (error) {
-    res
-      .status(400)
-      .json({ message: "Error creating study plan", error: error.message });
+    const status = error.message?.includes("studyPlan_id") ? 409 : 400;
+    res.status(status).json({
+      message: "Error creating study plan",
+      error: error.message,
+    });
   }
 });
 

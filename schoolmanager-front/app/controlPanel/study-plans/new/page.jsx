@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { fetchJSON, authHeaders } from "@/lib/api";
 
@@ -17,17 +17,39 @@ const STATES = [
 
 export default function NewStudyPlanPage() {
   const [form, setForm] = useState({
-    studyPlan_id: "",
     level: "primaria",
     grade: "1",
     effectiveFrom: "",
     state: "draft",
     minGrade: "12",
-    courses: "",
+    courses: [],
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+
+  const [courses, setCourses] = useState([]);
+  const [coursesLoading, setCoursesLoading] = useState(true);
+  const [coursesError, setCoursesError] = useState("");
+  const [courseSearch, setCourseSearch] = useState("");
+
+  useEffect(() => {
+    const loadCourses = async () => {
+      try {
+        setCoursesLoading(true);
+        const data = await fetchJSON("/courses", {
+          headers: { ...authHeaders() },
+        });
+        setCourses(Array.isArray(data) ? data : []);
+      } catch (e) {
+        setCoursesError(e.message || "Failed to load courses");
+      } finally {
+        setCoursesLoading(false);
+      }
+    };
+
+    loadCourses();
+  }, []);
 
   const update = (key) => (e) =>
     setForm((prev) => ({
@@ -35,19 +57,25 @@ export default function NewStudyPlanPage() {
       [key]: e.target.value,
     }));
 
+  const toggleCourse = (courseId) => {
+    setForm((prev) => {
+      const current = Array.isArray(prev.courses) ? prev.courses : [];
+      const exists = current.includes(courseId);
+      const nextCourses = exists
+        ? current.filter((id) => id !== courseId)
+        : [...current, courseId];
+      return { ...prev, courses: nextCourses };
+    });
+  };
+
   const onSubmit = async (e) => {
     e.preventDefault();
     setError("");
     setSuccess("");
 
-    const id = form.studyPlan_id.trim();
     const gradeNum = Number(form.grade);
     const minGradeNum = form.minGrade ? Number(form.minGrade) : 12;
 
-    if (!id) {
-      setError("studyPlan_id is required");
-      return;
-    }
     if (!form.effectiveFrom) {
       setError("effectiveFrom date is required");
       return;
@@ -64,18 +92,12 @@ export default function NewStudyPlanPage() {
     setLoading(true);
     try {
       const payload = {
-        studyPlan_id: id,
         level: form.level,
         effectiveFrom: form.effectiveFrom,
         state: form.state,
         grade: gradeNum,
         minGrade: minGradeNum,
-        courses: form.courses
-          ? form.courses
-              .split(",")
-              .map((s) => s.trim())
-              .filter(Boolean)
-          : [],
+        courses: Array.isArray(form.courses) ? form.courses : [],
       };
 
       await fetchJSON("/study-plans", {
@@ -86,13 +108,12 @@ export default function NewStudyPlanPage() {
 
       setSuccess("Study plan created successfully");
       setForm({
-        studyPlan_id: "",
         level: "primaria",
         grade: "1",
         effectiveFrom: "",
         state: "draft",
         minGrade: "12",
-        courses: "",
+        courses: [],
       });
     } catch (e) {
       setError(e.message || "Failed to create study plan");
@@ -126,15 +147,6 @@ export default function NewStudyPlanPage() {
             onSubmit={onSubmit}
             className="p-4 grid gap-3 sm:grid-cols-2"
           >
-            <div>
-              <label className="block text-sm mb-1">Study Plan ID</label>
-              <input
-                className="input w-full"
-                placeholder="studyplan-2025-secundaria-g5"
-                value={form.studyPlan_id}
-                onChange={update("studyPlan_id")}
-              />
-            </div>
             <div>
               <label className="block text-sm mb-1">Level</label>
               <select
@@ -193,16 +205,65 @@ export default function NewStudyPlanPage() {
                 onChange={update("minGrade")}
               />
             </div>
-            <div className="sm:col-span-2">
-              <label className="block text-sm mb-1">
-                Courses (comma separated)
-              </label>
-              <textarea
-                className="input w-full min-h-24"
-                placeholder="course-math-01, course-physics-01"
-                value={form.courses}
-                onChange={update("courses")}
+            <div className="sm:col-span-2 space-y-2">
+              <label className="block text-sm mb-1">Courses</label>
+              <input
+                className="input w-full"
+                placeholder="Search courses by ID or title"
+                value={courseSearch}
+                onChange={(e) => setCourseSearch(e.target.value)}
               />
+              <div className="max-h-64 overflow-y-auto rounded-lg border border-neutral-200/60 dark:border-neutral-700 bg-white/70 dark:bg-neutral-900/60 px-3 py-2 space-y-1">
+                {coursesLoading ? (
+                  <div className="text-xs text-neutral-500">
+                    Loading courses...
+                  </div>
+                ) : coursesError ? (
+                  <div className="text-xs text-red-600">{coursesError}</div>
+                ) : courses.length === 0 ? (
+                  <div className="text-xs text-neutral-500">
+                    No courses available.
+                  </div>
+                ) : (
+                  (courses || [])
+                    .filter((course) => {
+                      if (!courseSearch.trim()) return true;
+                      const query = courseSearch.toLowerCase();
+                      const id = String(course.course_id || "").toLowerCase();
+                      const title = String(course.title || "").toLowerCase();
+                      return (
+                        id.includes(query) ||
+                        title.includes(query)
+                      );
+                    })
+                    .map((course) => {
+                      const checked = Array.isArray(form.courses)
+                        ? form.courses.includes(course.course_id)
+                        : false;
+                      return (
+                        <label
+                          key={course.course_id}
+                          className="flex items-center gap-2 text-sm cursor-pointer"
+                        >
+                          <input
+                            type="checkbox"
+                            className="size-4 rounded border-neutral-300 dark:border-neutral-700"
+                            checked={checked}
+                            onChange={() => toggleCourse(course.course_id)}
+                          />
+                          <div className="flex flex-col">
+                            <span className="font-medium">
+                              {course.title || course.course_id}
+                            </span>
+                            <span className="text-xs text-neutral-500">
+                              {course.course_id}
+                            </span>
+                          </div>
+                        </label>
+                      );
+                    })
+                )}
+              </div>
             </div>
 
             {error && (
