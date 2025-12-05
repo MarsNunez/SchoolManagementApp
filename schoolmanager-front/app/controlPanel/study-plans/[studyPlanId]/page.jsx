@@ -28,7 +28,6 @@ const toFormState = (data) => ({
 });
 
 const toBaseline = (data) => ({
-  studyPlan_id: data?.studyPlan_id || "",
   level: data?.level || "primaria",
   grade:
     typeof data?.grade === "number"
@@ -71,8 +70,6 @@ export default function EditStudyPlanPage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-  const [idInput, setIdInput] = useState("");
-  const [isAdmin, setIsAdmin] = useState(false);
   const [allCourses, setAllCourses] = useState([]);
   const [coursesLoading, setCoursesLoading] = useState(true);
   const [coursesError, setCoursesError] = useState("");
@@ -88,7 +85,6 @@ export default function EditStudyPlanPage() {
         setForm(toFormState(data));
         setVersion(data?.version ?? 1);
         setBaseline(toBaseline(data));
-        setIdInput(data?.studyPlan_id || studyPlanId || "");
       } catch (e) {
         setError(e.message || "Failed to load study plan");
       } finally {
@@ -100,19 +96,6 @@ export default function EditStudyPlanPage() {
       load();
     }
   }, [studyPlanId]);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    try {
-      const raw = localStorage.getItem("staffProfile");
-      if (!raw) return;
-      const prof = JSON.parse(raw);
-      const role = String(prof?.role || "").toLowerCase();
-      setIsAdmin(role === "admin");
-    } catch {
-      setIsAdmin(false);
-    }
-  }, []);
 
   useEffect(() => {
     const loadCourses = async () => {
@@ -169,18 +152,10 @@ export default function EditStudyPlanPage() {
       setError("minGrade must be a number");
       return;
     }
-    if (isAdmin) {
-      const trimmedId = idInput.trim();
-      if (!trimmedId) {
-        setError("studyPlan_id cannot be empty");
-        return;
-      }
-    }
 
     setSaving(true);
     try {
       const payload = {
-        studyPlan_id: isAdmin && idInput ? idInput.trim() : baseline?.studyPlan_id,
         level: form.level,
         effectiveFrom: form.effectiveFrom,
         state: form.state,
@@ -220,7 +195,6 @@ export default function EditStudyPlanPage() {
           updated?.version != null ? updated.version : prev
         );
         setBaseline(toBaseline(updated));
-        setIdInput(updated?.studyPlan_id || idInput);
       }
 
       setSuccess("Study plan updated successfully");
@@ -263,14 +237,9 @@ export default function EditStudyPlanPage() {
               <div>
                 <label className="block text-sm mb-1">Study Plan ID</label>
                 <input
-                  className="input w-full bg-neutral-100 dark:bg-neutral-800 disabled:opacity-70"
-                  value={idInput}
-                  onChange={(e) => {
-                    if (isAdmin) {
-                      setIdInput(e.target.value);
-                    }
-                  }}
-                  disabled={!isAdmin}
+                  className="input w-full bg-neutral-100 dark:bg-neutral-800"
+                  value={studyPlanId || ""}
+                  disabled
                 />
               </div>
               <div>

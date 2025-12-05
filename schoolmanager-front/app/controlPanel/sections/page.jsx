@@ -19,6 +19,14 @@ const emptyForm = {
   current_capacity: "",
 };
 
+const GROUP_BADGE_STYLES = {
+  A: "border-emerald-600 bg-emerald-50 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300",
+  B: "border-blue-600 bg-blue-50 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300",
+  C: "border-violet-600 bg-violet-50 text-violet-800 dark:bg-violet-900/40 dark:text-violet-300",
+  D: "border-amber-600 bg-amber-50 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300",
+  E: "border-rose-600 bg-rose-50 text-rose-800 dark:bg-rose-900/40 dark:text-rose-300",
+};
+
 export default function SectionsPage() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -330,46 +338,57 @@ export default function SectionsPage() {
                 </tr>
               </thead>
               <tbody>
-                {items.map((section) => (
-                  <tr
-                    key={section.section_id}
-                    className="border-b last:border-none border-neutral-100 dark:border-neutral-800"
-                  >
-                    <td className="p-3 whitespace-nowrap">
-                      {section.section_id}
-                    </td>
-                    <td className="p-3 whitespace-nowrap">{section.title}</td>
-                    <td className="p-3 whitespace-nowrap">
-                      <div className="border">{section.group}</div>
-                    </td>
-                    <td className="p-3 whitespace-nowrap">
-                      {section.studyPlan_id}
-                    </td>
-                    <td className="p-3 whitespace-nowrap">
-                      {section.teacher_id}
-                    </td>
-                    <td className="p-3 whitespace-nowrap">{section.year}</td>
-                    <td className="p-3 whitespace-nowrap">
-                      {section.current_capacity}/{section.max_capacity}
-                    </td>
-                    <td className="p-3">
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => edit(section)}
-                          className="rounded-lg px-3 py-2 text-sm border border-neutral-300 dark:border-neutral-700"
+                {items.map((section) => {
+                  const group = String(section.group || "").toUpperCase();
+                  const groupClasses =
+                    GROUP_BADGE_STYLES[group] ||
+                    "border-neutral-400 bg-neutral-50 text-neutral-800 dark:bg-neutral-900/40 dark:text-neutral-200";
+
+                  return (
+                    <tr
+                      key={section.section_id}
+                      className="border-b last:border-none border-neutral-100 dark:border-neutral-800"
+                    >
+                      <td className="p-3 whitespace-nowrap">
+                        {section.section_id}
+                      </td>
+                      <td className="p-3 whitespace-nowrap">{section.title}</td>
+                      <td className="p-3 whitespace-nowrap">
+                        <div
+                          className={`border w-fit py-1 px-2 rounded-lg text-xs font-medium ${groupClasses}`}
                         >
-                          Edit
-                        </button>
-                        <button
-                          onClick={() => remove(section.section_id)}
-                          className="btn-danger"
-                        >
-                          Delete
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                          {group}
+                        </div>
+                      </td>
+                      <td className="p-3 whitespace-nowrap">
+                        {section.studyPlan_id}
+                      </td>
+                      <td className="p-3 whitespace-nowrap">
+                        {section.teacher_id}
+                      </td>
+                      <td className="p-3 whitespace-nowrap">{section.year}</td>
+                      <td className="p-3 whitespace-nowrap">
+                        {section.current_capacity}/{section.max_capacity}
+                      </td>
+                      <td className="p-3">
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => edit(section)}
+                            className="rounded-lg px-3 py-2 text-sm border border-neutral-300 dark:border-neutral-700"
+                          >
+                            Edit
+                          </button>
+                          <button
+                            onClick={() => remove(section.section_id)}
+                            className="btn-danger"
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           )}
