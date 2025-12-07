@@ -23,16 +23,6 @@ export default function StudentsPage() {
 
   useEffect(() => { load(); }, []);
 
-  const remove = async (student_id) => {
-    if (!confirm(`Delete ${student_id}?`)) return;
-    try {
-      await fetchJSON(`/students/${student_id}`, { method: "DELETE", headers: { ...authHeaders() } });
-      await load();
-    } catch (e) {
-      alert(e.message);
-    }
-  };
-
   return (
     <main className="min-h-dvh p-6">
       <div className="mx-auto max-w-6xl space-y-6">
@@ -74,12 +64,16 @@ export default function StudentsPage() {
                   <tr key={s.student_id} className="border-b last:border-none border-neutral-100 dark:border-neutral-800">
                     <td className="p-3 whitespace-nowrap">{s.student_id}</td>
                     <td className="p-3 whitespace-nowrap">{s.name} {s.lastname}</td>
-                    <td className="p-3 whitespace-nowrap">{s.email}</td>
-                    <td className="p-3 whitespace-nowrap">{s.dni}</td>
-                    <td className="p-3 whitespace-nowrap">{s.section_id || "—"}</td>
-                    <td className="p-3 flex gap-2">
-                      <Link href={`/controlPanel/students/${s.student_id}`} className="rounded-lg px-3 py-2 text-sm border border-neutral-300 dark:border-neutral-700">Edit</Link>
-                      <button onClick={() => remove(s.student_id)} className="btn-danger">Delete</button>
+                  <td className="p-3 whitespace-nowrap">{s.email}</td>
+                  <td className="p-3 whitespace-nowrap">{s.dni}</td>
+                  <td className="p-3 whitespace-nowrap">{s.section_id || "—"}</td>
+                    <td className="p-3">
+                      <Link
+                        href={`/controlPanel/students/${s.student_id}`}
+                        className="btn-primary inline-flex items-center justify-center px-3 py-2 text-sm"
+                      >
+                        Más
+                      </Link>
                     </td>
                   </tr>
                 ))}

@@ -2,9 +2,13 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { fetchJSON, authHeaders } from "@/lib/api";
 
 export default function NewStudentPage() {
+  const searchParams = useSearchParams();
+  const initialSectionId = searchParams?.get("section_id") || "";
+
   const [form, setForm] = useState({
     guardians: [{ full_name: "", phone: "", email: "" }],
     name: "",
@@ -14,7 +18,7 @@ export default function NewStudentPage() {
     email: "",
     phone: "",
     address: "",
-    section_id: "",
+    section_id: initialSectionId,
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");

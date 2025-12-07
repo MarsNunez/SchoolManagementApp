@@ -404,8 +404,7 @@ const seed = async () => {
         group: "A",
         teacher_id: "teacher-001",
         year: 2025,
-        max_capacity: 30,
-        current_capacity: 3,
+        start_capacity: 30,
       },
       {
         section_id: "section-2025-b",
@@ -414,8 +413,7 @@ const seed = async () => {
         group: "B",
         teacher_id: "teacher-002",
         year: 2025,
-        max_capacity: 30,
-        current_capacity: 3,
+        start_capacity: 30,
       },
       {
         section_id: "section-2025-c",
@@ -424,8 +422,7 @@ const seed = async () => {
         group: "C",
         teacher_id: "teacher-003",
         year: 2025,
-        max_capacity: 28,
-        current_capacity: 2,
+        start_capacity: 28,
       },
     ];
 

@@ -38,14 +38,10 @@ const SectionSchema = new Schema(
       required: true,
       min: 0,
     },
-    max_capacity: {
+    start_capacity: {
       type: Number,
       required: true,
       min: 0,
-    },
-    current_capacity: {
-      type: Number,
-      default: 0,
     },
   },
   {

@@ -1,5 +1,6 @@
 import express from "express";
 import { SectionModel } from "../models/Section.js";
+import { StudentModel } from "../models/Student.js";
 import { requireStaffAuth } from "../middlewares/staffAuthMiddleware.js";
 import { requireRole } from "../middlewares/roleMiddleware.js";
 
@@ -20,8 +21,29 @@ router.use(requireStaffAuth);
 // GET ALL SECTIONS
 router.get("/", requireRole("admin"), async (req, res) => {
   try {
-    const sections = await SectionModel.find();
-    res.json(sections);
+    const sections = await SectionModel.find().lean();
+    const ids = sections
+      .map((section) => section.section_id)
+      .filter((id) => typeof id === "string" && id.length > 0);
+
+    let countsById = {};
+    if (ids.length > 0) {
+      const counts = await StudentModel.aggregate([
+        { $match: { section_id: { $in: ids } } },
+        { $group: { _id: "$section_id", count: { $sum: 1 } } },
+      ]);
+      countsById = counts.reduce((acc, doc) => {
+        acc[doc._id] = doc.count;
+        return acc;
+      }, {});
+    }
+
+    const result = sections.map((section) => ({
+      ...section,
+      enrolledCount: countsById[section.section_id] || 0,
+    }));
+
+    res.json(result);
   } catch (error) {
     res
       .status(500)
@@ -49,18 +71,37 @@ router.get("/:sectionId", requireRole("admin"), async (req, res) => {
 // POST A NEW SECTION
 router.post("/", requireRole("admin"), async (req, res) => {
   try {
+    const generateUniqueSectionId = async () => {
+      for (let i = 0; i < 10; i++) {
+        const num = Math.floor(Math.random() * 1_000_000)
+          .toString()
+          .padStart(6, "0");
+        const candidate = `SEC-${num}`;
+        const exists = await SectionModel.exists({ section_id: candidate });
+        if (!exists) return candidate;
+      }
+      throw new Error("Could not generate unique section_id");
+    };
+
     const payload = normalizeSectionPayload(req.body);
     if (!payload.group || !GROUPS.has(payload.group)) {
       return res
         .status(400)
         .json({ message: "Invalid group. Allowed values are A, B, C, D, E." });
     }
-    const section = await SectionModel.create(payload);
+
+    const section_id = await generateUniqueSectionId();
+    const section = await SectionModel.create({
+      ...payload,
+      section_id,
+    });
     res.status(201).json(section);
   } catch (error) {
-    res
-      .status(400)
-      .json({ message: "Error creating section", error: error.message });
+    const status = error.message?.includes("section_id") ? 409 : 400;
+    res.status(status).json({
+      message: "Error creating section",
+      error: error.message,
+    });
   }
 });
 

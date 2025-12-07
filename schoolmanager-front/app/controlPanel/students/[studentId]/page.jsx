@@ -5,54 +5,25 @@ import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { fetchJSON, authHeaders } from "@/lib/api";
 
-export default function EditStudentPage() {
+export default function StudentProfilePage() {
   const params = useParams();
   const router = useRouter();
   const studentId = params?.studentId;
 
-  const [form, setForm] = useState({
-    guardians: [{ full_name: "", phone: "", email: "" }],
-    name: "",
-    lastname: "",
-    dni: "",
-    birth_date: "",
-    email: "",
-    phone: "",
-    address: "",
-    section_id: "",
-  });
+  const [student, setStudent] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
-  const [sections, setSections] = useState([]);
-
-  const update = (key) => (e) => setForm((s) => ({ ...s, [key]: e.target.value }));
-  const updateGuardian = (idx, key) => (e) => setForm((s) => {
-    const next = [...s.guardians];
-    next[idx] = { ...next[idx], [key]: e.target.value };
-    return { ...s, guardians: next };
-  });
-  const addGuardian = () => setForm((s) => ({ ...s, guardians: [...s.guardians, { full_name: "", phone: "", email: "" }] }));
-  const removeGuardian = (idx) => setForm((s) => ({ ...s, guardians: s.guardians.filter((_, i) => i !== idx) }));
+  const [deleteError, setDeleteError] = useState("");
+  const [confirmDelete, setConfirmDelete] = useState(false);
 
   useEffect(() => {
     const load = async () => {
       try {
         setLoading(true);
-        const data = await fetchJSON(`/students/${studentId}`, { headers: { ...authHeaders() } });
-        const birthStr = data?.birth_date ? new Date(data.birth_date).toISOString().slice(0, 10) : "";
-        setForm({
-          guardians: Array.isArray(data.guardians) && data.guardians.length > 0 ? data.guardians.map(g => ({ full_name: g.full_name || "", phone: g.phone || "", email: g.email || "" })) : [{ full_name: "", phone: "", email: "" }],
-          name: data?.name || "",
-          lastname: data?.lastname || "",
-          dni: String(data?.dni ?? ""),
-          birth_date: birthStr,
-          email: data?.email || "",
-          phone: data?.phone || "",
-          address: data?.address || "",
-          section_id: data?.section_id || "",
+        const data = await fetchJSON(`/students/${studentId}`, {
+          headers: { ...authHeaders() },
         });
+        setStudent(data || null);
       } catch (e) {
         setError(e.message);
       } finally {
@@ -62,146 +33,182 @@ export default function EditStudentPage() {
     if (studentId) load();
   }, [studentId]);
 
-  useEffect(() => {
-    (async () => {
-      try {
-        const data = await fetchJSON("/sections", { headers: { ...authHeaders() } });
-        setSections(Array.isArray(data) ? data : []);
-      } catch (e) {
-        console.warn("Failed to load sections", e.message);
-      }
-    })();
-  }, []);
-
-  const onSubmit = async (e) => {
-    e.preventDefault();
-    setError("");
-    setSuccess("");
-    setSaving(true);
+  const handleDelete = async () => {
+    if (!studentId) return;
+    setDeleteError("");
     try {
-      if (!form.name || !form.lastname || !form.dni || !form.email) {
-        throw new Error("name, lastname, dni and email are required");
-      }
-      const payload = {
-        guardians: form.guardians.filter(g => g.full_name && g.email).map(g => ({ full_name: g.full_name, phone: g.phone, email: g.email })),
-        name: form.name,
-        lastname: form.lastname,
-        dni: Number(form.dni),
-        birth_date: form.birth_date ? new Date(form.birth_date) : undefined,
-        email: form.email,
-        phone: form.phone,
-        address: form.address,
-        section_id: form.section_id || undefined,
-      };
-
       await fetchJSON(`/students/${studentId}`, {
-        method: "PUT",
+        method: "DELETE",
         headers: { ...authHeaders() },
-        body: JSON.stringify(payload),
       });
-      setSuccess("Student updated successfully");
+      router.push("/controlPanel/students");
     } catch (e) {
-      setError(e.message);
-    } finally {
-      setSaving(false);
+      setDeleteError(e.message || "Failed to delete student");
     }
   };
 
   return (
     <main className="min-h-dvh p-6">
       <div className="mx-auto max-w-3xl space-y-6">
-        <div className="mb-2 flex items-center justify-between">
-          <Link href="/controlPanel/students" className="inline-flex items-center gap-2 rounded-lg border border-neutral-300 dark:border-neutral-700 px-3 py-1.5 text-sm hover:bg-neutral-100 dark:hover:bg-neutral-800">
+        <div className="mb-2 flex items-center">
+          <Link
+            href="/controlPanel/students"
+            className="inline-flex items-center gap-2 rounded-lg border border-neutral-300 dark:border-neutral-700 px-3 py-1.5 text-sm hover:bg-neutral-100 dark:hover:bg-neutral-800"
+          >
             <i className="fa-solid fa-arrow-left"></i>
             Back
           </Link>
         </div>
 
         <header>
-          <h1 className="text-2xl font-semibold">Edit Student</h1>
-          <p className="text-sm text-neutral-500">Update student information</p>
+          <h1 className="text-2xl font-semibold">Student profile</h1>
+          <p className="text-sm text-neutral-500">
+            Detailed information about this student
+          </p>
         </header>
 
         {loading ? (
           <div className="text-sm text-neutral-500">Loading...</div>
+        ) : error ? (
+          <div className="text-sm text-red-600">{error}</div>
+        ) : !student ? (
+          <div className="text-sm text-red-600">Student not found.</div>
         ) : (
-          <section className="rounded-2xl border border-neutral-200/60 dark:border-neutral-800 bg-white/70 dark:bg-neutral-900/60 shadow-sm">
-            <form onSubmit={onSubmit} className="p-4 grid gap-3 sm:grid-cols-2">
+          <section className="rounded-2xl border border-neutral-200/60 dark:border-neutral-800 bg-white/70 dark:bg-neutral-900/60 shadow-sm p-4 space-y-4">
+            <div className="flex items-center justify-between gap-4">
               <div>
-                <label className="block text-sm mb-1">Name</label>
-                <input className="input w-full" value={form.name} onChange={update("name")} />
+                <h2 className="text-xl font-semibold">
+                  {student.name} {student.lastname}
+                </h2>
+                <p className="text-sm text-neutral-500">
+                  DNI {student.dni} · {student.email}
+                </p>
               </div>
-              <div>
-                <label className="block text-sm mb-1">Lastname</label>
-                <input className="input w-full" value={form.lastname} onChange={update("lastname")} />
-              </div>
-              <div>
-                <label className="block text-sm mb-1">DNI</label>
-                <input className="input w-full" type="number" value={form.dni} onChange={update("dni")} />
-              </div>
-              <div>
-                <label className="block text-sm mb-1">Birth date</label>
-                <input className="input w-full" type="date" value={form.birth_date} onChange={update("birth_date")} />
-              </div>
-              <div className="sm:col-span-2">
-                <label className="block text-sm mb-1">Email</label>
-                <input className="input w-full" type="email" value={form.email} onChange={update("email")} />
-              </div>
-              <div>
-                <label className="block text-sm mb-1">Phone</label>
-                <input className="input w-full" value={form.phone} onChange={update("phone")} />
-              </div>
-              <div>
-                <label className="block text-sm mb-1">Address</label>
-                <input className="input w-full" value={form.address} onChange={update("address")} />
-              </div>
-
-              <div className="sm:col-span-2 space-y-3">
-                <div className="flex items-center justify-between">
-                  <label className="block text-sm">Guardians</label>
-                  <button type="button" onClick={addGuardian} className="rounded-lg px-2 py-1 text-xs border border-neutral-300 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-800">Add</button>
+              <div className="text-xs text-neutral-500 text-right">
+                <div className="font-mono text-neutral-800 dark:text-neutral-200">
+                  ID: {student.student_id}
                 </div>
-                {form.guardians.map((g, idx) => (
-                  <div key={idx} className="grid gap-2 sm:grid-cols-3">
-                    <input className="input" placeholder="Full name" value={g.full_name} onChange={updateGuardian(idx, "full_name")} />
-                    <input className="input" placeholder="Phone" value={g.phone} onChange={updateGuardian(idx, "phone")} />
-                    <div className="flex gap-2">
-                      <input className="input flex-1" placeholder="Email" type="email" value={g.email} onChange={updateGuardian(idx, "email")} />
-                      {form.guardians.length > 1 && (
-                        <button type="button" onClick={() => removeGuardian(idx)} className="rounded-lg px-2 py-1 text-xs border border-neutral-300 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-800">Remove</button>
-                      )}
+                <div>
+                  Section:{" "}
+                  <span className="font-medium">
+                    {student.section_id || "—"}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div className="grid gap-3 sm:grid-cols-2 text-sm">
+              <div className="space-y-1">
+                <div className="text-neutral-500">Name</div>
+                <div className="font-medium">
+                  {student.name} {student.lastname}
+                </div>
+              </div>
+              <div className="space-y-1">
+                <div className="text-neutral-500">DNI</div>
+                <div className="font-medium">{student.dni}</div>
+              </div>
+              <div className="space-y-1">
+                <div className="text-neutral-500">Email</div>
+                <div className="font-medium break-all">{student.email}</div>
+              </div>
+              <div className="space-y-1">
+                <div className="text-neutral-500">Phone</div>
+                <div className="font-medium">{student.phone || "—"}</div>
+              </div>
+              <div className="space-y-1">
+                <div className="text-neutral-500">Address</div>
+                <div className="font-medium">{student.address || "—"}</div>
+              </div>
+              <div className="space-y-1">
+                <div className="text-neutral-500">Birth date</div>
+                <div className="font-medium">
+                  {student.birth_date
+                    ? new Date(student.birth_date).toLocaleDateString()
+                    : "—"}
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <h3 className="text-sm font-semibold">Guardians</h3>
+              </div>
+              {Array.isArray(student.guardians) && student.guardians.length > 0 ? (
+                <div className="space-y-2">
+                  {student.guardians.map((g, idx) => (
+                    <div
+                      key={idx}
+                      className="rounded-lg border border-neutral-200/60 dark:border-neutral-800 px-3 py-2 text-sm"
+                    >
+                      <div className="font-medium">{g.full_name}</div>
+                      <div className="text-xs text-neutral-500">
+                        {g.email}
+                        {g.phone ? ` · ${g.phone}` : ""}
+                      </div>
                     </div>
-                  </div>
-                ))}
-              </div>
-
-              <div className="sm:col-span-2">
-                <label className="block text-sm mb-1">Section</label>
-                <select className="input w-full" value={form.section_id} onChange={update("section_id")}>
-                  <option value="">Select section (optional)</option>
-                  {sections.map((sec) => (
-                    <option key={sec.section_id} value={sec.section_id}>
-                      {sec.section_id}
-                    </option>
                   ))}
-                </select>
-              </div>
-
-              {error && (
-                <div className="sm:col-span-2 text-sm text-red-600">{error}</div>
+                </div>
+              ) : (
+                <div className="text-sm text-neutral-500">
+                  No guardians registered.
+                </div>
               )}
-              {success && (
-                <div className="sm:col-span-2 text-sm text-emerald-700 bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-800 rounded-md px-3 py-2">{success}</div>
-              )}
+            </div>
 
-              <div className="sm:col-span-2 flex gap-2">
-                <button disabled={saving} className="btn-primary">{saving ? "Saving..." : "Save"}</button>
-                <button type="button" onClick={() => router.push("/controlPanel/students")} className="rounded-lg px-3 py-2 text-sm border border-neutral-300 dark:border-neutral-700">Cancel</button>
-              </div>
-            </form>
+            <div className="flex gap-2 pt-2">
+              <button
+                type="button"
+                className="btn-primary"
+                onClick={() =>
+                  router.push(`/controlPanel/students/${studentId}/edit`)
+                }
+              >
+                Edit
+              </button>
+              <button
+                type="button"
+                onClick={() => setConfirmDelete(true)}
+                className="btn-danger"
+              >
+                Delete
+              </button>
+            </div>
           </section>
         )}
       </div>
+      {confirmDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className="w-full max-w-sm rounded-2xl border border-neutral-200/60 dark:border-neutral-800 bg-white dark:bg-neutral-900 shadow-lg p-5 space-y-3">
+            <h2 className="text-lg font-semibold">Delete student</h2>
+            <p className="text-sm text-neutral-600 dark:text-neutral-300">
+              Are you sure you want to delete this student? This action cannot
+              be undone.
+            </p>
+            {deleteError && (
+              <div className="text-xs text-red-600 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-md px-3 py-2">
+                {deleteError}
+              </div>
+            )}
+            <div className="flex justify-end gap-2 pt-2">
+              <button
+                type="button"
+                onClick={() => setConfirmDelete(false)}
+                className="rounded-lg px-3 py-1.5 text-sm border border-neutral-300 dark:border-neutral-700"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleDelete}
+                className="btn-danger text-sm"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 }
