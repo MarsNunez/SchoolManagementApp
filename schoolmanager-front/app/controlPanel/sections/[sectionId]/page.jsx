@@ -100,6 +100,18 @@ export default function SectionDetailsPage() {
 
   const assignSelectedStudents = async () => {
     if (!section || selectedStudentIds.size === 0) return;
+    if (atCapacity) {
+      setError("Cannot add students: capacity reached");
+      return;
+    }
+    if (slotsLeft > 0 && selectedStudentIds.size > slotsLeft) {
+      setError(
+        `Only ${slotsLeft} spot${
+          slotsLeft === 1 ? "" : "s"
+        } available in this section`
+      );
+      return;
+    }
     setError("");
     try {
       const ids = Array.from(selectedStudentIds);
@@ -174,7 +186,16 @@ export default function SectionDetailsPage() {
 
   const teacher = section ? teacherById[section.teacher_id] : null;
   const enrolledCount = students.length;
-  const capacity = section?.start_capacity ?? section?.max_capacity ?? 0;
+  const rawCapacity =
+    section?.max_capacity ??
+    section?.maxCapacity ??
+    section?.capacity ??
+    section?.start_capacity;
+  const parsedCapacity = Number(rawCapacity);
+  const capacity = Number.isFinite(parsedCapacity) ? parsedCapacity : null;
+  const slotsLeft =
+    capacity == null ? Infinity : Math.max(0, capacity - enrolledCount);
+  const atCapacity = capacity != null && enrolledCount >= capacity;
 
   return (
     <main className="min-h-dvh p-6">
@@ -242,7 +263,7 @@ export default function SectionDetailsPage() {
                 <div className="space-y-1 text-sm">
                   <div className="text-neutral-500">Capacity</div>
                   <div className="font-medium">
-                    {enrolledCount}/{capacity}
+                    {enrolledCount}/{capacity != null ? capacity : "—"}
                   </div>
                 </div>
               </div>
@@ -256,13 +277,22 @@ export default function SectionDetailsPage() {
                     Students currently assigned to this section
                   </p>
                 </div>
-                <button
-                  onClick={handleEnroll}
-                  className="btn-primary inline-flex items-center gap-2 text-sm"
-                >
-                  <i className="fa-solid fa-user-plus"></i>
-                  Enroll new student
-                </button>
+                <div className="relative group inline-flex items-center">
+                  {atCapacity && (
+                    <div className="pointer-events-none absolute top-full mt-2 left-1/2 -translate-x-1/2 rounded bg-white text-neutral-900 text-xs px-3 py-2 opacity-0 group-hover:opacity-100 shadow-lg z-20 whitespace-nowrap border border-neutral-200">
+                      <span className="absolute top-0 -translate-y-full left-1/2 -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-b-4 border-l-transparent border-r-transparent border-b-white"></span>
+                      Section is at max capacity
+                    </div>
+                  )}
+                  <button
+                    onClick={handleEnroll}
+                    disabled={atCapacity}
+                    className="btn-primary inline-flex items-center gap-2 text-sm disabled:opacity-60 disabled:cursor-not-allowed"
+                  >
+                    <i className="fa-solid fa-user-plus"></i>
+                    Enroll new student
+                  </button>
+                </div>
               </header>
               {students.length === 0 ? (
                 <div className="p-4 text-sm text-neutral-500">
@@ -321,15 +351,40 @@ export default function SectionDetailsPage() {
                     this section
                   </p>
                 </div>
-                <button
-                  type="button"
-                  onClick={assignSelectedStudents}
-                  disabled={selectedStudentIds.size === 0}
-                  className="btn-primary inline-flex items-center gap-2 text-sm disabled:opacity-60 disabled:cursor-not-allowed"
-                >
-                  <i className="fa-solid fa-user-check"></i>
-                  Add selected
-                </button>
+                <div className="relative group inline-flex items-center">
+                  {(() => {
+                    let tooltip = "";
+                    if (atCapacity) {
+                      tooltip = "Capacity reached";
+                    } else if (
+                      slotsLeft > 0 &&
+                      selectedStudentIds.size > slotsLeft
+                    ) {
+                      tooltip = `Only ${slotsLeft} spot${
+                        slotsLeft === 1 ? "" : "s"
+                      } left`;
+                    }
+                    return tooltip ? (
+                      <div className="pointer-events-none absolute top-full mt-2 left-1/2 -translate-x-1/2 rounded bg-white text-neutral-900 text-xs px-3 py-2 opacity-0 group-hover:opacity-100 shadow-lg z-20 max-w-[16rem] text-center border border-neutral-200">
+                        <span className="absolute top-0 -translate-y-full left-1/2 -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-b-4 border-l-transparent border-r-transparent border-b-white"></span>
+                        {tooltip}
+                      </div>
+                    ) : null;
+                  })()}
+                  <button
+                    type="button"
+                    onClick={assignSelectedStudents}
+                    disabled={
+                      selectedStudentIds.size === 0 ||
+                      atCapacity ||
+                      (slotsLeft > 0 && selectedStudentIds.size > slotsLeft)
+                    }
+                    className="btn-primary inline-flex items-center gap-2 text-sm disabled:opacity-60 disabled:cursor-not-allowed"
+                  >
+                    <i className="fa-solid fa-user-check"></i>
+                    Add selected
+                  </button>
+                </div>
               </header>
               <div className="p-4 space-y-3">
                 <input
@@ -347,12 +402,22 @@ export default function SectionDetailsPage() {
                     availableStudents.map((s) => (
                       <label
                         key={s.student_id}
-                        className="flex items-center gap-2 cursor-pointer"
+                        className={`flex items-center gap-2 ${
+                          atCapacity
+                            ? "cursor-not-allowed opacity-60"
+                            : "cursor-pointer"
+                        }`}
+                        title={
+                          atCapacity
+                            ? "Cannot select: section is at capacity"
+                            : ""
+                        }
                       >
                         <input
                           type="checkbox"
                           className="size-4 rounded border-neutral-300 dark:border-neutral-700"
                           checked={selectedStudentIds.has(s.student_id)}
+                          disabled={atCapacity}
                           onChange={() => toggleStudentSelection(s.student_id)}
                         />
                         <div className="flex flex-col">

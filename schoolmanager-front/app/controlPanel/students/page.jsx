@@ -8,6 +8,7 @@ export default function StudentsPage() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [query, setQuery] = useState("");
 
   const load = async () => {
     try {
@@ -45,6 +46,14 @@ export default function StudentsPage() {
         {error && <div className="text-sm text-red-600">{error}</div>}
 
         <section className="rounded-2xl border border-neutral-200/60 dark:border-neutral-800 bg-white/70 dark:bg-neutral-900/60 shadow-sm overflow-x-auto">
+          <div className="p-4 border-b border-neutral-200/60 dark:border-neutral-800">
+            <input
+              className="input w-full max-w-md"
+              placeholder="Search by name, ID or DNI"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+            />
+          </div>
           {loading ? (
             <div className="p-6 text-sm text-neutral-500">Loading...</div>
           ) : (
@@ -60,7 +69,20 @@ export default function StudentsPage() {
                 </tr>
               </thead>
               <tbody>
-                {items.map((s) => (
+                {items
+                  .filter((s) => {
+                    if (!query.trim()) return true;
+                    const q = query.toLowerCase();
+                    const name = `${s.name || ""} ${s.lastname || ""}`.toLowerCase();
+                    const id = String(s.student_id || "").toLowerCase();
+                    const dni = String(s.dni || "");
+                    return (
+                      name.includes(q) ||
+                      id.includes(q) ||
+                      dni.includes(q)
+                    );
+                  })
+                  .map((s) => (
                   <tr key={s.student_id} className="border-b last:border-none border-neutral-100 dark:border-neutral-800">
                     <td className="p-3 whitespace-nowrap">{s.student_id}</td>
                     <td className="p-3 whitespace-nowrap">{s.name} {s.lastname}</td>

@@ -1,12 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { fetchJSON, authHeaders } from "@/lib/api";
 
 export default function NewStudentPage() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const initialSectionId = searchParams?.get("section_id") || "";
 
   const [form, setForm] = useState({
@@ -33,6 +33,14 @@ export default function NewStudentPage() {
   });
   const addGuardian = () => setForm((s) => ({ ...s, guardians: [...s.guardians, { full_name: "", phone: "", email: "" }] }));
   const removeGuardian = (idx) => setForm((s) => ({ ...s, guardians: s.guardians.filter((_, i) => i !== idx) }));
+
+  const handleBack = () => {
+    if (typeof window !== "undefined" && window.history.length > 1) {
+      router.back();
+    } else {
+      router.push("/controlPanel/students");
+    }
+  };
 
   useEffect(() => {
     (async () => {
@@ -98,10 +106,14 @@ export default function NewStudentPage() {
     <main className="min-h-dvh p-6">
       <div className="mx-auto max-w-3xl space-y-6">
         <div className="mb-2 flex items-center justify-between">
-          <Link href="/controlPanel/students" className="inline-flex items-center gap-2 rounded-lg border border-neutral-300 dark:border-neutral-700 px-3 py-1.5 text-sm hover:bg-neutral-100 dark:hover:bg-neutral-800">
+          <button
+            type="button"
+            onClick={handleBack}
+            className="inline-flex items-center gap-2 rounded-lg border border-neutral-300 dark:border-neutral-700 px-3 py-1.5 text-sm hover:bg-neutral-100 dark:hover:bg-neutral-800"
+          >
             <i className="fa-solid fa-arrow-left"></i>
             Back
-          </Link>
+          </button>
         </div>
 
         <header>
