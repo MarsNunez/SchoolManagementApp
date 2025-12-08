@@ -19,7 +19,7 @@ const normalizeSectionPayload = (payload = {}) => {
 router.use(requireStaffAuth);
 
 // GET ALL SECTIONS
-router.get("/", requireRole("admin"), async (req, res) => {
+router.get("/", requireRole("admin", "secretary"), async (req, res) => {
   try {
     const sections = await SectionModel.find().lean();
     const ids = sections
@@ -52,7 +52,7 @@ router.get("/", requireRole("admin"), async (req, res) => {
 });
 
 // GET A SECTION BY sectionId
-router.get("/:sectionId", requireRole("admin"), async (req, res) => {
+router.get("/:sectionId", requireRole("admin", "secretary"), async (req, res) => {
   try {
     const section = await SectionModel.findOne({
       section_id: req.params.sectionId,
@@ -106,9 +106,11 @@ router.post("/", requireRole("admin"), async (req, res) => {
 });
 
 // UPDATE A SECTION BY sectionId
-router.put("/:sectionId", requireRole("admin"), async (req, res) => {
+router.put("/:sectionId", requireRole("admin", "secretary"), async (req, res) => {
   try {
     const payload = normalizeSectionPayload(req.body);
+    const requesterRole = req.staff?.role;
+
     if (
       Object.prototype.hasOwnProperty.call(payload, "group") &&
       payload.group &&
@@ -118,6 +120,21 @@ router.put("/:sectionId", requireRole("admin"), async (req, res) => {
         .status(400)
         .json({ message: "Invalid group. Allowed values are A, B, C, D, E." });
     }
+
+    // Secretaries cannot modify capacity or year
+    if (requesterRole === "secretary") {
+      delete payload.start_capacity;
+      delete payload.max_capacity;
+      delete payload.year;
+      delete payload.section_id;
+    }
+
+    if (Object.keys(payload).length === 0) {
+      return res
+        .status(400)
+        .json({ message: "No valid fields provided for update" });
+    }
+
     const section = await SectionModel.findOneAndUpdate(
       { section_id: req.params.sectionId },
       payload,

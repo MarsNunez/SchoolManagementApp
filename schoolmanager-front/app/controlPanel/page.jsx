@@ -56,6 +56,7 @@ export default function ControlPanel() {
       desc: "Manage curriculum plans",
       color: "bg-violet-600",
       tint: "bg-violet-600/10",
+      roles: ["admin"],
     },
     {
       href: "/controlPanel/sections",

@@ -7,7 +7,7 @@ const router = express.Router();
 router.use(requireStaffAuth);
 
 // GET ALL STUDY PLANS
-router.get("/", requireRole("admin"), async (req, res) => {
+router.get("/", requireRole("admin", "secretary"), async (req, res) => {
   try {
     const studyPlans = await StudyPlanModel.find();
     res.json(studyPlans);
@@ -19,7 +19,7 @@ router.get("/", requireRole("admin"), async (req, res) => {
 });
 
 // GET A STUDY PLAN BY studyPlanId
-router.get("/:studyPlanId", requireRole("admin"), async (req, res) => {
+router.get("/:studyPlanId", requireRole("admin", "secretary"), async (req, res) => {
   try {
     const studyPlan = await StudyPlanModel.findOne({
       studyPlan_id: req.params.studyPlanId,

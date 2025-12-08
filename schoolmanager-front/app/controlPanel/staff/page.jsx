@@ -112,8 +112,24 @@ export default function StaffPage() {
             <input className="input" placeholder="name" value={form.name} onChange={(e)=>setForm({...form, name:e.target.value})} />
             <input className="input" placeholder="lastname" value={form.lastname} onChange={(e)=>setForm({...form, lastname:e.target.value})} />
             <input className="input" placeholder="dni" type="number" value={form.dni} onChange={(e)=>setForm({...form, dni:e.target.value})} />
-            <input className="input" placeholder="email" type="email" value={form.email} onChange={(e)=>setForm({...form, email:e.target.value})} disabled={disableSensitive} title={disableSensitive ? "Secretaries cannot change email when editing" : ""} />
-            <input className="input" placeholder="password" type="password" value={form.password} onChange={(e)=>setForm({...form, password:e.target.value})} disabled={disableSensitive} title={disableSensitive ? "Secretaries cannot change password when editing" : ""} />
+            <input
+              className={`input ${disableSensitive ? "cursor-not-allowed" : ""}`}
+              placeholder="email"
+              type="email"
+              value={form.email}
+              onChange={(e)=>setForm({...form, email:e.target.value})}
+              disabled={disableSensitive}
+              title={disableSensitive ? "Secretaries cannot change email when editing" : ""}
+            />
+            <input
+              className={`input ${disableSensitive ? "cursor-not-allowed" : ""}`}
+              placeholder="password"
+              type="password"
+              value={form.password}
+              onChange={(e)=>setForm({...form, password:e.target.value})}
+              disabled={disableSensitive}
+              title={disableSensitive ? "Secretaries cannot change password when editing" : ""}
+            />
             {role === "admin" ? (
               <select className="input" value={form.role} onChange={(e)=>setForm({...form, role:e.target.value})}>
                 <option value="admin">Admin</option>
