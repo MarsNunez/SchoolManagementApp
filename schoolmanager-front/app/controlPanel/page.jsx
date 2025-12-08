@@ -1,8 +1,25 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
 export default function ControlPanel() {
+  const [role, setRole] = useState("");
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const raw = localStorage.getItem("staffProfile");
+        if (raw) {
+          const prof = JSON.parse(raw);
+          setRole(String(prof?.role || "").toLowerCase());
+        }
+      } catch {
+        setRole("");
+      }
+    }
+  }, []);
+
   const cards = [
     {
       href: "/controlPanel/teachers",
@@ -17,6 +34,7 @@ export default function ControlPanel() {
       desc: "Create and edit courses",
       color: "bg-blue-600",
       tint: "bg-blue-600/10",
+      roles: ["admin"],
     },
     {
       href: "/controlPanel/staff",
@@ -64,7 +82,9 @@ export default function ControlPanel() {
         </header>
 
         <section className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {cards.map((c) => (
+          {cards
+            .filter((c) => !c.roles || c.roles.includes(role))
+            .map((c) => (
             <Link
               key={c.href}
               href={c.href}

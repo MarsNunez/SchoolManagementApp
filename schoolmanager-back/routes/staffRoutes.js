@@ -77,7 +77,7 @@ router.post("/login", async (req, res) => {
 router.use(requireStaffAuth);
 
 // REGISTER STAFF MEMBER
-router.post("/register", requireRole("admin"), async (req, res) => {
+router.post("/register", requireRole("admin", "secretary"), async (req, res) => {
   try {
     const { name, lastname, dni, email, password, role, state } =
       req.body;
@@ -98,6 +98,23 @@ router.post("/register", requireRole("admin"), async (req, res) => {
       return res.status(409).json({
         code: "REGISTER_CONFLICT",
         message: "Staff member with provided identifiers already exists",
+      });
+    }
+
+    const requesterRole = req.staff?.role;
+    const normalizedRole = String(role || "").toLowerCase() || "secretary";
+
+    if (normalizedRole === "teacher") {
+      return res.status(400).json({
+        code: "INVALID_ROLE",
+        message: "Teacher is not a valid staff role",
+      });
+    }
+
+    if (requesterRole === "secretary" && normalizedRole === "admin") {
+      return res.status(403).json({
+        code: "FORBIDDEN",
+        message: "Secretaries cannot create admin users",
       });
     }
 
@@ -125,7 +142,7 @@ router.post("/register", requireRole("admin"), async (req, res) => {
       dni,
       email,
       password: hashedPassword,
-      role,
+      role: normalizedRole,
       state: typeof state === "boolean" ? state : true,
     });
 
@@ -145,9 +162,12 @@ router.post("/register", requireRole("admin"), async (req, res) => {
 });
 
 // GET ALL STAFF
-router.get("/", requireRole("admin"), async (req, res) => {
+router.get("/", requireRole("admin", "secretary"), async (req, res) => {
   try {
-    const staff = await StaffModel.find();
+    const requesterRole = req.staff?.role;
+    const filter =
+      requesterRole === "secretary" ? { role: { $ne: "admin" } } : {};
+    const staff = await StaffModel.find(filter);
     const sanitized = staff.map((member) => sanitizeStaff(member));
     res.json(sanitized);
   } catch (error) {
@@ -158,13 +178,20 @@ router.get("/", requireRole("admin"), async (req, res) => {
 });
 
 // GET STAFF MEMBER BY staffId
-router.get("/:staffId", requireRole("admin"), async (req, res) => {
+router.get("/:staffId", requireRole("admin", "secretary"), async (req, res) => {
   try {
     const staffMember = await StaffModel.findOne({
       staff_id: req.params.staffId,
     });
     if (!staffMember) {
       return res.status(404).json({ message: "Staff member not found" });
+    }
+
+    if (req.staff?.role === "secretary" && staffMember.role === "admin") {
+      return res.status(403).json({
+        code: "FORBIDDEN",
+        message: "Secretaries cannot access admin users",
+      });
     }
     res.json(sanitizeStaff(staffMember));
   } catch (error) {
@@ -175,12 +202,53 @@ router.get("/:staffId", requireRole("admin"), async (req, res) => {
 });
 
 // UPDATE STAFF MEMBER BY staffId
-router.put("/:staffId", requireRole("admin"), async (req, res) => {
+router.put("/:staffId", requireRole("admin", "secretary"), async (req, res) => {
   try {
+    const requesterRole = req.staff?.role;
     const payload = { ...req.body };
 
-    if (payload.password) {
+    const target = await StaffModel.findOne({ staff_id: req.params.staffId });
+    if (!target) {
+      return res.status(404).json({ message: "Staff member not found" });
+    }
+
+    const targetRole = String(target.role || "").toLowerCase();
+
+    // Secretaries cannot act on admins
+    if (requesterRole === "secretary" && targetRole === "admin") {
+      return res.status(403).json({
+        code: "FORBIDDEN",
+        message: "Secretaries cannot modify admin users",
+      });
+    }
+
+    if (payload.role) {
+      const incomingRole = String(payload.role).toLowerCase();
+      if (incomingRole === "teacher") {
+        return res.status(400).json({
+          code: "INVALID_ROLE",
+          message: "Teacher is not a valid staff role",
+        });
+      }
+      payload.role = incomingRole;
+    }
+
+    // If secretary, block changing email, password, or state of teacher/secretary
+    if (requesterRole === "secretary") {
+      delete payload.email;
+      delete payload.state;
+      if (payload.password) {
+        delete payload.password;
+      }
+    } else if (payload.password) {
       payload.password = await bcrypt.hash(payload.password, 10);
+    }
+
+    // If nothing to update
+    if (Object.keys(payload).length === 0) {
+      return res
+        .status(400)
+        .json({ message: "No allowed fields provided for update" });
     }
 
     const staffMember = await StaffModel.findOneAndUpdate(
@@ -188,10 +256,6 @@ router.put("/:staffId", requireRole("admin"), async (req, res) => {
       payload,
       { new: true, runValidators: true }
     );
-
-    if (!staffMember) {
-      return res.status(404).json({ message: "Staff member not found" });
-    }
 
     res.json(sanitizeStaff(staffMember));
   } catch (error) {
@@ -202,14 +266,25 @@ router.put("/:staffId", requireRole("admin"), async (req, res) => {
 });
 
 // DELETE STAFF MEMBER BY staffId
-router.delete("/:staffId", requireRole("admin"), async (req, res) => {
+router.delete("/:staffId", requireRole("admin", "secretary"), async (req, res) => {
   try {
-    const staffMember = await StaffModel.findOneAndDelete({
+    const requesterRole = req.staff?.role;
+
+    const staffMember = await StaffModel.findOne({
       staff_id: req.params.staffId,
     });
     if (!staffMember) {
       return res.status(404).json({ message: "Staff member not found" });
     }
+
+    if (requesterRole === "secretary" && staffMember.role === "admin") {
+      return res.status(403).json({
+        code: "FORBIDDEN",
+        message: "Secretaries cannot delete admin users",
+      });
+    }
+
+    await StaffModel.deleteOne({ staff_id: req.params.staffId });
 
     res.json({ message: "Staff member deleted successfully" });
   } catch (error) {

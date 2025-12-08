@@ -8,6 +8,7 @@ export default function StaffPage() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [role, setRole] = useState("");
 
   const [form, setForm] = useState({
     name: "",
@@ -20,6 +21,11 @@ export default function StaffPage() {
   });
   const [submitting, setSubmitting] = useState(false);
   const [editingId, setEditingId] = useState("");
+  const [editingTargetRole, setEditingTargetRole] = useState("");
+  const canManage = role === "admin" || role === "secretary";
+  const isEditing = Boolean(editingId);
+  const disableSensitive =
+    role === "secretary" && isEditing && editingTargetRole !== "admin";
 
   const load = async () => {
     try {
@@ -35,7 +41,25 @@ export default function StaffPage() {
 
   useEffect(() => { load(); }, []);
 
-  const resetForm = () => { setEditingId(""); setForm({ name:"", lastname:"", dni:"", email:"", password:"", role:"secretary", state:true }); };
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const raw = localStorage.getItem("staffProfile");
+        if (raw) {
+          const prof = JSON.parse(raw);
+          setRole(String(prof?.role || "").toLowerCase());
+        }
+      } catch {
+        setRole("");
+      }
+    }
+  }, []);
+
+  const resetForm = () => {
+    setEditingId("");
+    setEditingTargetRole("");
+    setForm({ name:"", lastname:"", dni:"", email:"", password:"", role:"secretary", state:true });
+  };
 
   const submitItem = async (e) => {
     e.preventDefault();
@@ -88,17 +112,27 @@ export default function StaffPage() {
             <input className="input" placeholder="name" value={form.name} onChange={(e)=>setForm({...form, name:e.target.value})} />
             <input className="input" placeholder="lastname" value={form.lastname} onChange={(e)=>setForm({...form, lastname:e.target.value})} />
             <input className="input" placeholder="dni" type="number" value={form.dni} onChange={(e)=>setForm({...form, dni:e.target.value})} />
-            <input className="input" placeholder="email" type="email" value={form.email} onChange={(e)=>setForm({...form, email:e.target.value})} />
-            <input className="input" placeholder="password" type="password" value={form.password} onChange={(e)=>setForm({...form, password:e.target.value})} />
-            <select className="input" value={form.role} onChange={(e)=>setForm({...form, role:e.target.value})}>
-              <option value="admin">Admin</option>
-              <option value="secretary">Secretary</option>
-              <option value="teacher">Teacher</option>
-            </select>
-            <label className="inline-flex items-center gap-2 text-sm">
-              <input type="checkbox" className="size-4" checked={form.state} onChange={(e)=>setForm({...form, state:e.target.checked})} />
-              Active
-            </label>
+            <input className="input" placeholder="email" type="email" value={form.email} onChange={(e)=>setForm({...form, email:e.target.value})} disabled={disableSensitive} title={disableSensitive ? "Secretaries cannot change email when editing" : ""} />
+            <input className="input" placeholder="password" type="password" value={form.password} onChange={(e)=>setForm({...form, password:e.target.value})} disabled={disableSensitive} title={disableSensitive ? "Secretaries cannot change password when editing" : ""} />
+            {role === "admin" ? (
+              <select className="input" value={form.role} onChange={(e)=>setForm({...form, role:e.target.value})}>
+                <option value="admin">Admin</option>
+                <option value="secretary">Secretary</option>
+              </select>
+            ) : (
+              <input type="hidden" value={form.role} readOnly />
+            )}
+            {role === "admin" && (
+              <label className="inline-flex items-center gap-2 text-sm">
+                <input
+                  type="checkbox"
+                  className="size-4"
+                  checked={form.state}
+                  onChange={(e)=>setForm({...form, state:e.target.checked})}
+                />
+                Active
+              </label>
+            )}
             {error && <div className="sm:col-span-3 text-sm text-red-600">{error}</div>}
             <div className="flex gap-2">
               <button disabled={submitting} className="btn-primary">{submitting ? (editingId?"Saving...":"Creating...") : (editingId?"Save":"Create")}</button>
@@ -132,10 +166,14 @@ export default function StaffPage() {
                     <td className="p-3 whitespace-nowrap">{s.email}</td>
                     <td className="p-3 whitespace-nowrap">{s.role}</td>
                     <td className="p-3 whitespace-nowrap">{String(s.state)}</td>
-                    <td className="p-3 flex gap-2">
-                      <button onClick={() => { setEditingId(s.staff_id); setForm({ name:s.name||"", lastname:s.lastname||"", dni:String(s.dni||""), email:s.email||"", password:"", role:s.role||"secretary", state:!!s.state }); }} className="rounded-lg px-3 py-2 text-sm border border-neutral-300 dark:border-neutral-700">Edit</button>
-                      <button onClick={() => remove(s.staff_id)} className="btn-danger">Delete</button>
-                    </td>
+                    {canManage && !(role === "secretary" && s.role === "admin") ? (
+                      <td className="p-3 flex gap-2">
+                        <button onClick={() => { setEditingId(s.staff_id); setEditingTargetRole(s.role || "secretary"); setForm({ name:s.name||"", lastname:s.lastname||"", dni:String(s.dni||""), email:s.email||"", password:"", role:s.role||"secretary", state:!!s.state }); }} className="rounded-lg px-3 py-2 text-sm border border-neutral-300 dark:border-neutral-700">Edit</button>
+                        <button onClick={() => remove(s.staff_id)} className="btn-danger">Delete</button>
+                      </td>
+                    ) : (
+                      <td className="p-3 text-sm text-neutral-500">—</td>
+                    )}
                   </tr>
                 ))}
               </tbody>

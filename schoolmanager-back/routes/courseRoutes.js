@@ -8,7 +8,7 @@ const router = express.Router();
 router.use(requireStaffAuth);
 
 // GET ALL COURSES
-router.get("/", requireRole("admin", "secretary"), async (req, res) => {
+router.get("/", requireRole("admin"), async (req, res) => {
   try {
     const courses = await CourseModel.find();
     res.json(courses);
@@ -22,7 +22,7 @@ router.get("/", requireRole("admin", "secretary"), async (req, res) => {
 // GET COURSE BY courseId
 router.get(
   "/:courseId",
-  requireRole("admin", "secretary"),
+  requireRole("admin"),
   async (req, res) => {
     try {
       const course = await CourseModel.findOne({
@@ -41,7 +41,7 @@ router.get(
 );
 
 // CREATE COURSE
-router.post("/", requireRole("admin", "secretary"), async (req, res) => {
+router.post("/", requireRole("admin"), async (req, res) => {
   try {
     const generateUniqueCourseId = async () => {
       for (let i = 0; i < 10; i++) {
@@ -70,7 +70,7 @@ router.post("/", requireRole("admin", "secretary"), async (req, res) => {
 // UPDATE COURSE BY courseId
 router.put(
   "/:courseId",
-  requireRole("admin", "secretary"),
+  requireRole("admin"),
   async (req, res) => {
     try {
       const course = await CourseModel.findOneAndUpdate(
@@ -95,7 +95,7 @@ router.put(
 // DELETE COURSE BY courseId
 router.delete(
   "/:courseId",
-  requireRole("admin", "secretary"),
+  requireRole("admin"),
   async (req, res) => {
     try {
       const course = await CourseModel.findOneAndDelete({
