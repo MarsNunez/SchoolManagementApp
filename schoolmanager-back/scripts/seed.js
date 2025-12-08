@@ -6,11 +6,13 @@ import { StaffModel } from "../models/Staff.js";
 import { TeacherModel } from "../models/Teacher.js";
 import { CourseModel } from "../models/Course.js";
 import { StudyPlanModel } from "../models/StudyPlan.js";
-import { StudentModel } from "../models/Student.js";
 import { SectionModel } from "../models/Section.js";
+import { StudentModel } from "../models/Student.js";
 import { PostModel } from "../models/Post.js";
 
 dotenv.config();
+
+const makeId = (prefix, num) => `${prefix}-${num.toString().padStart(6, "0")}`;
 
 const seed = async () => {
   try {
@@ -26,16 +28,17 @@ const seed = async () => {
       TeacherModel.deleteMany({}),
       CourseModel.deleteMany({}),
       StudyPlanModel.deleteMany({}),
-      StudentModel.deleteMany({}),
       SectionModel.deleteMany({}),
+      StudentModel.deleteMany({}),
       PostModel.deleteMany({}),
     ]);
 
+    // STAFF (Admins + Secretaries)
     const staffRaw = [
       {
-        staff_id: "staff-001",
+        staff_id: makeId("STF", 1),
         name: "Lucia",
-        lastname: "Ramirezz",
+        lastname: "Ramirez",
         dni: 70234561,
         email: "1@1.com",
         password: "1",
@@ -43,42 +46,42 @@ const seed = async () => {
         state: true,
       },
       {
-        staff_id: "staff-002",
+        staff_id: makeId("STF", 2),
         name: "Diego",
         lastname: "Salazar",
         dni: 70234562,
         email: "diego.salazar@colegio.edu",
-        password: "StaffAdmin#1",
+        password: "Admin#2",
         role: "admin",
         state: true,
       },
       {
-        staff_id: "staff-003",
+        staff_id: makeId("STF", 3),
         name: "Rosa",
         lastname: "Valdes",
         dni: 71234563,
-        email: "rosa.valdes@colegio.edu",
-        password: "Secretaria#1",
+        email: "2@2.com",
+        password: "2",
         role: "secretary",
         state: true,
       },
       {
-        staff_id: "staff-004",
+        staff_id: makeId("STF", 4),
         name: "Maria",
         lastname: "Huaman",
         dni: 71234564,
         email: "maria.huaman@colegio.edu",
-        password: "Secretaria#1",
+        password: "Secretaria#2",
         role: "secretary",
         state: true,
       },
       {
-        staff_id: "staff-005",
+        staff_id: makeId("STF", 5),
         name: "Karen",
         lastname: "Lagos",
         dni: 71234565,
         email: "karen.lagos@colegio.edu",
-        password: "Secretaria#2",
+        password: "Secretaria#3",
         role: "secretary",
         state: true,
       },
@@ -90,127 +93,123 @@ const seed = async () => {
         password: await bcrypt.hash(member.password, 10),
       }))
     );
-
     await StaffModel.insertMany(staffSeed);
     console.log(`Inserted ${staffSeed.length} staff members`);
 
+    // TEACHERS
     const teacherSeed = [
       {
-        teacher_id: "teacher-001",
+        teacher_id: makeId("TEA", 1),
         name: "Rafael",
         lastname: "Mendoza",
         dni: 76230011,
         specialties: ["Matematica", "Fisica"],
         email: "rafael.mendoza@colegio.edu",
         phone: "+51987654321",
-        current_teaching_courses: ["course-math-01", "course-physics-01"],
       },
-
       {
-        teacher_id: "teacher-002",
+        teacher_id: makeId("TEA", 2),
         name: "Carolina",
         lastname: "Paredes",
         dni: 76230012,
         specialties: ["Historia", "Civica"],
         email: "carolina.paredes@colegio.edu",
         phone: "+51987654322",
-        current_teaching_courses: ["course-history-01", "course-literature-01"],
       },
       {
-        teacher_id: "teacher-003",
+        teacher_id: makeId("TEA", 3),
         name: "German",
         lastname: "Silva",
         dni: 76230013,
         specialties: ["Biologia", "Quimica"],
         email: "german.silva@colegio.edu",
         phone: "+51987654323",
-        current_teaching_courses: ["course-biology-01", "course-chemistry-01"],
       },
     ];
-
     await TeacherModel.insertMany(teacherSeed);
     console.log(`Inserted ${teacherSeed.length} teachers`);
 
+    // COURSES
     const courseSeed = [
       {
-        course_id: "course-math-01",
+        course_id: makeId("CUR", 1),
         title: "Matematica I",
         description: "Fundamentos de algebra y geometria.",
-        teacher_id: "teacher-001",
+        teacher_id: teacherSeed[0].teacher_id,
         duration: 60,
       },
       {
-        course_id: "course-physics-01",
+        course_id: makeId("CUR", 2),
         title: "Fisica I",
         description: "Movimiento, fuerza y energia.",
-        teacher_id: "teacher-001",
+        teacher_id: teacherSeed[0].teacher_id,
         duration: 48,
       },
       {
-        course_id: "course-history-01",
+        course_id: makeId("CUR", 3),
         title: "Historia del Peru",
         description:
           "Repaso cronologico desde las culturas preincas hasta la republica.",
-        teacher_id: "teacher-002",
+        teacher_id: teacherSeed[1].teacher_id,
         duration: 56,
       },
       {
-        course_id: "course-literature-01",
+        course_id: makeId("CUR", 4),
         title: "Literatura Hispanoamericana",
         description: "Autores clasicos y contemporaneos.",
-        teacher_id: "teacher-002",
+        teacher_id: teacherSeed[1].teacher_id,
         duration: 50,
       },
       {
-        course_id: "course-biology-01",
+        course_id: makeId("CUR", 5),
         title: "Biologia General",
         description: "Estructura celular y sistemas del cuerpo humano.",
-        teacher_id: "teacher-003",
+        teacher_id: teacherSeed[2].teacher_id,
         duration: 52,
       },
       {
-        course_id: "course-chemistry-01",
+        course_id: makeId("CUR", 6),
         title: "Quimica I",
         description: "Quimica organica basica y reacciones.",
-        teacher_id: "teacher-003",
+        teacher_id: teacherSeed[2].teacher_id,
         duration: 52,
       },
       {
-        course_id: "course-english-01",
+        course_id: makeId("CUR", 7),
         title: "Ingles Comunicativo",
         description: "Comprension y produccion oral.",
-        teacher_id: "teacher-002",
+        teacher_id: teacherSeed[1].teacher_id,
         duration: 45,
       },
       {
-        course_id: "course-art-01",
+        course_id: makeId("CUR", 8),
         title: "Arte y Creatividad",
         description: "Exploracion de tecnicas artisticas mixtas.",
-        teacher_id: "teacher-002",
+        teacher_id: teacherSeed[1].teacher_id,
         duration: 40,
       },
       {
-        course_id: "course-tech-01",
+        course_id: makeId("CUR", 9),
         title: "Tecnologia y Robotica",
         description: "Fundamentos de programacion y robotica educativa.",
-        teacher_id: "teacher-001",
+        teacher_id: teacherSeed[0].teacher_id,
         duration: 60,
       },
       {
-        course_id: "course-ethics-01",
+        course_id: makeId("CUR", 10),
         title: "Etica y Ciudadania",
         description: "Formacion en valores y convivencia escolar.",
-        teacher_id: "teacher-002",
+        teacher_id: teacherSeed[1].teacher_id,
         duration: 38,
       },
     ];
-
     await CourseModel.insertMany(courseSeed);
     console.log(`Inserted ${courseSeed.length} courses`);
 
+    // STUDY PLANS
     const studyPlanSeed = [
       {
-        studyPlan_id: "studyplan-2025-secundaria-g5",
+        studyPlan_id: makeId("STP", 1),
         level: "secundaria",
         version: 1,
         effectiveFrom: new Date("2025-03-01"),
@@ -218,15 +217,15 @@ const seed = async () => {
         grade: 5,
         minGrade: 12,
         courses: [
-          "course-math-01",
-          "course-physics-01",
-          "course-biology-01",
-          "course-chemistry-01",
-          "course-english-01",
+          courseSeed[0].course_id,
+          courseSeed[1].course_id,
+          courseSeed[4].course_id,
+          courseSeed[5].course_id,
+          courseSeed[7].course_id,
         ],
       },
       {
-        studyPlan_id: "studyplan-2025-secundaria-g4",
+        studyPlan_id: makeId("STP", 2),
         level: "secundaria",
         version: 1,
         effectiveFrom: new Date("2025-03-01"),
@@ -234,21 +233,54 @@ const seed = async () => {
         grade: 4,
         minGrade: 12,
         courses: [
-          "course-history-01",
-          "course-literature-01",
-          "course-art-01",
-          "course-tech-01",
-          "course-ethics-01",
+          courseSeed[2].course_id,
+          courseSeed[3].course_id,
+          courseSeed[7].course_id,
+          courseSeed[8].course_id,
+          courseSeed[9].course_id,
         ],
       },
     ];
-
     await StudyPlanModel.insertMany(studyPlanSeed);
     console.log(`Inserted ${studyPlanSeed.length} study plans`);
 
+    // SECTIONS
+    const sectionSeed = [
+      {
+        section_id: makeId("SEC", 1),
+        title: "Secundaria 5A",
+        studyPlan_id: studyPlanSeed[0].studyPlan_id,
+        group: "A",
+        teacher_id: teacherSeed[0].teacher_id,
+        year: 2025,
+        start_capacity: 30,
+      },
+      {
+        section_id: makeId("SEC", 2),
+        title: "Secundaria 5B",
+        studyPlan_id: studyPlanSeed[0].studyPlan_id,
+        group: "B",
+        teacher_id: teacherSeed[1].teacher_id,
+        year: 2025,
+        start_capacity: 30,
+      },
+      {
+        section_id: makeId("SEC", 3),
+        title: "Secundaria 4A",
+        studyPlan_id: studyPlanSeed[1].studyPlan_id,
+        group: "C",
+        teacher_id: teacherSeed[2].teacher_id,
+        year: 2025,
+        start_capacity: 28,
+      },
+    ];
+    await SectionModel.insertMany(sectionSeed);
+    console.log(`Inserted ${sectionSeed.length} sections`);
+
+    // STUDENTS
     const studentSeed = [
       {
-        student_id: "student-001",
+        student_id: makeId("EST", 1),
         guardians: [
           {
             full_name: "Ana Torres",
@@ -263,10 +295,10 @@ const seed = async () => {
         email: "mateo.torres@alumnos.edu",
         phone: "+51911111111",
         address: "Av. Primavera 123",
-        section_id: "section-2025-a",
+        section_id: sectionSeed[0].section_id,
       },
       {
-        student_id: "student-002",
+        student_id: makeId("EST", 2),
         guardians: [
           {
             full_name: "Ana Torres",
@@ -281,10 +313,10 @@ const seed = async () => {
         email: "valeria.torres@alumnos.edu",
         phone: "+51911111112",
         address: "Av. Primavera 123",
-        section_id: "section-2025-a",
+        section_id: sectionSeed[0].section_id,
       },
       {
-        student_id: "student-003",
+        student_id: makeId("EST", 3),
         guardians: [
           {
             full_name: "Jorge Campos",
@@ -299,10 +331,10 @@ const seed = async () => {
         email: "santiago.campos@alumnos.edu",
         phone: "+51911111113",
         address: "Jr. Los Geranios 456",
-        section_id: "section-2025-a",
+        section_id: sectionSeed[0].section_id,
       },
       {
-        student_id: "student-004",
+        student_id: makeId("EST", 4),
         guardians: [
           {
             full_name: "Jorge Campos",
@@ -317,10 +349,10 @@ const seed = async () => {
         email: "luciana.campos@alumnos.edu",
         phone: "+51911111114",
         address: "Jr. Los Geranios 456",
-        section_id: "section-2025-b",
+        section_id: sectionSeed[1].section_id,
       },
       {
-        student_id: "student-005",
+        student_id: makeId("EST", 5),
         guardians: [
           {
             full_name: "Laura Delgado",
@@ -335,10 +367,10 @@ const seed = async () => {
         email: "gabriel.delgado@alumnos.edu",
         phone: "+51911111115",
         address: "Calle Los Cerezos 789",
-        section_id: "section-2025-b",
+        section_id: sectionSeed[1].section_id,
       },
       {
-        student_id: "student-006",
+        student_id: makeId("EST", 6),
         guardians: [
           {
             full_name: "Laura Delgado",
@@ -353,10 +385,10 @@ const seed = async () => {
         email: "isabella.delgado@alumnos.edu",
         phone: "+51911111116",
         address: "Calle Los Cerezos 789",
-        section_id: "section-2025-b",
+        section_id: sectionSeed[1].section_id,
       },
       {
-        student_id: "student-007",
+        student_id: makeId("EST", 7),
         guardians: [
           {
             full_name: "Carlos Ibanez",
@@ -371,10 +403,10 @@ const seed = async () => {
         email: "andres.ibanez@alumnos.edu",
         phone: "+51911111117",
         address: "Pasaje Las Flores 321",
-        section_id: "section-2025-c",
+        section_id: sectionSeed[2].section_id,
       },
       {
-        student_id: "student-008",
+        student_id: makeId("EST", 8),
         guardians: [
           {
             full_name: "Carlos Ibanez",
@@ -389,46 +421,13 @@ const seed = async () => {
         email: "renata.ibanez@alumnos.edu",
         phone: "+51911111118",
         address: "Pasaje Las Flores 321",
-        section_id: "section-2025-c",
+        section_id: sectionSeed[2].section_id,
       },
     ];
-
     await StudentModel.insertMany(studentSeed);
     console.log(`Inserted ${studentSeed.length} students`);
 
-    const sectionSeed = [
-      {
-        section_id: "section-2025-a",
-        title: "Seccion 5A",
-        studyPlan_id: "studyplan-2025-secundaria-g5",
-        group: "A",
-        teacher_id: "teacher-001",
-        year: 2025,
-        start_capacity: 30,
-      },
-      {
-        section_id: "section-2025-b",
-        title: "Seccion 5B",
-        studyPlan_id: "studyplan-2025-secundaria-g5",
-        group: "B",
-        teacher_id: "teacher-002",
-        year: 2025,
-        start_capacity: 30,
-      },
-      {
-        section_id: "section-2025-c",
-        title: "Seccion 4A",
-        studyPlan_id: "studyplan-2025-secundaria-g4",
-        group: "C",
-        teacher_id: "teacher-003",
-        year: 2025,
-        start_capacity: 28,
-      },
-    ];
-
-    await SectionModel.insertMany(sectionSeed);
-    console.log(`Inserted ${sectionSeed.length} sections`);
-
+    // POSTS
     const postSeed = [
       {
         title: "Inicio de ano escolar",
@@ -438,24 +437,23 @@ const seed = async () => {
           "https://colegio.edu/horarios-2025.pdf",
           "https://colegio.edu/reglamento.pdf",
         ],
-        creator_id: "teacher-001",
+        creator_id: teacherSeed[0].teacher_id,
       },
       {
         title: "Reunion de padres",
         content:
           "Se convoca a reunion informativa el proximo viernes a las 7 pm.",
         links: ["https://colegio.edu/agenda-reunion"],
-        creator_id: "teacher-002",
+        creator_id: teacherSeed[1].teacher_id,
       },
       {
         title: "Proyecto de laboratorio",
         content:
           "Los alumnos de ciencias presentaran sus proyectos finales la proxima semana.",
         links: ["https://colegio.edu/proyectos-ciencias"],
-        creator_id: "teacher-003",
+        creator_id: teacherSeed[2].teacher_id,
       },
     ];
-
     await PostModel.insertMany(postSeed);
     console.log(`Inserted ${postSeed.length} posts`);
 

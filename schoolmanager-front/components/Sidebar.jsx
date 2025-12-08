@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 
-export default function Sidebar() {
+export default function Sidebar({ onOpenSettings }) {
   const pathname = usePathname();
   const router = useRouter();
   const [isAuthed, setIsAuthed] = useState(false);
@@ -45,6 +45,8 @@ export default function Sidebar() {
     setIsAuthed(false);
     router.push("/auth/login");
   };
+
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
   const toggleCollapsed = () => {
     setCollapsed((c) => {
@@ -90,11 +92,12 @@ export default function Sidebar() {
   };
 
   return (
-    <aside
-      className={`h-dvh sticky top-0 duration-300 ${
-        collapsed ? "w-20" : "w-60"
-      } border-r border-neutral-200/60 dark:border-neutral-800 bg-white/70 dark:bg-neutral-900/60 backdrop-blur p-4 hidden md:flex md:flex-col`}
-    >
+    <>
+      <aside
+        className={`h-dvh sticky top-0 duration-300 ${
+          collapsed ? "w-20" : "w-60"
+        } border-r border-neutral-200/60 dark:border-neutral-800 bg-white/70 dark:bg-neutral-900/60 backdrop-blur p-4 hidden md:flex md:flex-col`}
+      >
       {/* Brand */}
       <div
         className={`mb-4 flex items-center ${
@@ -164,7 +167,12 @@ export default function Sidebar() {
         SETTINGS
       </div>
       <nav className="flex flex-col text-[1rem]">
-        <NavItem href="#" icon="fa-solid fa-gear" label="Settings" />
+        <NavItem
+          icon="fa-solid fa-gear"
+          label="Settings"
+          onClick={() => (onOpenSettings ? onOpenSettings() : null)}
+          className="cursor-pointer"
+        />
         {!isAuthed ? (
           <>
             <NavItem
@@ -182,13 +190,48 @@ export default function Sidebar() {
           </>
         ) : (
           <NavItem
-            onClick={logout}
+            onClick={() => setShowLogoutConfirm(true)}
             icon="fa-solid fa-right-from-bracket"
             label="Logout"
             className="text-red-500 cursor-pointer "
           />
         )}
       </nav>
-    </aside>
+      </aside>
+
+      {showLogoutConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            onClick={() => setShowLogoutConfirm(false)}
+          ></div>
+          <div className="relative w-full max-w-sm rounded-2xl border border-neutral-200/60 dark:border-neutral-800 bg-white dark:bg-neutral-900 shadow-lg p-5 space-y-4">
+            <h2 className="text-lg font-semibold">Sign out</h2>
+            <p className="text-sm text-neutral-600 dark:text-neutral-300">
+              Are you sure you want to log out? You will need to sign in again to continue.
+            </p>
+            <div className="flex justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setShowLogoutConfirm(false)}
+                className="rounded-lg px-3 py-2 text-sm border border-neutral-300 dark:border-neutral-700"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowLogoutConfirm(false);
+                  logout();
+                }}
+                className="btn-danger text-sm"
+              >
+                Logout
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 }

@@ -165,7 +165,7 @@ export default function CoursesPage() {
               <option value="">Select teacher (optional)</option>
               {teachers.map((t) => (
                 <option key={t.teacher_id} value={t.teacher_id}>
-                  {t.teacher_id}
+                  {t.name} {t.lastname} ({t.teacher_id})
                 </option>
               ))}
             </select>
@@ -250,7 +250,15 @@ export default function CoursesPage() {
                   >
                     <td className="p-3 whitespace-nowrap">{c.course_id}</td>
                     <td className="p-3 whitespace-nowrap">{c.title}</td>
-                    <td className="p-3 whitespace-nowrap">{c.teacher_id}</td>
+                    <td className="p-3 whitespace-nowrap">
+                      {(() => {
+                        const t = teachers.find(
+                          (teacher) => teacher.teacher_id === c.teacher_id
+                        );
+                        if (t) return `${t.name} ${t.lastname}`;
+                        return c.teacher_id || "—";
+                      })()}
+                    </td>
                     <td className="p-3 whitespace-nowrap">{c.duration}</td>
                     <td className="p-3 flex gap-2">
                       <button
