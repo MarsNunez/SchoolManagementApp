@@ -1,8 +1,13 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
-  --background: #ffffff;
+  --background: #f5f5f7;
   --foreground: #171717;
+  --glow-inner: rgba(37, 99, 235, 0.45); /* stronger blue glow */
+  --glow-mid: rgba(37, 99, 235, 0.2);
+  --glow-outer: rgba(37, 99, 235, 0);
 }
 
 @theme inline {
@@ -12,11 +17,22 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html.dark {
+  --background: #0a0a0a;
+  --foreground: #ededed;
+  --glow-inner: rgba(255, 255, 255, 0.12);
+  --glow-mid: rgba(255, 255, 255, 0.04);
+  --glow-outer: rgba(255, 255, 255, 0);
+}
+
+html[data-theme="light"] body {
+  background-color: #f5f5f7;
+  color: #171717;
+}
+
+html[data-theme="dark"] body {
+  background-color: #050505;
+  color: #f5f5f5;
 }
 
 body {
@@ -39,17 +55,17 @@ body::after {
   background:
     radial-gradient(
       70% 50% at 50% 92%,
-      rgba(255, 255, 255, 0.12) 0%,
-      rgba(255, 255, 255, 0.04) 35%,
-      rgba(255, 255, 255, 0) 65%
+      var(--glow-inner) 0%,
+      var(--glow-mid) 35%,
+      var(--glow-outer) 65%
     ),
     radial-gradient(
       90% 70% at 50% 95%,
-      rgba(0, 0, 0, 0.45) 0%,
-      rgba(0, 0, 0, 0.3) 40%,
-      rgba(0, 0, 0, 0) 75%
+      rgba(15, 23, 42, 0.4) 0%,
+      rgba(15, 23, 42, 0.25) 40%,
+      rgba(15, 23, 42, 0) 75%
     );
-  mix-blend-mode: screen;
+  opacity: 1;
   z-index: 2;
 }
 

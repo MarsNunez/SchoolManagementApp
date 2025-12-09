@@ -167,12 +167,14 @@ export default function Sidebar({ onOpenSettings }) {
         SETTINGS
       </div>
       <nav className="flex flex-col text-[1rem]">
-        <NavItem
-          icon="fa-solid fa-gear"
-          label="Settings"
-          onClick={() => (onOpenSettings ? onOpenSettings() : null)}
-          className="cursor-pointer"
-        />
+        {isAuthed && (
+          <NavItem
+            icon="fa-solid fa-gear"
+            label="Settings"
+            onClick={() => (onOpenSettings ? onOpenSettings() : null)}
+            className="cursor-pointer"
+          />
+        )}
         {!isAuthed ? (
           <>
             <NavItem
