@@ -91,7 +91,7 @@ export default function EditStudentPage() {
         });
         setSections(Array.isArray(data) ? data : []);
       } catch (e) {
-        console.warn("Failed to load sections", e.message);
+        console.warn("No se pudieron cargar las secciones", e.message);
       }
     })();
   }, []);
@@ -103,7 +103,9 @@ export default function EditStudentPage() {
     setSaving(true);
     try {
       if (!form.name || !form.lastname || !form.dni || !form.email) {
-        throw new Error("name, lastname, dni and email are required");
+        throw new Error(
+          "nombre, apellidos, DNI y correo son obligatorios"
+        );
       }
       const payload = {
         guardians: form.guardians
@@ -128,7 +130,7 @@ export default function EditStudentPage() {
         headers: { ...authHeaders() },
         body: JSON.stringify(payload),
       });
-      setSuccess("Student updated successfully");
+      setSuccess("Estudiante actualizado correctamente");
     } catch (e) {
       setError(e.message);
     } finally {
@@ -145,19 +147,19 @@ export default function EditStudentPage() {
             className="inline-flex items-center gap-2 rounded-lg border border-neutral-300 dark:border-neutral-700 px-3 py-1.5 text-sm hover:bg-neutral-100 dark:hover:bg-neutral-800"
           >
             <i className="fa-solid fa-arrow-left"></i>
-            Back
+            Volver
           </Link>
         </div>
 
         <header>
-          <h1 className="text-2xl font-semibold">Edit student</h1>
+          <h1 className="text-2xl font-semibold">Editar estudiante</h1>
           <p className="text-sm text-neutral-500">
-            Update student information
+            Actualiza la información del estudiante
           </p>
         </header>
 
         {loading ? (
-          <div className="text-sm text-neutral-500">Loading...</div>
+          <div className="text-sm text-neutral-500">Cargando...</div>
         ) : (
           <section className="rounded-2xl border border-neutral-200/60 dark:border-neutral-800 bg-white/70 dark:bg-neutral-900/60 shadow-sm">
             <form
@@ -165,7 +167,7 @@ export default function EditStudentPage() {
               className="p-4 grid gap-3 sm:grid-cols-2"
             >
               <div>
-                <label className="block text-sm mb-1">Name</label>
+                <label className="block text-sm mb-1">Nombres</label>
                 <input
                   className="input w-full"
                   value={form.name}
@@ -173,7 +175,7 @@ export default function EditStudentPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm mb-1">Lastname</label>
+                <label className="block text-sm mb-1">Apellidos</label>
                 <input
                   className="input w-full"
                   value={form.lastname}
@@ -190,7 +192,7 @@ export default function EditStudentPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm mb-1">Birth date</label>
+                <label className="block text-sm mb-1">Fecha de nacimiento</label>
                 <input
                   className="input w-full"
                   type="date"
@@ -199,7 +201,9 @@ export default function EditStudentPage() {
                 />
               </div>
               <div className="sm:col-span-2">
-                <label className="block text-sm mb-1">Email</label>
+                <label className="block text-sm mb-1">
+                  Correo electrónico
+                </label>
                 <input
                   className="input w-full"
                   type="email"
@@ -208,7 +212,7 @@ export default function EditStudentPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm mb-1">Phone</label>
+                <label className="block text-sm mb-1">Teléfono</label>
                 <input
                   className="input w-full"
                   value={form.phone}
@@ -216,7 +220,7 @@ export default function EditStudentPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm mb-1">Address</label>
+                <label className="block text-sm mb-1">Dirección</label>
                 <input
                   className="input w-full"
                   value={form.address}
@@ -226,33 +230,33 @@ export default function EditStudentPage() {
 
               <div className="sm:col-span-2 space-y-3">
                 <div className="flex items-center justify-between">
-                  <label className="block text-sm">Guardians</label>
+                  <label className="block text-sm">Apoderados</label>
                   <button
                     type="button"
                     onClick={addGuardian}
                     className="rounded-lg px-2 py-1 text-xs border border-neutral-300 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-800"
                   >
-                    Add
+                    Agregar
                   </button>
                 </div>
                 {form.guardians.map((g, idx) => (
                   <div key={idx} className="grid gap-2 sm:grid-cols-3">
                     <input
                       className="input"
-                      placeholder="Full name"
+                      placeholder="Nombre completo"
                       value={g.full_name}
                       onChange={updateGuardian(idx, "full_name")}
                     />
                     <input
                       className="input"
-                      placeholder="Phone"
+                      placeholder="Teléfono"
                       value={g.phone}
                       onChange={updateGuardian(idx, "phone")}
                     />
                     <div className="flex gap-2">
                       <input
                         className="input flex-1"
-                        placeholder="Email"
+                        placeholder="Correo electrónico"
                         type="email"
                         value={g.email}
                         onChange={updateGuardian(idx, "email")}
@@ -263,7 +267,7 @@ export default function EditStudentPage() {
                           onClick={() => removeGuardian(idx)}
                           className="rounded-lg px-2 py-1 text-xs border border-neutral-300 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-800"
                         >
-                          Remove
+                          Quitar
                         </button>
                       )}
                     </div>
@@ -272,13 +276,13 @@ export default function EditStudentPage() {
               </div>
 
               <div className="sm:col-span-2">
-                <label className="block text-sm mb-1">Section</label>
+                <label className="block text-sm mb-1">Sección</label>
                 <select
                   className="input w-full"
                   value={form.section_id}
                   onChange={update("section_id")}
                 >
-                  <option value="">Select section (optional)</option>
+                  <option value="">Seleccionar sección (opcional)</option>
                   {sections.map((sec) => (
                     <option key={sec.section_id} value={sec.section_id}>
                       {sec.section_id}
@@ -300,14 +304,16 @@ export default function EditStudentPage() {
 
               <div className="sm:col-span-2 flex gap-2">
                 <button disabled={saving} className="btn-primary">
-                  {saving ? "Saving..." : "Save changes"}
+                  {saving ? "Guardando..." : "Guardar cambios"}
                 </button>
                 <button
                   type="button"
-                  onClick={() => router.push(`/controlPanel/students/${studentId}`)}
+                  onClick={() =>
+                    router.push(`/controlPanel/students/${studentId}`)
+                  }
                   className="rounded-lg px-3 py-2 text-sm border border-neutral-300 dark:border-neutral-700"
                 >
-                  Cancel
+                  Cancelar
                 </button>
               </div>
             </form>

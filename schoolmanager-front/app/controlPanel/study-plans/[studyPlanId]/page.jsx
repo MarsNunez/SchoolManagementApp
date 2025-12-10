@@ -11,9 +11,9 @@ const LEVELS = [
 ];
 
 const STATES = [
-  { value: "draft", label: "Draft" },
-  { value: "active", label: "Active" },
-  { value: "archived", label: "Archived" },
+  { value: "draft", label: "Borrador" },
+  { value: "active", label: "Activo" },
+  { value: "archived", label: "Archivado" },
 ];
 
 const toFormState = (data) => ({
@@ -86,7 +86,7 @@ export default function EditStudyPlanPage() {
         setVersion(data?.version ?? 1);
         setBaseline(toBaseline(data));
       } catch (e) {
-        setError(e.message || "Failed to load study plan");
+        setError(e.message || "Error al cargar el plan de estudio");
       } finally {
         setLoading(false);
       }
@@ -106,7 +106,7 @@ export default function EditStudyPlanPage() {
         });
         setAllCourses(Array.isArray(data) ? data : []);
       } catch (e) {
-        setCoursesError(e.message || "Failed to load courses");
+        setCoursesError(e.message || "Error al cargar los cursos");
       } finally {
         setCoursesLoading(false);
       }
@@ -141,15 +141,15 @@ export default function EditStudyPlanPage() {
     const minGradeNum = form.minGrade ? Number(form.minGrade) : 12;
 
     if (!form.effectiveFrom) {
-      setError("effectiveFrom date is required");
+      setError("La fecha de vigencia es obligatoria");
       return;
     }
     if (!Number.isFinite(gradeNum) || gradeNum < 1 || gradeNum > 6) {
-      setError("grade must be a number between 1 and 6");
+      setError("El grado debe ser un número entre 1 y 6");
       return;
     }
     if (!Number.isFinite(minGradeNum)) {
-      setError("minGrade must be a number");
+      setError("La nota mínima debe ser un número");
       return;
     }
 
@@ -178,7 +178,7 @@ export default function EditStudyPlanPage() {
 
       if (Object.keys(changes).length === 0) {
         setSuccess("");
-        setError("No changes detected");
+        setError("No se detectaron cambios");
         setSaving(false);
         return;
       }
@@ -197,10 +197,10 @@ export default function EditStudyPlanPage() {
         setBaseline(toBaseline(updated));
       }
 
-      setSuccess("Study plan updated successfully");
+      setSuccess("Plan de estudio actualizado correctamente");
       setError("");
     } catch (e) {
-      setError(e.message || "Failed to update study plan");
+      setError(e.message || "Error al actualizar el plan de estudio");
     } finally {
       setSaving(false);
     }
@@ -215,19 +215,19 @@ export default function EditStudyPlanPage() {
             className="inline-flex items-center gap-2 rounded-lg border border-neutral-300 dark:border-neutral-700 px-3 py-1.5 text-sm hover:bg-neutral-100 dark:hover:bg-neutral-800"
           >
             <i className="fa-solid fa-arrow-left"></i>
-            Back
+            Volver
           </Link>
         </div>
 
         <header>
-          <h1 className="text-2xl font-semibold">Edit Study Plan</h1>
+          <h1 className="text-2xl font-semibold">Editar plan de estudio</h1>
           <p className="text-sm text-neutral-500">
-            Update study plan information
+            Actualiza la información del plan de estudio
           </p>
         </header>
 
         {loading ? (
-          <div className="text-sm text-neutral-500">Loading...</div>
+          <div className="text-sm text-neutral-500">Cargando...</div>
         ) : (
           <section className="rounded-2xl border border-neutral-200/60 dark:border-neutral-800 bg-white/70 dark:bg-neutral-900/60 shadow-sm">
             <form
@@ -235,7 +235,7 @@ export default function EditStudyPlanPage() {
               className="p-4 grid gap-3 sm:grid-cols-2"
             >
               <div>
-                <label className="block text-sm mb-1">Study Plan ID</label>
+                <label className="block text-sm mb-1">ID del plan de estudio</label>
                 <input
                   className="input w-full bg-neutral-100 dark:bg-neutral-800"
                   value={studyPlanId || ""}
@@ -243,7 +243,7 @@ export default function EditStudyPlanPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm mb-1">Version</label>
+                <label className="block text-sm mb-1">Versión</label>
                 <input
                   className="input w-full bg-neutral-100 dark:bg-neutral-800"
                   value={version}
@@ -251,7 +251,7 @@ export default function EditStudyPlanPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm mb-1">Level</label>
+                <label className="block text-sm mb-1">Nivel</label>
                 <select
                   className="input w-full"
                   value={form.level}
@@ -265,7 +265,7 @@ export default function EditStudyPlanPage() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm mb-1">Grade</label>
+                <label className="block text-sm mb-1">Grado</label>
                 <input
                   className="input w-full"
                   type="number"
@@ -276,7 +276,7 @@ export default function EditStudyPlanPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm mb-1">Effective From</label>
+                <label className="block text-sm mb-1">Vigente desde</label>
                 <input
                   className="input w-full"
                   type="date"
@@ -285,7 +285,7 @@ export default function EditStudyPlanPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm mb-1">State</label>
+                <label className="block text-sm mb-1">Estado</label>
                 <select
                   className="input w-full"
                   value={form.state}
@@ -299,7 +299,7 @@ export default function EditStudyPlanPage() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm mb-1">Minimum Grade</label>
+                <label className="block text-sm mb-1">Nota mínima</label>
                 <input
                   className="input w-full"
                   type="number"
@@ -309,17 +309,17 @@ export default function EditStudyPlanPage() {
                 />
               </div>
               <div className="sm:col-span-2">
-                <label className="block text-sm mb-1">Courses</label>
+                <label className="block text-sm mb-1">Cursos</label>
                 <input
                   className="input w-full mb-2"
-                  placeholder="Search courses by ID or title"
+                  placeholder="Buscar cursos por ID o título"
                   value={courseSearch}
                   onChange={(e) => setCourseSearch(e.target.value)}
                 />
                 <div className="max-h-64 overflow-y-auto rounded-lg border border-neutral-200/60 dark:border-neutral-700 bg-white/70 dark:bg-neutral-900/60 px-3 py-2 space-y-1">
                   {coursesLoading ? (
                     <div className="text-xs text-neutral-500">
-                      Loading courses...
+                      Cargando cursos...
                     </div>
                   ) : coursesError ? (
                     <div className="text-xs text-red-600">
@@ -327,7 +327,7 @@ export default function EditStudyPlanPage() {
                     </div>
                   ) : allCourses.length === 0 ? (
                     <div className="text-xs text-neutral-500">
-                      No courses available.
+                      No hay cursos disponibles.
                     </div>
                   ) : (
                     (allCourses || [])
@@ -384,16 +384,14 @@ export default function EditStudyPlanPage() {
 
               <div className="sm:col-span-2 flex gap-2">
                 <button disabled={saving} className="btn-primary">
-                  {saving ? "Saving..." : "Save"}
+                  {saving ? "Guardando..." : "Guardar"}
                 </button>
                 <button
                   type="button"
-                  onClick={() =>
-                    router.push("/controlPanel/study-plans")
-                  }
+                  onClick={() => router.push("/controlPanel/study-plans")}
                   className="rounded-lg px-3 py-2 text-sm border border-neutral-300 dark:border-neutral-700"
                 >
-                  Cancel
+                  Cancelar
                 </button>
               </div>
             </form>

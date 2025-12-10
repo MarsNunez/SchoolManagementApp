@@ -25,7 +25,8 @@ export default function AuthLoginPage() {
       });
 
       const data = await res.json();
-      if (!res.ok) throw new Error(data?.message || "Login failed");
+      if (!res.ok)
+        throw new Error(data?.message || "Error al iniciar sesión");
 
       if (typeof window !== "undefined") {
         localStorage.setItem("authToken", data.token);
@@ -47,10 +48,10 @@ export default function AuthLoginPage() {
             <span className="text-2xl font-semibold text-blue-600">SM</span>
           </div>
           <h1 className="text-2xl font-semibold tracking-tight">
-            Welcome back
+            Bienvenido de nuevo
           </h1>
           <p className="text-sm text-neutral-500">
-            Sign in to your school account
+            Inicia sesión en tu cuenta del colegio
           </p>
         </div>
 
@@ -58,12 +59,12 @@ export default function AuthLoginPage() {
           <form className="p-6 space-y-4" onSubmit={onSubmit}>
             <div className="space-y-2">
               <label htmlFor="email" className="block text-sm font-medium">
-                Email
+                Correo electrónico
               </label>
               <input
                 id="email"
                 type="email"
-                placeholder="you@school.edu"
+                placeholder="tu@colegio.edu"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full rounded-lg border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500"
@@ -72,7 +73,7 @@ export default function AuthLoginPage() {
 
             <div className="space-y-2">
               <label htmlFor="password" className="block text-sm font-medium">
-                Password
+                Contraseña
               </label>
               <input
                 id="password"
@@ -90,10 +91,10 @@ export default function AuthLoginPage() {
                   type="checkbox"
                   className="size-4 rounded border-neutral-300 dark-border-neutral-700"
                 />
-                Remember me
+                Recordarme
               </label>
               <a className="text-blue-600 hover:underline" href="#">
-                Forgot password?
+                ¿Olvidaste tu contraseña?
               </a>
             </div>
 
@@ -108,15 +109,15 @@ export default function AuthLoginPage() {
               disabled={loading}
               className="w-full rounded-lg bg-blue-600 text-white py-2.5 font-medium hover:bg-blue-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              {loading ? "Signing in..." : "Sign In"}
+              {loading ? "Ingresando..." : "Iniciar sesión"}
             </button>
           </form>
         </div>
 
         <p className="mt-6 text-center text-sm text-neutral-600 dark:text-neutral-400">
-          Don&apos;t have an account?{" "}
+          ¿No tienes una cuenta?{" "}
           <Link href="/auth/register" className="text-blue-600 hover:underline">
-            Create one
+            Crea una
           </Link>
         </p>
       </div>

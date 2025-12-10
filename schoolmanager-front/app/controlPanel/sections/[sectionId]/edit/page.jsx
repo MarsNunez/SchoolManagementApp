@@ -49,7 +49,7 @@ export default function EditSectionPage() {
         setStudyPlans(Array.isArray(planData) ? planData : []);
         setTeachers(Array.isArray(teacherData) ? teacherData : []);
       } catch (e) {
-        setError(e.message || "Failed to load section");
+        setError(e.message || "Error al cargar la sección");
       } finally {
         setLoading(false);
       }
@@ -78,12 +78,16 @@ export default function EditSectionPage() {
     setError("");
     setSaving(true);
     try {
-      if (!form.title.trim()) throw new Error("title is required");
-      if (!form.studyPlan_id.trim()) throw new Error("studyPlan_id is required");
-      if (!form.teacher_id.trim()) throw new Error("teacher_id is required");
+      if (!form.title.trim()) throw new Error("El título es obligatorio");
+      if (!form.studyPlan_id.trim())
+        throw new Error("El plan de estudios es obligatorio");
+      if (!form.teacher_id.trim())
+        throw new Error("El profesor es obligatorio");
       const startCapNumber = Number(form.start_capacity);
       if (!Number.isFinite(startCapNumber) || startCapNumber < 0) {
-        throw new Error("start_capacity must be a non-negative number");
+        throw new Error(
+          "La capacidad inicial debe ser un número no negativo"
+        );
       }
 
       const payload = {
@@ -127,7 +131,7 @@ export default function EditSectionPage() {
             className="inline-flex items-center gap-2 rounded-lg border border-neutral-300 dark:border-neutral-700 px-3 py-1.5 text-sm hover:bg-neutral-100 dark:hover:bg-neutral-800"
           >
             <i className="fa-solid fa-arrow-left"></i>
-            Back
+            Volver
           </button>
           {sectionId && (
             <div className="text-xs text-neutral-500">
@@ -137,19 +141,19 @@ export default function EditSectionPage() {
         </div>
 
         <header>
-          <h1 className="text-2xl font-semibold">Edit Section</h1>
+          <h1 className="text-2xl font-semibold">Editar sección</h1>
           <p className="text-sm text-neutral-500">
-            Update section information
+            Actualiza la información de la sección
           </p>
         </header>
 
         <section className="rounded-2xl border border-neutral-200/60 dark:border-neutral-800 bg-white/70 dark:bg-neutral-900/60 shadow-sm">
           {loading ? (
-            <div className="p-4 text-sm text-neutral-500">Loading...</div>
+            <div className="p-4 text-sm text-neutral-500">Cargando...</div>
           ) : (
             <form onSubmit={onSubmit} className="p-4 grid gap-3 sm:grid-cols-2">
               <div>
-                <label className="block text-sm mb-1">Title</label>
+                <label className="block text-sm mb-1">Título</label>
                 <input
                   className="input w-full"
                   value={form.title}
@@ -159,7 +163,7 @@ export default function EditSectionPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm mb-1">Group</label>
+                <label className="block text-sm mb-1">Grupo</label>
                 <select
                   className="input w-full"
                   value={form.group}
@@ -169,21 +173,24 @@ export default function EditSectionPage() {
                 >
                   {GROUP_OPTIONS.map((option) => (
                     <option key={option} value={option}>
-                      Group {option}
+                      Grupo {option}
                     </option>
                   ))}
                 </select>
               </div>
               <div>
-                <label className="block text-sm mb-1">Study Plan</label>
+                <label className="block text-sm mb-1">Plan de estudios</label>
                 <select
                   className="input w-full"
                   value={form.studyPlan_id}
                   onChange={(e) =>
-                    setForm((prev) => ({ ...prev, studyPlan_id: e.target.value }))
+                    setForm((prev) => ({
+                      ...prev,
+                      studyPlan_id: e.target.value,
+                    }))
                   }
                 >
-                  <option value="">Select study plan</option>
+                  <option value="">Selecciona un plan de estudios</option>
                   {studyPlans.map((plan) => (
                     <option key={plan.studyPlan_id} value={plan.studyPlan_id}>
                       {plan.studyPlan_id}
@@ -192,15 +199,18 @@ export default function EditSectionPage() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm mb-1">Teacher</label>
+                <label className="block text-sm mb-1">Profesor</label>
                 <select
                   className="input w-full"
                   value={form.teacher_id}
                   onChange={(e) =>
-                    setForm((prev) => ({ ...prev, teacher_id: e.target.value }))
+                    setForm((prev) => ({
+                      ...prev,
+                      teacher_id: e.target.value,
+                    }))
                   }
                 >
-                  <option value="">Select teacher</option>
+                  <option value="">Selecciona un profesor</option>
                   {teachers.map((teacher) => (
                     <option key={teacher.teacher_id} value={teacher.teacher_id}>
                       {teacher.name} {teacher.lastname}
@@ -209,7 +219,7 @@ export default function EditSectionPage() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm mb-1">Year</label>
+                <label className="block text-sm mb-1">Año</label>
                 <input
                   className={`input w-full ${isSecretary ? "cursor-not-allowed" : ""}`}
                   type="number"
@@ -221,7 +231,7 @@ export default function EditSectionPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm mb-1">Start capacity</label>
+                <label className="block text-sm mb-1">Capacidad inicial</label>
                 <input
                   className={`input w-full ${isSecretary ? "cursor-not-allowed" : ""}`}
                   type="number"
@@ -243,14 +253,14 @@ export default function EditSectionPage() {
 
               <div className="sm:col-span-2 flex gap-2">
                 <button disabled={saving} className="btn-primary">
-                  {saving ? "Saving..." : "Save"}
+                  {saving ? "Guardando..." : "Guardar"}
                 </button>
                 <button
                   type="button"
                   onClick={handleBack}
                   className="rounded-lg px-3 py-2 text-sm border border-neutral-300 dark:border-neutral-700"
                 >
-                  Cancel
+                  Cancelar
                 </button>
               </div>
             </form>

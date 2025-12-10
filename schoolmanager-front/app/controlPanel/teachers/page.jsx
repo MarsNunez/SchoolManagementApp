@@ -92,7 +92,7 @@ export default function TeachersPage() {
   };
 
   const remove = async (teacher_id) => {
-    if (!confirm(`Delete ${teacher_id}?`)) return;
+    if (!confirm(`¿Eliminar ${teacher_id}?`)) return;
     try {
       await fetchJSON(`/teachers/${teacher_id}`, {
         method: "DELETE",
@@ -108,15 +108,18 @@ export default function TeachersPage() {
     <main className="min-h-dvh p-6">
       <div className="mx-auto max-w-6xl space-y-6">
         <div className="mb-2">
-          <Link href="/controlPanel" className="inline-flex items-center gap-2 rounded-lg border border-neutral-300 dark:border-neutral-700 px-3 py-1.5 text-sm hover:bg-neutral-100 dark:hover:bg-neutral-800">
+          <Link
+            href="/controlPanel"
+            className="inline-flex items-center gap-2 rounded-lg border border-neutral-300 dark:border-neutral-700 px-3 py-1.5 text-sm hover:bg-neutral-100 dark:hover:bg-neutral-800"
+          >
             <i className="fa-solid fa-arrow-left"></i>
-            Back
+            Volver
           </Link>
         </div>
         <header>
-          <h1 className="text-2xl font-semibold">Teachers</h1>
+          <h1 className="text-2xl font-semibold">Profesores</h1>
           <p className="text-sm text-neutral-500">
-            List, create and manage teachers
+            Listar, crear y gestionar profesores
           </p>
         </header>
 
@@ -124,26 +127,28 @@ export default function TeachersPage() {
           <form onSubmit={submitItem} className="p-4 grid gap-3 sm:grid-cols-3">
             <input
               className="input"
-              placeholder="name"
+              placeholder="nombre"
               value={form.name}
               onChange={(e) => setForm({ ...form, name: e.target.value })}
             />
             <input
               className="input"
-              placeholder="lastname"
+              placeholder="apellidos"
               value={form.lastname}
-              onChange={(e) => setForm({ ...form, lastname: e.target.value })}
+              onChange={(e) =>
+                setForm({ ...form, lastname: e.target.value })
+              }
             />
             <input
               className="input"
-              placeholder="dni"
+              placeholder="DNI"
               type="number"
               value={form.dni}
               onChange={(e) => setForm({ ...form, dni: e.target.value })}
             />
             <input
               className="input"
-              placeholder="specialties (comma separated)"
+              placeholder="especialidades (separadas por coma)"
               value={form.specialties}
               onChange={(e) =>
                 setForm({ ...form, specialties: e.target.value })
@@ -151,20 +156,20 @@ export default function TeachersPage() {
             />
             <input
               className="input"
-              placeholder="email"
+              placeholder="correo electrónico"
               type="email"
               value={form.email}
               onChange={(e) => setForm({ ...form, email: e.target.value })}
             />
             <input
               className="input"
-              placeholder="phone"
+              placeholder="teléfono"
               value={form.phone}
               onChange={(e) => setForm({ ...form, phone: e.target.value })}
             />
             <input
               className="input sm:col-span-2"
-              placeholder="photo url"
+              placeholder="URL de foto"
               value={form.photo}
               onChange={(e) => setForm({ ...form, photo: e.target.value })}
             />
@@ -175,11 +180,11 @@ export default function TeachersPage() {
               <button disabled={submitting} className="btn-primary">
                 {submitting
                   ? editingId
-                    ? "Saving..."
-                    : "Creating..."
+                    ? "Guardando..."
+                    : "Creando..."
                   : editingId
-                  ? "Save"
-                  : "Create"}
+                  ? "Guardar"
+                  : "Crear"}
               </button>
               {editingId && (
                 <button
@@ -187,7 +192,7 @@ export default function TeachersPage() {
                   onClick={resetForm}
                   className="rounded-lg px-3 py-2 text-sm border border-neutral-300 dark:border-neutral-700"
                 >
-                  Cancel
+                  Cancelar
                 </button>
               )}
             </div>
@@ -196,17 +201,17 @@ export default function TeachersPage() {
 
         <section className="rounded-2xl border border-neutral-200/60 dark:border-neutral-800 bg-white/70 dark:bg-neutral-900/60 shadow-sm overflow-x-auto">
           {loading ? (
-            <div className="p-6 text-sm text-neutral-500">Loading...</div>
+            <div className="p-6 text-sm text-neutral-500">Cargando...</div>
           ) : (
             <table className="w-full text-sm">
               <thead className="text-left border-b border-neutral-200/60 dark:border-neutral-800">
                 <tr>
                   <th className="p-3">ID</th>
-                  <th className="p-3">Name</th>
-                  <th className="p-3">Email</th>
+                  <th className="p-3">Nombre</th>
+                  <th className="p-3">Correo</th>
                   <th className="p-3">DNI</th>
-                  <th className="p-3">Specialties</th>
-                  <th className="p-3">Actions</th>
+                  <th className="p-3">Especialidades</th>
+                  <th className="p-3">Acciones</th>
                 </tr>
               </thead>
               <tbody>
@@ -238,13 +243,13 @@ export default function TeachersPage() {
                         }}
                         className="rounded-lg px-3 py-2 text-sm border border-neutral-300 dark:border-neutral-700"
                       >
-                        Edit
+                        Editar
                       </button>
                       <button
                         onClick={() => remove(t.teacher_id)}
                         className="btn-danger"
                       >
-                        Delete
+                        Eliminar
                       </button>
                     </td>
                   </tr>

@@ -47,7 +47,7 @@ export default function CoursesPage() {
         });
         setTeachers(Array.isArray(data) ? data : []);
       } catch (e) {
-        console.warn("Failed to load teachers:", e.message);
+        console.warn("No se pudieron cargar los profesores:", e.message);
       }
     })();
   }, []);
@@ -66,10 +66,10 @@ export default function CoursesPage() {
       // Client-side validation for required fields
       const errs = { title: "", duration: "" };
       if (!form.title || form.title.trim() === "")
-        errs.title = "Title is required";
+        errs.title = "El título es obligatorio";
       const parsedDuration = Number(form.duration);
       if (!Number.isFinite(parsedDuration) || parsedDuration < 0)
-        errs.duration = "Duration must be a non-negative number";
+        errs.duration = "La duración debe ser un número no negativo";
       setFieldErrors(errs);
       if (errs.title || errs.duration) {
         setSubmitting(false);
@@ -105,7 +105,7 @@ export default function CoursesPage() {
   };
 
   const remove = async (course_id) => {
-    if (!confirm(`Delete ${course_id}?`)) return;
+    if (!confirm(`¿Eliminar ${course_id}?`)) return;
     try {
       await fetchJSON(`/courses/${course_id}`, {
         method: "DELETE",
@@ -126,13 +126,13 @@ export default function CoursesPage() {
             className="inline-flex items-center gap-2 rounded-lg border border-neutral-300 dark:border-neutral-700 px-3 py-1.5 text-sm hover:bg-neutral-100 dark:hover:bg-neutral-800"
           >
             <i className="fa-solid fa-arrow-left"></i>
-            Back
+            Volver
           </Link>
         </div>
         <header>
-          <h1 className="text-2xl font-semibold">Courses</h1>
+          <h1 className="text-2xl font-semibold">Cursos</h1>
           <p className="text-sm text-neutral-500">
-            List, create and manage courses
+            Listar, crear y gestionar cursos
           </p>
         </header>
 
@@ -143,7 +143,7 @@ export default function CoursesPage() {
                 className={`input w-full ${
                   fieldErrors.title ? "border-red-500 focus:ring-red-500" : ""
                 }`}
-                placeholder="title"
+                placeholder="título"
                 value={form.title}
                 onChange={(e) => {
                   setForm({ ...form, title: e.target.value });
@@ -162,7 +162,7 @@ export default function CoursesPage() {
               value={form.teacher_id}
               onChange={(e) => setForm({ ...form, teacher_id: e.target.value })}
             >
-              <option value="">Select teacher (optional)</option>
+              <option value="">Seleccionar profesor (opcional)</option>
               {teachers.map((t) => (
                 <option key={t.teacher_id} value={t.teacher_id}>
                   {t.name} {t.lastname} ({t.teacher_id})
@@ -171,7 +171,7 @@ export default function CoursesPage() {
             </select>
             <input
               className="input sm:col-span-2"
-              placeholder="description"
+              placeholder="descripción"
               value={form.description}
               onChange={(e) =>
                 setForm({ ...form, description: e.target.value })
@@ -184,7 +184,7 @@ export default function CoursesPage() {
                     ? "border-red-500 focus:ring-red-500"
                     : ""
                 }`}
-                placeholder="duration (hours)"
+                placeholder="duración (horas)"
                 type="number"
                 min={0}
                 value={form.duration}
@@ -209,11 +209,11 @@ export default function CoursesPage() {
               <button disabled={submitting} className="btn-primary">
                 {submitting
                   ? editingId
-                    ? "Saving..."
-                    : "Creating..."
+                    ? "Guardando..."
+                    : "Creando..."
                   : editingId
-                  ? "Save"
-                  : "Create"}
+                  ? "Guardar"
+                  : "Crear"}
               </button>
               {editingId && (
                 <button
@@ -221,7 +221,7 @@ export default function CoursesPage() {
                   onClick={resetForm}
                   className="rounded-lg px-3 py-2 text-sm border border-neutral-300 dark:border-neutral-700"
                 >
-                  Cancel
+                  Cancelar
                 </button>
               )}
             </div>
@@ -230,16 +230,16 @@ export default function CoursesPage() {
 
         <section className="rounded-2xl border border-neutral-200/60 dark:border-neutral-800 bg-white/70 dark:bg-neutral-900/60 shadow-sm overflow-x-auto">
           {loading ? (
-            <div className="p-6 text-sm text-neutral-500">Loading...</div>
+            <div className="p-6 text-sm text-neutral-500">Cargando...</div>
           ) : (
             <table className="w-full text-sm">
               <thead className="text-left border-b border-neutral-200/60 dark:border-neutral-800">
                 <tr>
                   <th className="p-3">ID</th>
-                  <th className="p-3">Title</th>
-                  <th className="p-3">Teacher</th>
-                  <th className="p-3">Duration</th>
-                  <th className="p-3">Actions</th>
+                  <th className="p-3">Título</th>
+                  <th className="p-3">Profesor</th>
+                  <th className="p-3">Duración</th>
+                  <th className="p-3">Acciones</th>
                 </tr>
               </thead>
               <tbody>
@@ -273,13 +273,13 @@ export default function CoursesPage() {
                         }}
                         className="rounded-lg px-3 py-2 text-sm border border-neutral-300 dark:border-neutral-700"
                       >
-                        Edit
+                        Editar
                       </button>
                       <button
                         onClick={() => remove(c.course_id)}
                         className="btn-danger"
                       >
-                        Delete
+                        Eliminar
                       </button>
                     </td>
                   </tr>

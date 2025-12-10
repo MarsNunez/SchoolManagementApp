@@ -99,41 +99,53 @@ export default function StaffPage() {
         <div className="mb-2">
           <Link href="/controlPanel" className="inline-flex items-center gap-2 rounded-lg border border-neutral-300 dark:border-neutral-700 px-3 py-1.5 text-sm hover:bg-neutral-100 dark:hover:bg-neutral-800">
             <i className="fa-solid fa-arrow-left"></i>
-            Back
+            Volver
           </Link>
         </div>
         <header>
-          <h1 className="text-2xl font-semibold">Staff</h1>
-          <p className="text-sm text-neutral-500">Admins and secretaries management</p>
+          <h1 className="text-2xl font-semibold">Personal</h1>
+          <p className="text-sm text-neutral-500">Gestión de administradores y secretarias</p>
         </header>
 
         <section className="rounded-2xl border border-neutral-200/60 dark:border-neutral-800 bg-white/70 dark:bg-neutral-900/60 shadow-sm">
           <form onSubmit={submitItem} className="p-4 grid gap-3 sm:grid-cols-3">
-            <input className="input" placeholder="name" value={form.name} onChange={(e)=>setForm({...form, name:e.target.value})} />
-            <input className="input" placeholder="lastname" value={form.lastname} onChange={(e)=>setForm({...form, lastname:e.target.value})} />
+            <input className="input" placeholder="nombre" value={form.name} onChange={(e)=>setForm({...form, name:e.target.value})} />
+            <input className="input" placeholder="apellidos" value={form.lastname} onChange={(e)=>setForm({...form, lastname:e.target.value})} />
             <input className="input" placeholder="dni" type="number" value={form.dni} onChange={(e)=>setForm({...form, dni:e.target.value})} />
             <input
               className={`input ${disableSensitive ? "cursor-not-allowed" : ""}`}
-              placeholder="email"
+              placeholder="correo electrónico"
               type="email"
               value={form.email}
-              onChange={(e)=>setForm({...form, email:e.target.value})}
+              onChange={(e) =>
+                setForm({ ...form, email: e.target.value })
+              }
               disabled={disableSensitive}
-              title={disableSensitive ? "Secretaries cannot change email when editing" : ""}
+              title={
+                disableSensitive
+                  ? "Las secretarias no pueden cambiar el correo al editar"
+                  : ""
+              }
             />
             <input
               className={`input ${disableSensitive ? "cursor-not-allowed" : ""}`}
-              placeholder="password"
+              placeholder="contraseña"
               type="password"
               value={form.password}
-              onChange={(e)=>setForm({...form, password:e.target.value})}
+              onChange={(e) =>
+                setForm({ ...form, password: e.target.value })
+              }
               disabled={disableSensitive}
-              title={disableSensitive ? "Secretaries cannot change password when editing" : ""}
+              title={
+                disableSensitive
+                  ? "Las secretarias no pueden cambiar la contraseña al editar"
+                  : ""
+              }
             />
             {role === "admin" ? (
               <select className="input" value={form.role} onChange={(e)=>setForm({...form, role:e.target.value})}>
-                <option value="admin">Admin</option>
-                <option value="secretary">Secretary</option>
+                <option value="admin">Administrador</option>
+                <option value="secretary">Secretaria</option>
               </select>
             ) : (
               <input type="hidden" value={form.role} readOnly />
@@ -146,14 +158,30 @@ export default function StaffPage() {
                   checked={form.state}
                   onChange={(e)=>setForm({...form, state:e.target.checked})}
                 />
-                Active
+                Activo
               </label>
             )}
-            {error && <div className="sm:col-span-3 text-sm text-red-600">{error}</div>}
+            {error && (
+              <div className="sm:col-span-3 text-sm text-red-600">{error}</div>
+            )}
             <div className="flex gap-2">
-              <button disabled={submitting} className="btn-primary">{submitting ? (editingId?"Saving...":"Creating...") : (editingId?"Save":"Create")}</button>
+              <button disabled={submitting} className="btn-primary">
+                {submitting
+                  ? editingId
+                    ? "Guardando..."
+                    : "Creando..."
+                  : editingId
+                  ? "Guardar"
+                  : "Crear"}
+              </button>
               {editingId && (
-                <button type="button" onClick={resetForm} className="rounded-lg px-3 py-2 text-sm border border-neutral-300 dark:border-neutral-700">Cancel</button>
+                <button
+                  type="button"
+                  onClick={resetForm}
+                  className="rounded-lg px-3 py-2 text-sm border border-neutral-300 dark:border-neutral-700"
+                >
+                  Cancelar
+                </button>
               )}
             </div>
           </form>
@@ -161,17 +189,17 @@ export default function StaffPage() {
 
         <section className="rounded-2xl border border-neutral-200/60 dark:border-neutral-800 bg-white/70 dark:bg-neutral-900/60 shadow-sm overflow-x-auto">
           {loading ? (
-            <div className="p-6 text-sm text-neutral-500">Loading...</div>
+            <div className="p-6 text-sm text-neutral-500">Cargando...</div>
           ) : (
             <table className="w-full text-sm">
               <thead className="text-left border-b border-neutral-200/60 dark:border-neutral-800">
                 <tr>
                   <th className="p-3">ID</th>
-                  <th className="p-3">Name</th>
-                  <th className="p-3">Email</th>
-                  <th className="p-3">Role</th>
-                  <th className="p-3">State</th>
-                  <th className="p-3">Actions</th>
+                  <th className="p-3">Nombre</th>
+                  <th className="p-3">Correo</th>
+                  <th className="p-3">Rol</th>
+                  <th className="p-3">Estado</th>
+                  <th className="p-3">Acciones</th>
                 </tr>
               </thead>
               <tbody>
@@ -184,8 +212,8 @@ export default function StaffPage() {
                     <td className="p-3 whitespace-nowrap">{String(s.state)}</td>
                     {canManage && !(role === "secretary" && s.role === "admin") ? (
                       <td className="p-3 flex gap-2">
-                        <button onClick={() => { setEditingId(s.staff_id); setEditingTargetRole(s.role || "secretary"); setForm({ name:s.name||"", lastname:s.lastname||"", dni:String(s.dni||""), email:s.email||"", password:"", role:s.role||"secretary", state:!!s.state }); }} className="rounded-lg px-3 py-2 text-sm border border-neutral-300 dark:border-neutral-700">Edit</button>
-                        <button onClick={() => remove(s.staff_id)} className="btn-danger">Delete</button>
+                        <button onClick={() => { setEditingId(s.staff_id); setEditingTargetRole(s.role || "secretary"); setForm({ name:s.name||"", lastname:s.lastname||"", dni:String(s.dni||""), email:s.email||"", password:"", role:s.role||"secretary", state:!!s.state }); }} className="rounded-lg px-3 py-2 text-sm border border-neutral-300 dark:border-neutral-700">Editar</button>
+                        <button onClick={() => remove(s.staff_id)} className="btn-danger">Eliminar</button>
                       </td>
                     ) : (
                       <td className="p-3 text-sm text-neutral-500">—</td>

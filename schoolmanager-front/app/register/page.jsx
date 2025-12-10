@@ -41,7 +41,9 @@ export default function RegisterPage() {
           ? localStorage.getItem("authToken")
           : null;
       if (!token)
-        throw new Error("Admin token required. Please login as admin first.");
+        throw new Error(
+          "Se requiere el token de administrador. Inicia sesión como administrador primero."
+        );
 
       const payload = { ...form, dni: Number(form.dni) };
 
@@ -55,9 +57,10 @@ export default function RegisterPage() {
       });
 
       const data = await res.json();
-      if (!res.ok) throw new Error(data?.message || "Register failed");
+      if (!res.ok)
+        throw new Error(data?.message || "Error al registrar al personal");
 
-      setSuccess("Staff created successfully");
+      setSuccess("Personal creado correctamente");
       // Nota: no reemplazamos el token vigente (admin) con el del usuario creado.
     } catch (err) {
       setError(err.message);
@@ -74,10 +77,10 @@ export default function RegisterPage() {
             <span className="text-2xl font-semibold text-emerald-600">SM</span>
           </div>
           <h1 className="text-2xl font-semibold tracking-tight">
-            Create an account
+            Crear una cuenta
           </h1>
           <p className="text-sm text-neutral-500">
-            Register staff to access the dashboard
+            Registra personal para acceder al panel
           </p>
         </div>
 
@@ -85,41 +88,41 @@ export default function RegisterPage() {
           <form className="p-6 grid gap-4 sm:grid-cols-2" onSubmit={onSubmit}>
             <div className="space-y-2 sm:col-span-2">
               <label htmlFor="staff_id" className="block text-sm font-medium">
-                Staff ID
+                ID del personal
               </label>
               <input
                 id="staff_id"
                 type="text"
                 value={form.staff_id}
                 onChange={update("staff_id")}
-                placeholder="staff-001"
+                placeholder="PER-0001"
                 className="w-full rounded-lg border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 px-3 py-2 outline-none focus:ring-2 focus:ring-emerald-500"
               />
             </div>
 
             <div className="space-y-2">
               <label htmlFor="name" className="block text-sm font-medium">
-                Name
+                Nombres
               </label>
               <input
                 id="name"
                 type="text"
                 value={form.name}
                 onChange={update("name")}
-                placeholder="Lucia"
+                placeholder="Lucía"
                 className="w-full rounded-lg border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 px-3 py-2 outline-none focus:ring-2 focus:ring-emerald-500"
               />
             </div>
             <div className="space-y-2">
               <label htmlFor="lastname" className="block text-sm font-medium">
-                Lastname
+                Apellidos
               </label>
               <input
                 id="lastname"
                 type="text"
                 value={form.lastname}
                 onChange={update("lastname")}
-                placeholder="Ramirez"
+                placeholder="Ramírez"
                 className="w-full rounded-lg border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 px-3 py-2 outline-none focus:ring-2 focus:ring-emerald-500"
               />
             </div>
@@ -139,21 +142,21 @@ export default function RegisterPage() {
             </div>
             <div className="space-y-2">
               <label htmlFor="email" className="block text-sm font-medium">
-                Email
+                Correo electrónico
               </label>
               <input
                 id="email"
                 type="email"
                 value={form.email}
                 onChange={update("email")}
-                placeholder="you@school.edu"
+                placeholder="tu@colegio.edu"
                 className="w-full rounded-lg border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 px-3 py-2 outline-none focus:ring-2 focus:ring-emerald-500"
               />
             </div>
 
             <div className="space-y-2">
               <label htmlFor="password" className="block text-sm font-medium">
-                Password
+                Contraseña
               </label>
               <input
                 id="password"
@@ -166,7 +169,7 @@ export default function RegisterPage() {
             </div>
             <div className="space-y-2">
               <label htmlFor="role" className="block text-sm font-medium">
-                Role
+                Rol
               </label>
               <select
                 id="role"
@@ -174,9 +177,9 @@ export default function RegisterPage() {
                 onChange={update("role")}
                 className="w-full rounded-lg border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 px-3 py-2 outline-none focus:ring-2 focus:ring-emerald-500"
               >
-                <option value="admin">Admin</option>
-                <option value="secretary">Secretary</option>
-                <option value="teacher">Teacher</option>
+                <option value="admin">Administrador</option>
+                <option value="secretary">Secretaria</option>
+                <option value="teacher">Profesor</option>
               </select>
             </div>
 
@@ -188,10 +191,10 @@ export default function RegisterPage() {
                   onChange={update("state")}
                   className="size-4 rounded border-neutral-300 dark:border-neutral-700"
                 />
-                Active state
+                Estado activo
               </label>
               <a className="text-emerald-600 hover:underline" href="/auth/login">
-                Already have an account?
+                ¿Ya tienes una cuenta?
               </a>
             </div>
 
@@ -212,7 +215,7 @@ export default function RegisterPage() {
                 disabled={loading}
                 className="w-full rounded-lg bg-emerald-600 text-white py-2.5 font-medium hover:bg-emerald-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
               >
-                {loading ? "Creating..." : "Create Account"}
+                {loading ? "Creando..." : "Crear cuenta"}
               </button>
             </div>
           </form>

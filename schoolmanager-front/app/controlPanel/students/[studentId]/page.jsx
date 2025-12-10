@@ -43,7 +43,7 @@ export default function StudentProfilePage() {
       });
       router.push("/controlPanel/students");
     } catch (e) {
-      setDeleteError(e.message || "Failed to delete student");
+      setDeleteError(e.message || "Error al eliminar al estudiante");
     }
   };
 
@@ -56,23 +56,23 @@ export default function StudentProfilePage() {
             className="inline-flex items-center gap-2 rounded-lg border border-neutral-300 dark:border-neutral-700 px-3 py-1.5 text-sm hover:bg-neutral-100 dark:hover:bg-neutral-800"
           >
             <i className="fa-solid fa-arrow-left"></i>
-            Back
+            Volver
           </Link>
         </div>
 
         <header>
-          <h1 className="text-2xl font-semibold">Student profile</h1>
+          <h1 className="text-2xl font-semibold">Perfil del estudiante</h1>
           <p className="text-sm text-neutral-500">
-            Detailed information about this student
+            Información detallada de este estudiante
           </p>
         </header>
 
         {loading ? (
-          <div className="text-sm text-neutral-500">Loading...</div>
+          <div className="text-sm text-neutral-500">Cargando...</div>
         ) : error ? (
           <div className="text-sm text-red-600">{error}</div>
         ) : !student ? (
-          <div className="text-sm text-red-600">Student not found.</div>
+          <div className="text-sm text-red-600">Estudiante no encontrado.</div>
         ) : (
           <section className="rounded-2xl border border-neutral-200/60 dark:border-neutral-800 bg-white/70 dark:bg-neutral-900/60 shadow-sm p-4 space-y-4">
             <div className="flex items-center justify-between gap-4">
@@ -99,7 +99,7 @@ export default function StudentProfilePage() {
 
             <div className="grid gap-3 sm:grid-cols-2 text-sm">
               <div className="space-y-1">
-                <div className="text-neutral-500">Name</div>
+                <div className="text-neutral-500">Nombre</div>
                 <div className="font-medium">
                   {student.name} {student.lastname}
                 </div>
@@ -109,19 +109,19 @@ export default function StudentProfilePage() {
                 <div className="font-medium">{student.dni}</div>
               </div>
               <div className="space-y-1">
-                <div className="text-neutral-500">Email</div>
+                <div className="text-neutral-500">Correo electrónico</div>
                 <div className="font-medium break-all">{student.email}</div>
               </div>
               <div className="space-y-1">
-                <div className="text-neutral-500">Phone</div>
+                <div className="text-neutral-500">Teléfono</div>
                 <div className="font-medium">{student.phone || "—"}</div>
               </div>
               <div className="space-y-1">
-                <div className="text-neutral-500">Address</div>
+                <div className="text-neutral-500">Dirección</div>
                 <div className="font-medium">{student.address || "—"}</div>
               </div>
               <div className="space-y-1">
-                <div className="text-neutral-500">Birth date</div>
+                <div className="text-neutral-500">Fecha de nacimiento</div>
                 <div className="font-medium">
                   {student.birth_date
                     ? new Date(student.birth_date).toLocaleDateString()
@@ -132,7 +132,7 @@ export default function StudentProfilePage() {
 
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <h3 className="text-sm font-semibold">Guardians</h3>
+                <h3 className="text-sm font-semibold">Apoderados</h3>
               </div>
               {Array.isArray(student.guardians) && student.guardians.length > 0 ? (
                 <div className="space-y-2">
@@ -151,7 +151,7 @@ export default function StudentProfilePage() {
                 </div>
               ) : (
                 <div className="text-sm text-neutral-500">
-                  No guardians registered.
+                  No hay apoderados registrados.
                 </div>
               )}
             </div>
@@ -164,14 +164,14 @@ export default function StudentProfilePage() {
                   router.push(`/controlPanel/students/${studentId}/edit`)
                 }
               >
-                Edit
+                Editar
               </button>
               <button
                 type="button"
                 onClick={() => setConfirmDelete(true)}
                 className="btn-danger"
               >
-                Delete
+                Eliminar
               </button>
             </div>
           </section>
@@ -180,10 +180,10 @@ export default function StudentProfilePage() {
       {confirmDelete && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
           <div className="w-full max-w-sm rounded-2xl border border-neutral-200/60 dark:border-neutral-800 bg-white dark:bg-neutral-900 shadow-lg p-5 space-y-3">
-            <h2 className="text-lg font-semibold">Delete student</h2>
+            <h2 className="text-lg font-semibold">Eliminar estudiante</h2>
             <p className="text-sm text-neutral-600 dark:text-neutral-300">
-              Are you sure you want to delete this student? This action cannot
-              be undone.
+              ¿Seguro que quieres eliminar a este estudiante? Esta acción no se
+              puede deshacer.
             </p>
             {deleteError && (
               <div className="text-xs text-red-600 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-md px-3 py-2">
@@ -196,14 +196,14 @@ export default function StudentProfilePage() {
                 onClick={() => setConfirmDelete(false)}
                 className="rounded-lg px-3 py-1.5 text-sm border border-neutral-300 dark:border-neutral-700"
               >
-                Cancel
+                Cancelar
               </button>
               <button
                 type="button"
                 onClick={handleDelete}
                 className="btn-danger text-sm"
               >
-                Delete
+                Eliminar
               </button>
             </div>
           </div>

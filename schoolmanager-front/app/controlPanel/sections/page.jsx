@@ -55,7 +55,7 @@ export default function SectionsPage() {
         });
         setTeachers(Array.isArray(teacherData) ? teacherData : []);
       } catch (e) {
-        console.warn("Failed to load teachers:", e.message);
+        console.warn("No se pudieron cargar los profesores:", e.message);
       }
     };
     fetchTeachers();
@@ -78,7 +78,7 @@ export default function SectionsPage() {
   const isAdmin = role === "admin";
 
   const remove = async (section_id) => {
-    if (!confirm(`Delete ${section_id}?`)) return;
+    if (!confirm(`¿Eliminar ${section_id}?`)) return;
     try {
       await fetchJSON(`/sections/${section_id}`, {
         method: "DELETE",
@@ -99,7 +99,7 @@ export default function SectionsPage() {
             className="inline-flex items-center gap-2 rounded-lg border border-neutral-300 dark:border-neutral-700 px-3 py-1.5 text-sm hover:bg-neutral-100 dark:hover:bg-neutral-800"
           >
             <i className="fa-solid fa-arrow-left"></i>
-            Back
+            Volver
           </Link>
           {isAdmin && (
             <Link
@@ -107,15 +107,15 @@ export default function SectionsPage() {
               className="btn-primary inline-flex items-center gap-2"
             >
               <i className="fa-solid fa-plus"></i>
-              Create section
+              Crear sección
             </Link>
           )}
         </div>
 
         <header>
-          <h1 className="text-2xl font-semibold">Sections</h1>
+          <h1 className="text-2xl font-semibold">Secciones</h1>
           <p className="text-sm text-neutral-500">
-            List and manage sections
+            Listar y gestionar secciones
           </p>
         </header>
 
@@ -123,19 +123,19 @@ export default function SectionsPage() {
 
         <section className="rounded-2xl border border-neutral-200/60 dark:border-neutral-800 bg-white/70 dark:bg-neutral-900/60 shadow-sm overflow-x-auto">
           {loading ? (
-            <div className="p-6 text-sm text-neutral-500">Loading...</div>
+            <div className="p-6 text-sm text-neutral-500">Cargando...</div>
           ) : (
             <table className="w-full text-sm">
               <thead className="text-left border-b border-neutral-200/60 dark:border-neutral-800">
                 <tr>
                   <th className="p-3">ID</th>
-                  <th className="p-3">Title</th>
-                  <th className="p-3">Group</th>
-                  <th className="p-3">Study Plan</th>
-                  <th className="p-3">Teacher</th>
-                  <th className="p-3">Year</th>
-                  <th className="p-3">Capacity</th>
-                  <th className="p-3">Actions</th>
+                  <th className="p-3">Título</th>
+                  <th className="p-3">Grupo</th>
+                  <th className="p-3">Plan de estudios</th>
+                  <th className="p-3">Profesor</th>
+                  <th className="p-3">Año</th>
+                  <th className="p-3">Capacidad</th>
+                  <th className="p-3">Acciones</th>
                 </tr>
               </thead>
               <tbody>
@@ -183,14 +183,14 @@ export default function SectionsPage() {
                             href={`/controlPanel/sections/${section.section_id}/edit`}
                             className="rounded-lg px-3 py-2 text-sm border border-neutral-300 dark:border-neutral-700"
                           >
-                            Edit
+                            Editar
                           </Link>
                           {isAdmin && (
                             <button
                               onClick={() => remove(section.section_id)}
                               className="btn-danger"
                             >
-                              Delete
+                              Eliminar
                             </button>
                           )}
                         </div>

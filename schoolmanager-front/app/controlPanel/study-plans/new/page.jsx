@@ -10,9 +10,9 @@ const LEVELS = [
 ];
 
 const STATES = [
-  { value: "draft", label: "Draft" },
-  { value: "active", label: "Active" },
-  { value: "archived", label: "Archived" },
+  { value: "draft", label: "Borrador" },
+  { value: "active", label: "Activo" },
+  { value: "archived", label: "Archivado" },
 ];
 
 export default function NewStudyPlanPage() {
@@ -42,7 +42,7 @@ export default function NewStudyPlanPage() {
         });
         setCourses(Array.isArray(data) ? data : []);
       } catch (e) {
-        setCoursesError(e.message || "Failed to load courses");
+        setCoursesError(e.message || "Error al cargar los cursos");
       } finally {
         setCoursesLoading(false);
       }
@@ -77,15 +77,15 @@ export default function NewStudyPlanPage() {
     const minGradeNum = form.minGrade ? Number(form.minGrade) : 12;
 
     if (!form.effectiveFrom) {
-      setError("effectiveFrom date is required");
+      setError("La fecha de vigencia es obligatoria");
       return;
     }
     if (!Number.isFinite(gradeNum) || gradeNum < 1 || gradeNum > 6) {
-      setError("grade must be a number between 1 and 6");
+      setError("El grado debe ser un número entre 1 y 6");
       return;
     }
     if (!Number.isFinite(minGradeNum)) {
-      setError("minGrade must be a number");
+      setError("La nota mínima debe ser un número");
       return;
     }
 
@@ -106,7 +106,7 @@ export default function NewStudyPlanPage() {
         body: JSON.stringify(payload),
       });
 
-      setSuccess("Study plan created successfully");
+      setSuccess("Plan de estudio creado correctamente");
       setForm({
         level: "primaria",
         grade: "1",
@@ -116,7 +116,7 @@ export default function NewStudyPlanPage() {
         courses: [],
       });
     } catch (e) {
-      setError(e.message || "Failed to create study plan");
+      setError(e.message || "Error al crear el plan de estudio");
     } finally {
       setLoading(false);
     }
@@ -131,14 +131,14 @@ export default function NewStudyPlanPage() {
             className="inline-flex items-center gap-2 rounded-lg border border-neutral-300 dark:border-neutral-700 px-3 py-1.5 text-sm hover:bg-neutral-100 dark:hover:bg-neutral-800"
           >
             <i className="fa-solid fa-arrow-left"></i>
-            Back
+            Volver
           </Link>
         </div>
 
         <header>
-          <h1 className="text-2xl font-semibold">Register Study Plan</h1>
+          <h1 className="text-2xl font-semibold">Registrar plan de estudio</h1>
           <p className="text-sm text-neutral-500">
-            Provide details to create a new study plan
+            Ingresa los detalles para crear un nuevo plan de estudio
           </p>
         </header>
 
@@ -148,7 +148,7 @@ export default function NewStudyPlanPage() {
             className="p-4 grid gap-3 sm:grid-cols-2"
           >
             <div>
-              <label className="block text-sm mb-1">Level</label>
+              <label className="block text-sm mb-1">Nivel</label>
               <select
                 className="input w-full"
                 value={form.level}
@@ -162,7 +162,7 @@ export default function NewStudyPlanPage() {
               </select>
             </div>
             <div>
-              <label className="block text-sm mb-1">Grade</label>
+              <label className="block text-sm mb-1">Grado</label>
               <input
                 className="input w-full"
                 type="number"
@@ -173,7 +173,7 @@ export default function NewStudyPlanPage() {
               />
             </div>
             <div>
-              <label className="block text-sm mb-1">Effective From</label>
+              <label className="block text-sm mb-1">Vigente desde</label>
               <input
                 className="input w-full"
                 type="date"
@@ -182,7 +182,7 @@ export default function NewStudyPlanPage() {
               />
             </div>
             <div>
-              <label className="block text-sm mb-1">State</label>
+              <label className="block text-sm mb-1">Estado</label>
               <select
                 className="input w-full"
                 value={form.state}
@@ -196,7 +196,7 @@ export default function NewStudyPlanPage() {
               </select>
             </div>
             <div>
-              <label className="block text-sm mb-1">Minimum Grade</label>
+              <label className="block text-sm mb-1">Nota mínima</label>
               <input
                 className="input w-full"
                 type="number"
@@ -206,23 +206,23 @@ export default function NewStudyPlanPage() {
               />
             </div>
             <div className="sm:col-span-2 space-y-2">
-              <label className="block text-sm mb-1">Courses</label>
-              <input
-                className="input w-full"
-                placeholder="Search courses by ID or title"
-                value={courseSearch}
-                onChange={(e) => setCourseSearch(e.target.value)}
-              />
+              <label className="block text-sm mb-1">Cursos</label>
+                <input
+                  className="input w-full"
+                  placeholder="Buscar cursos por ID o título"
+                  value={courseSearch}
+                  onChange={(e) => setCourseSearch(e.target.value)}
+                />
               <div className="max-h-64 overflow-y-auto rounded-lg border border-neutral-200/60 dark:border-neutral-700 bg-white/70 dark:bg-neutral-900/60 px-3 py-2 space-y-1">
                 {coursesLoading ? (
                   <div className="text-xs text-neutral-500">
-                    Loading courses...
+                    Cargando cursos...
                   </div>
                 ) : coursesError ? (
                   <div className="text-xs text-red-600">{coursesError}</div>
                 ) : courses.length === 0 ? (
                   <div className="text-xs text-neutral-500">
-                    No courses available.
+                    No hay cursos disponibles.
                   </div>
                 ) : (
                   (courses || [])
@@ -279,7 +279,7 @@ export default function NewStudyPlanPage() {
 
             <div className="sm:col-span-2">
               <button disabled={loading} className="btn-primary">
-                {loading ? "Creating..." : "Create"}
+                {loading ? "Creando..." : "Crear"}
               </button>
             </div>
           </form>

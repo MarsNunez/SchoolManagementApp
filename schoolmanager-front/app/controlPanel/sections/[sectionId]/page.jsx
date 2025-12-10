@@ -48,7 +48,7 @@ export default function SectionDetailsPage() {
         setStudents(all.filter((s) => s.section_id === sectionData.section_id));
         setTeachers(Array.isArray(teachersData) ? teachersData : []);
       } catch (e) {
-        setError(e.message || "Failed to load section details");
+        setError(e.message || "Error al cargar los detalles de la sección");
       } finally {
         setLoading(false);
       }
@@ -71,7 +71,7 @@ export default function SectionDetailsPage() {
     return (
       <main className="min-h-dvh grid place-items-center p-6">
         <div className="text-sm text-red-600">
-          Section ID is missing from the URL.
+          Falta el ID de la sección en la URL.
         </div>
       </main>
     );
@@ -101,14 +101,12 @@ export default function SectionDetailsPage() {
   const assignSelectedStudents = async () => {
     if (!section || selectedStudentIds.size === 0) return;
     if (atCapacity) {
-      setError("Cannot add students: capacity reached");
+      setError("No se pueden agregar estudiantes: capacidad completa");
       return;
     }
     if (slotsLeft > 0 && selectedStudentIds.size > slotsLeft) {
       setError(
-        `Only ${slotsLeft} spot${
-          slotsLeft === 1 ? "" : "s"
-        } available in this section`
+        `Solo quedan ${slotsLeft} lugares disponibles en esta sección`
       );
       return;
     }
@@ -136,7 +134,7 @@ export default function SectionDetailsPage() {
       );
       setSelectedStudentIds(new Set());
     } catch (e) {
-      setError(e.message || "Failed to assign students to section");
+      setError(e.message || "Error al asignar estudiantes a la sección");
     }
   };
 
@@ -175,7 +173,7 @@ export default function SectionDetailsPage() {
         updatedAll.filter((s) => s.section_id === section.section_id)
       );
     } catch (e) {
-      setError(e.message || "Failed to remove student from section");
+      setError(e.message || "Error al quitar al estudiante de la sección");
     }
   };
 
@@ -206,16 +204,16 @@ export default function SectionDetailsPage() {
             className="inline-flex items-center gap-2 rounded-lg border border-neutral-300 dark:border-neutral-700 px-3 py-1.5 text-sm hover:bg-neutral-100 dark:hover:bg-neutral-800"
           >
             <i className="fa-solid fa-arrow-left"></i>
-            Back
+            Volver
           </Link>
         </div>
 
         {loading ? (
-          <div className="text-sm text-neutral-500">Loading section…</div>
+          <div className="text-sm text-neutral-500">Cargando sección…</div>
         ) : error ? (
           <div className="text-sm text-red-600">{error}</div>
         ) : !section ? (
-          <div className="text-sm text-red-600">Section not found.</div>
+          <div className="text-sm text-red-600">Sección no encontrada.</div>
         ) : (
           <>
             <section className="rounded-2xl border border-neutral-200/60 dark:border-neutral-800 bg-white/70 dark:bg-neutral-900/60 shadow-sm p-4 space-y-3">
@@ -225,14 +223,14 @@ export default function SectionDetailsPage() {
                     {section.title || section.section_id}
                   </h1>
                   <p className="text-sm text-neutral-500">
-                    Detailed information about this section
+                    Información detallada sobre esta sección
                   </p>
                 </div>
                 <div className="flex flex-col items-end gap-2">
                   <div
                     className={`border w-fit py-1 px-2 rounded-lg text-xs font-medium ${groupClasses}`}
                   >
-                    Group {group}
+                    Grupo {group}
                   </div>
                   <div className="text-xs text-neutral-500">
                     ID:{" "}
@@ -245,11 +243,11 @@ export default function SectionDetailsPage() {
 
               <div className="grid gap-3 sm:grid-cols-2">
                 <div className="space-y-1 text-sm">
-                  <div className="text-neutral-500">Study plan</div>
+                  <div className="text-neutral-500">Plan de estudios</div>
                   <div className="font-medium">{section.studyPlan_id}</div>
                 </div>
                 <div className="space-y-1 text-sm">
-                  <div className="text-neutral-500">Teacher</div>
+                  <div className="text-neutral-500">Profesor</div>
                   <div className="font-medium">
                     {teacher
                       ? `${teacher.name} ${teacher.lastname}`
@@ -257,11 +255,11 @@ export default function SectionDetailsPage() {
                   </div>
                 </div>
                 <div className="space-y-1 text-sm">
-                  <div className="text-neutral-500">Year</div>
+                  <div className="text-neutral-500">Año</div>
                   <div className="font-medium">{section.year}</div>
                 </div>
                 <div className="space-y-1 text-sm">
-                  <div className="text-neutral-500">Capacity</div>
+                  <div className="text-neutral-500">Capacidad</div>
                   <div className="font-medium">
                     {enrolledCount}/{capacity != null ? capacity : "—"}
                   </div>
@@ -272,16 +270,18 @@ export default function SectionDetailsPage() {
             <section className="rounded-2xl border border-neutral-200/60 dark:border-neutral-800 bg-white/70 dark:bg-neutral-900/60 shadow-sm overflow-x-auto">
               <header className="flex items-center justify-between p-4">
                 <div>
-                  <h2 className="text-lg font-semibold">Enrolled students</h2>
+                  <h2 className="text-lg font-semibold">
+                    Estudiantes matriculados
+                  </h2>
                   <p className="text-xs text-neutral-500">
-                    Students currently assigned to this section
+                    Estudiantes actualmente asignados a esta sección
                   </p>
                 </div>
                 <div className="relative group inline-flex items-center">
                   {atCapacity && (
                     <div className="pointer-events-none absolute top-full mt-2 left-1/2 -translate-x-1/2 rounded bg-white text-neutral-900 text-xs px-3 py-2 opacity-0 group-hover:opacity-100 shadow-lg z-20 whitespace-nowrap border border-neutral-200">
                       <span className="absolute top-0 -translate-y-full left-1/2 -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-b-4 border-l-transparent border-r-transparent border-b-white"></span>
-                      Section is at max capacity
+                      La sección está en su capacidad máxima
                     </div>
                   )}
                   <button
@@ -290,23 +290,23 @@ export default function SectionDetailsPage() {
                     className="btn-primary inline-flex items-center gap-2 text-sm disabled:opacity-60 disabled:cursor-not-allowed"
                   >
                     <i className="fa-solid fa-user-plus"></i>
-                    Enroll new student
+                    Matricular nuevo estudiante
                   </button>
                 </div>
               </header>
               {students.length === 0 ? (
                 <div className="p-4 text-sm text-neutral-500">
-                  No students enrolled in this section yet.
+                  Aún no hay estudiantes matriculados en esta sección.
                 </div>
               ) : (
                 <table className="w-full text-sm">
                   <thead className="text-left border-b border-neutral-200/60 dark:border-neutral-800">
                     <tr>
                       <th className="p-3">ID</th>
-                      <th className="p-3">Name</th>
-                      <th className="p-3">Email</th>
+                      <th className="p-3">Nombre</th>
+                      <th className="p-3">Correo</th>
                       <th className="p-3">DNI</th>
-                      <th className="p-3 text-center">Actions</th>
+                      <th className="p-3 text-center">Acciones</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -328,7 +328,7 @@ export default function SectionDetailsPage() {
                             type="button"
                             onClick={() => setConfirmingStudent(s)}
                             className="inline-flex h-5 w-5 text-[10px] text-center cursor-pointer items-center justify-center rounded-full border-2 border-red-200 text-red-600 hover:bg-red-50 dark:border-red-800 dark:hover:bg-red-900/40"
-                            title="Remove from section"
+                            title="Quitar de la sección"
                           >
                             <i className="fa-solid fa-minus"></i>
                           </button>
@@ -344,25 +344,23 @@ export default function SectionDetailsPage() {
               <header className="flex items-center justify-between p-4">
                 <div>
                   <h2 className="text-lg font-semibold">
-                    Assign existing students
+                    Asignar estudiantes existentes
                   </h2>
                   <p className="text-xs text-neutral-500">
-                    Search and select already created students to enroll them in
-                    this section
+                    Busca y selecciona estudiantes ya creados para
+                    matricularlos en esta sección
                   </p>
                 </div>
                 <div className="relative group inline-flex items-center">
                   {(() => {
                     let tooltip = "";
                     if (atCapacity) {
-                      tooltip = "Capacity reached";
+                      tooltip = "Capacidad completa";
                     } else if (
                       slotsLeft > 0 &&
                       selectedStudentIds.size > slotsLeft
                     ) {
-                      tooltip = `Only ${slotsLeft} spot${
-                        slotsLeft === 1 ? "" : "s"
-                      } left`;
+                      tooltip = `Solo quedan ${slotsLeft} lugares`;
                     }
                     return tooltip ? (
                       <div className="pointer-events-none absolute top-full mt-2 left-1/2 -translate-x-1/2 rounded bg-white text-neutral-900 text-xs px-3 py-2 opacity-0 group-hover:opacity-100 shadow-lg z-20 max-w-[16rem] text-center border border-neutral-200">
@@ -382,21 +380,21 @@ export default function SectionDetailsPage() {
                     className="btn-primary inline-flex items-center gap-2 text-sm disabled:opacity-60 disabled:cursor-not-allowed"
                   >
                     <i className="fa-solid fa-user-check"></i>
-                    Add selected
+                    Agregar seleccionados
                   </button>
                 </div>
               </header>
               <div className="p-4 space-y-3">
                 <input
                   className="input w-full"
-                  placeholder="Search students by name, email or ID"
+                  placeholder="Buscar estudiantes por nombre, correo o ID"
                   value={studentSearch}
                   onChange={(e) => setStudentSearch(e.target.value)}
                 />
                 <div className="max-h-64 overflow-y-auto rounded-lg border border-neutral-200/60 dark:border-neutral-700 bg-white/70 dark:bg-neutral-900/60 px-3 py-2 space-y-1 text-sm">
                   {availableStudents.length === 0 ? (
                     <div className="text-xs text-neutral-500">
-                      No available students to assign.
+                      No hay estudiantes disponibles para asignar.
                     </div>
                   ) : (
                     availableStudents.map((s) => (
@@ -409,7 +407,7 @@ export default function SectionDetailsPage() {
                         }`}
                         title={
                           atCapacity
-                            ? "Cannot select: section is at capacity"
+                            ? "No se puede seleccionar: la sección está llena"
                             : ""
                         }
                       >
@@ -440,13 +438,13 @@ export default function SectionDetailsPage() {
       {confirmingStudent && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
           <div className="w-full max-w-sm rounded-2xl border border-neutral-200/60 dark:border-neutral-800 bg-white dark:bg-neutral-900 shadow-lg p-5 space-y-3">
-            <h2 className="text-lg font-semibold">Remove student</h2>
+            <h2 className="text-lg font-semibold">Quitar estudiante</h2>
             <p className="text-sm text-neutral-600 dark:text-neutral-300">
-              Are you sure you want to remove{" "}
+              ¿Seguro que quieres quitar a{" "}
               <span className="font-semibold">
                 {confirmingStudent.name} {confirmingStudent.lastname}
               </span>{" "}
-              from this section?
+              de esta sección?
             </p>
             {error && (
               <div className="text-xs text-red-600 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-md px-3 py-2">
@@ -459,7 +457,7 @@ export default function SectionDetailsPage() {
                 onClick={() => setConfirmingStudent(null)}
                 className="rounded-lg px-3 py-1.5 text-sm border border-neutral-300 dark:border-neutral-700"
               >
-                Cancel
+                Cancelar
               </button>
               <button
                 type="button"
@@ -469,7 +467,7 @@ export default function SectionDetailsPage() {
                 }}
                 className="btn-danger text-sm"
               >
-                Remove
+                Quitar
               </button>
             </div>
           </div>

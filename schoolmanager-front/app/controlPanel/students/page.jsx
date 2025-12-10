@@ -28,19 +28,27 @@ export default function StudentsPage() {
     <main className="min-h-dvh p-6">
       <div className="mx-auto max-w-6xl space-y-6">
         <div className="mb-2 flex items-center justify-between">
-          <Link href="/controlPanel" className="inline-flex items-center gap-2 rounded-lg border border-neutral-300 dark:border-neutral-700 px-3 py-1.5 text-sm hover:bg-neutral-100 dark:hover:bg-neutral-800">
+          <Link
+            href="/controlPanel"
+            className="inline-flex items-center gap-2 rounded-lg border border-neutral-300 dark:border-neutral-700 px-3 py-1.5 text-sm hover:bg-neutral-100 dark:hover:bg-neutral-800"
+          >
             <i className="fa-solid fa-arrow-left"></i>
-            Back
+            Volver
           </Link>
-          <Link href="/controlPanel/students/new" className="btn-primary inline-flex items-center gap-2">
+          <Link
+            href="/controlPanel/students/new"
+            className="btn-primary inline-flex items-center gap-2"
+          >
             <i className="fa-solid fa-user-plus"></i>
-            Register new student
+            Registrar nuevo estudiante
           </Link>
         </div>
 
         <header>
-          <h1 className="text-2xl font-semibold">Students</h1>
-          <p className="text-sm text-neutral-500">List and manage students</p>
+          <h1 className="text-2xl font-semibold">Estudiantes</h1>
+          <p className="text-sm text-neutral-500">
+            Listar y gestionar estudiantes
+          </p>
         </header>
 
         {error && <div className="text-sm text-red-600">{error}</div>}
@@ -49,23 +57,23 @@ export default function StudentsPage() {
           <div className="p-4 border-b border-neutral-200/60 dark:border-neutral-800">
             <input
               className="input w-full max-w-md"
-              placeholder="Search by name, ID or DNI"
+              placeholder="Buscar por nombre, ID o DNI"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
             />
           </div>
           {loading ? (
-            <div className="p-6 text-sm text-neutral-500">Loading...</div>
+            <div className="p-6 text-sm text-neutral-500">Cargando...</div>
           ) : (
             <table className="w-full text-sm">
               <thead className="text-left border-b border-neutral-200/60 dark:border-neutral-800">
                 <tr>
                   <th className="p-3">ID</th>
-                  <th className="p-3">Name</th>
-                  <th className="p-3">Email</th>
+                  <th className="p-3">Nombre</th>
+                  <th className="p-3">Correo</th>
                   <th className="p-3">DNI</th>
-                  <th className="p-3">Section</th>
-                  <th className="p-3">Actions</th>
+                  <th className="p-3">Sección</th>
+                  <th className="p-3">Acciones</th>
                 </tr>
               </thead>
               <tbody>

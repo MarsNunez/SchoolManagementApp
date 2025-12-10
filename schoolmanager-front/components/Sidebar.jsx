@@ -22,10 +22,10 @@ export default function Sidebar({ onOpenSettings }) {
           const prof = JSON.parse(raw);
           const role = String(prof?.role || "").toLowerCase();
           const map = {
-            admin: "Admin",
-            secretary: "Secretary",
-            teacher: "Teacher",
-            student: "Student",
+            admin: "Administrador",
+            secretary: "Secretaria",
+            teacher: "Profesor",
+            student: "Estudiante",
           };
           setRoleLabel(map[role] || "");
         } else {
@@ -111,7 +111,7 @@ export default function Sidebar({ onOpenSettings }) {
           <div className="mr-auto">
             <div className="text-sm font-semibold">SchoolManager</div>
             <div className="text-xs text-neutral-600 dark:text-neutral-300 border border-neutral-500 rounded px-2 py-0.5 inline-flex items-center gap-1">
-              {roleLabel || (isAuthed ? "User" : "Guest")}
+              {roleLabel || (isAuthed ? "Usuario" : "Invitado")}
             </div>
           </div>
         )}
@@ -119,7 +119,7 @@ export default function Sidebar({ onOpenSettings }) {
           <button
             onClick={toggleCollapsed}
             className="h-8 w-8 rounded-md grid place-items-center hover:bg-neutral-100 dark:hover:bg-neutral-800"
-            title="Collapse"
+            title="Contraer"
           >
             <i className="fa-solid fa-angles-left"></i>
           </button>
@@ -130,7 +130,7 @@ export default function Sidebar({ onOpenSettings }) {
         <button
           onClick={toggleCollapsed}
           className="mb-4 h-8 w-8 rounded-md grid place-items-center hover:bg-neutral-100 dark:hover:bg-neutral-800 self-center"
-          title="Expand"
+          title="Expandir"
         >
           <i className="fa-solid fa-angles-right"></i>
         </button>
@@ -142,15 +142,15 @@ export default function Sidebar({ onOpenSettings }) {
           collapsed ? "hidden" : ""
         }`}
       >
-        OVERVIEW
+        GENERAL
       </div>
       <nav className="flex flex-col gap-1">
-        <NavItem href="/" icon="fa-solid fa-house" label="Home" />
+        <NavItem href="/" icon="fa-solid fa-house" label="Inicio" />
         {isAuthed && (
           <NavItem
             href="/controlPanel"
             icon="fa-solid fa-table-columns"
-            label="Control Panel"
+            label="Panel de control"
           />
         )}
       </nav>
@@ -164,13 +164,13 @@ export default function Sidebar({ onOpenSettings }) {
           collapsed ? "hidden" : ""
         }`}
       >
-        SETTINGS
+        AJUSTES
       </div>
       <nav className="flex flex-col text-[1rem]">
         {isAuthed && (
           <NavItem
             icon="fa-solid fa-gear"
-            label="Settings"
+            label="Configuración"
             onClick={() => (onOpenSettings ? onOpenSettings() : null)}
             className="cursor-pointer"
           />
@@ -180,13 +180,13 @@ export default function Sidebar({ onOpenSettings }) {
             <NavItem
               href="/auth/login"
               icon="fa-solid fa-right-to-bracket"
-              label="Login"
+              label="Iniciar sesión"
               className="text-blue-600"
             />
             <NavItem
               href="/auth/register"
               icon="fa-solid fa-user-plus"
-              label="Register"
+              label="Registrarse"
               className="text-emerald-600"
             />
           </>
@@ -194,7 +194,7 @@ export default function Sidebar({ onOpenSettings }) {
           <NavItem
             onClick={() => setShowLogoutConfirm(true)}
             icon="fa-solid fa-right-from-bracket"
-            label="Logout"
+            label="Cerrar sesión"
             className="text-red-500 cursor-pointer "
           />
         )}
@@ -208,9 +208,9 @@ export default function Sidebar({ onOpenSettings }) {
             onClick={() => setShowLogoutConfirm(false)}
           ></div>
           <div className="relative w-full max-w-sm rounded-2xl border border-neutral-200/60 dark:border-neutral-800 bg-white dark:bg-neutral-900 shadow-lg p-5 space-y-4">
-            <h2 className="text-lg font-semibold">Sign out</h2>
+            <h2 className="text-lg font-semibold">Cerrar sesión</h2>
             <p className="text-sm text-neutral-600 dark:text-neutral-300">
-              Are you sure you want to log out? You will need to sign in again to continue.
+              ¿Seguro que quieres cerrar sesión? Tendrás que iniciar sesión de nuevo para continuar.
             </p>
             <div className="flex justify-end gap-2">
               <button
@@ -218,7 +218,7 @@ export default function Sidebar({ onOpenSettings }) {
                 onClick={() => setShowLogoutConfirm(false)}
                 className="rounded-lg px-3 py-2 text-sm border border-neutral-300 dark:border-neutral-700"
               >
-                Cancel
+                Cancelar
               </button>
               <button
                 type="button"
@@ -228,7 +228,7 @@ export default function Sidebar({ onOpenSettings }) {
                 }}
                 className="btn-danger text-sm"
               >
-                Logout
+                Cerrar sesión
               </button>
             </div>
           </div>

@@ -33,7 +33,7 @@ export default function ControlPanelLayout({ children }) {
   if (!ready) {
     return (
       <main className="min-h-dvh grid place-items-center p-6">
-        <div className="text-sm text-neutral-500">Checking access…</div>
+        <div className="text-sm text-neutral-500">Verificando acceso…</div>
       </main>
     );
   }
