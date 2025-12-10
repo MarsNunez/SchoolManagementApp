@@ -97,7 +97,7 @@ export default function SettingsModal({ onClose }) {
         className="absolute inset-0 bg-black/60 backdrop-blur-sm"
         onClick={onClose}
       ></div>
-      <div className="relative w-[90vw] max-w-6xl h-[80vh] rounded-2xl bg-gradient-to-b from-neutral-50 via-neutral-50 to-neutral-100 text-neutral-900 dark:bg-neutral-900 dark:text-white shadow-2xl border border-neutral-200/60 dark:border-neutral-800 overflow-hidden flex">
+      <div className="relative w-[90vw] max-w-6xl h-[80vh] rounded-2xl bg-neutral-50 text-neutral-900 dark:bg-neutral-900 dark:text-white shadow-2xl border border-neutral-200/60 dark:border-neutral-800 overflow-hidden flex">
         {/* Sidebar */}
         <aside className="w-64 bg-neutral-100/80 dark:bg-neutral-950/80 border-r border-neutral-200/60 dark:border-neutral-800 p-4 flex flex-col gap-2">
           <div className="text-sm font-semibold text-neutral-600 dark:text-neutral-300 mb-2">

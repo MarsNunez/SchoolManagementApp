@@ -96,7 +96,7 @@ export default function Sidebar({ onOpenSettings }) {
       <aside
         className={`h-dvh sticky top-0 duration-300 ${
           collapsed ? "w-20" : "w-60"
-        } border-r border-neutral-200/60 dark:border-neutral-800 bg-white/70 dark:bg-neutral-900/60 backdrop-blur p-4 hidden md:flex md:flex-col`}
+        } border-r border-neutral-200/40 dark:border-neutral-800 bg-white/40 dark:bg-neutral-900/60 backdrop-blur-md p-4 hidden md:flex md:flex-col`}
       >
       {/* Brand */}
       <div
