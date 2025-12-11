@@ -4,12 +4,13 @@ import { useState } from "react";
 import Sidebar from "./Sidebar.jsx";
 import SettingsModal from "./SettingsModal.jsx";
 import PreferencesBootstrap from "./PreferencesBootstrap.jsx";
+import { LanguageProvider } from "@/lib/languageContext";
 
 export default function AppShell({ children }) {
   const [showSettings, setShowSettings] = useState(false);
 
   return (
-    <>
+    <LanguageProvider>
       <PreferencesBootstrap />
       <div className="min-h-dvh flex">
         <Sidebar onOpenSettings={() => setShowSettings(true)} />
@@ -18,6 +19,6 @@ export default function AppShell({ children }) {
       {showSettings && (
         <SettingsModal onClose={() => setShowSettings(false)} />
       )}
-    </>
+    </LanguageProvider>
   );
 }

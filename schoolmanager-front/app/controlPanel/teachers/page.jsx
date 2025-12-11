@@ -3,11 +3,28 @@
 import { useEffect, useState } from "react";
 import { fetchJSON, authHeaders } from "@/lib/api";
 import Link from "next/link";
+import { useLanguage } from "@/lib/languageContext";
+import * as XLSX from "xlsx";
 
 export default function TeachersPage() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [menuOpen, setMenuOpen] = useState(false);
+  const { language } = useLanguage();
+
+  const texts =
+    language === "en"
+      ? {
+          title: "Teachers",
+          subtitle: "List, create and manage teachers",
+          exportExcel: "Export to Excel",
+        }
+      : {
+          title: "Profesores",
+          subtitle: "Listar, crear y gestionar profesores",
+          exportExcel: "Exportar a Excel",
+        };
 
   const [form, setForm] = useState({
     name: "",
@@ -104,6 +121,28 @@ export default function TeachersPage() {
     }
   };
 
+  const exportToExcel = () => {
+    try {
+      const rows = items.map((t) => ({
+        ID: t.teacher_id,
+        Nombre: `${t.name || ""} ${t.lastname || ""}`.trim(),
+        DNI: t.dni ?? "",
+        Correo: t.email || "",
+        Teléfono: t.phone || "",
+        Especialidades: Array.isArray(t.specialties)
+          ? t.specialties.join(", ")
+          : "",
+      }));
+
+      const worksheet = XLSX.utils.json_to_sheet(rows);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Teachers");
+      XLSX.writeFile(workbook, "teachers.xlsx");
+    } catch (e) {
+      console.error("Error al exportar profesores a Excel:", e);
+    }
+  };
+
   return (
     <main className="min-h-dvh p-6">
       <div className="mx-auto max-w-6xl space-y-6">
@@ -116,11 +155,35 @@ export default function TeachersPage() {
             Volver
           </Link>
         </div>
-        <header>
-          <h1 className="text-2xl font-semibold">Profesores</h1>
-          <p className="text-sm text-neutral-500">
-            Listar, crear y gestionar profesores
-          </p>
+        <header className="flex items-start justify-between gap-3">
+          <div>
+            <h1 className="text-2xl font-semibold">{texts.title}</h1>
+            <p className="text-sm text-neutral-500">{texts.subtitle}</p>
+          </div>
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => setMenuOpen((v) => !v)}
+              className="h-9 w-9 rounded-xl border border-neutral-300 dark:border-neutral-700 bg-white/80 dark:bg-neutral-900/80 flex items-center justify-center shadow-sm hover:bg-neutral-100 dark:hover:bg-neutral-800"
+              aria-label="More actions"
+            >
+              <i className="fa-solid fa-ellipsis-vertical text-neutral-600 dark:text-neutral-200"></i>
+            </button>
+            {menuOpen && (
+              <div className="absolute right-0 mt-2 w-44 rounded-xl border border-neutral-200/60 dark:border-neutral-800 bg-white dark:bg-neutral-900 shadow-lg py-1 z-20">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMenuOpen(false);
+                    exportToExcel();
+                  }}
+                  className="w-full px-3 py-2 text-left text-sm hover:bg-neutral-100 dark:hover:bg-neutral-800"
+                >
+                  {texts.exportExcel}
+                </button>
+              </div>
+            )}
+          </div>
         </header>
 
         <section className="rounded-2xl border border-neutral-200/60 dark:border-neutral-800 bg-white/70 dark:bg-neutral-900/60 shadow-sm">

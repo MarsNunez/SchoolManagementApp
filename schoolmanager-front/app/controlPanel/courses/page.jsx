@@ -3,12 +3,65 @@
 import { useEffect, useState } from "react";
 import { fetchJSON, authHeaders } from "@/lib/api";
 import Link from "next/link";
+import { useLanguage } from "@/lib/languageContext";
+import * as XLSX from "xlsx";
 
 export default function CoursesPage() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [teachers, setTeachers] = useState([]);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const { language } = useLanguage();
+
+  const texts =
+    language === "en"
+      ? {
+          back: "Back",
+          title: "Courses",
+          subtitle: "List, create and manage courses",
+          titlePlaceholder: "title",
+          descriptionPlaceholder: "description",
+          durationPlaceholder: "duration (hours)",
+          teacherSelect: "Select teacher (optional)",
+          savingExisting: "Saving...",
+          creatingNew: "Creating...",
+          save: "Save",
+          create: "Create",
+          cancel: "Cancel",
+          loading: "Loading...",
+          thTitle: "Title",
+          thTeacher: "Teacher",
+          thDuration: "Duration",
+          thActions: "Actions",
+          edit: "Edit",
+          remove: "Delete",
+          exportExcel: "Export to Excel",
+          deleteConfirm: (id) => `Delete ${id}?`,
+        }
+      : {
+          back: "Volver",
+          title: "Cursos",
+          subtitle: "Listar, crear y gestionar cursos",
+          titlePlaceholder: "título",
+          descriptionPlaceholder: "descripción",
+          durationPlaceholder: "duración (horas)",
+          teacherSelect: "Seleccionar profesor (opcional)",
+          savingExisting: "Guardando...",
+          creatingNew: "Creando...",
+          save: "Guardar",
+          create: "Crear",
+          cancel: "Cancelar",
+          loading: "Cargando...",
+          thTitle: "Título",
+          thTeacher: "Profesor",
+          thDuration: "Duración",
+          thActions: "Acciones",
+          edit: "Editar",
+          remove: "Eliminar",
+          exportExcel: "Exportar a Excel",
+          deleteConfirm: (id) => `¿Eliminar ${id}?`,
+        };
 
   const [form, setForm] = useState({
     title: "",
@@ -105,7 +158,7 @@ export default function CoursesPage() {
   };
 
   const remove = async (course_id) => {
-    if (!confirm(`¿Eliminar ${course_id}?`)) return;
+    if (!confirm(texts.deleteConfirm(course_id))) return;
     try {
       await fetchJSON(`/courses/${course_id}`, {
         method: "DELETE",
@@ -114,6 +167,29 @@ export default function CoursesPage() {
       await load();
     } catch (e) {
       alert(e.message);
+    }
+  };
+
+  const exportToExcel = () => {
+    try {
+      const rows = items.map((c) => {
+        const teacher = teachers.find((t) => t.teacher_id === c.teacher_id);
+        return {
+          ID: c.course_id,
+          [texts.thTitle]: c.title || "",
+          [texts.thTeacher]: teacher
+            ? `${teacher.name || ""} ${teacher.lastname || ""}`.trim()
+            : c.teacher_id || "",
+          [texts.thDuration]: c.duration ?? "",
+        };
+      });
+
+      const worksheet = XLSX.utils.json_to_sheet(rows);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Courses");
+      XLSX.writeFile(workbook, "courses.xlsx");
+    } catch (e) {
+      console.error("Error al exportar a Excel:", e);
     }
   };
 
@@ -126,14 +202,38 @@ export default function CoursesPage() {
             className="inline-flex items-center gap-2 rounded-lg border border-neutral-300 dark:border-neutral-700 px-3 py-1.5 text-sm hover:bg-neutral-100 dark:hover:bg-neutral-800"
           >
             <i className="fa-solid fa-arrow-left"></i>
-            Volver
+            {texts.back}
           </Link>
         </div>
-        <header>
-          <h1 className="text-2xl font-semibold">Cursos</h1>
-          <p className="text-sm text-neutral-500">
-            Listar, crear y gestionar cursos
-          </p>
+        <header className="flex items-start justify-between gap-3">
+          <div>
+            <h1 className="text-2xl font-semibold">{texts.title}</h1>
+            <p className="text-sm text-neutral-500">{texts.subtitle}</p>
+          </div>
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => setMenuOpen((v) => !v)}
+              className="h-9 w-9 rounded-xl border border-neutral-300 dark:border-neutral-700 bg-white/80 dark:bg-neutral-900/80 flex items-center justify-center shadow-sm hover:bg-neutral-100 dark:hover:bg-neutral-800"
+              aria-label="More actions"
+            >
+              <i className="fa-solid fa-ellipsis-vertical text-neutral-600 dark:text-neutral-200"></i>
+            </button>
+            {menuOpen && (
+              <div className="absolute right-0 mt-2 w-44 rounded-xl border border-neutral-200/60 dark:border-neutral-800 bg-white dark:bg-neutral-900 shadow-lg py-1 z-20">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMenuOpen(false);
+                    exportToExcel();
+                  }}
+                  className="w-full px-3 py-2 text-left text-sm hover:bg-neutral-100 dark:hover:bg-neutral-800"
+                >
+                  {texts.exportExcel}
+                </button>
+              </div>
+            )}
+          </div>
         </header>
 
         <section className="rounded-2xl border border-neutral-200/60 dark:border-neutral-800 bg-white/70 dark:bg-neutral-900/60 shadow-sm">
@@ -143,7 +243,7 @@ export default function CoursesPage() {
                 className={`input w-full ${
                   fieldErrors.title ? "border-red-500 focus:ring-red-500" : ""
                 }`}
-                placeholder="título"
+                placeholder={texts.titlePlaceholder}
                 value={form.title}
                 onChange={(e) => {
                   setForm({ ...form, title: e.target.value });
@@ -162,7 +262,7 @@ export default function CoursesPage() {
               value={form.teacher_id}
               onChange={(e) => setForm({ ...form, teacher_id: e.target.value })}
             >
-              <option value="">Seleccionar profesor (opcional)</option>
+              <option value="">{texts.teacherSelect}</option>
               {teachers.map((t) => (
                 <option key={t.teacher_id} value={t.teacher_id}>
                   {t.name} {t.lastname} ({t.teacher_id})
@@ -171,7 +271,7 @@ export default function CoursesPage() {
             </select>
             <input
               className="input sm:col-span-2"
-              placeholder="descripción"
+              placeholder={texts.descriptionPlaceholder}
               value={form.description}
               onChange={(e) =>
                 setForm({ ...form, description: e.target.value })
@@ -184,7 +284,7 @@ export default function CoursesPage() {
                     ? "border-red-500 focus:ring-red-500"
                     : ""
                 }`}
-                placeholder="duración (horas)"
+                placeholder={texts.durationPlaceholder}
                 type="number"
                 min={0}
                 value={form.duration}
@@ -209,11 +309,11 @@ export default function CoursesPage() {
               <button disabled={submitting} className="btn-primary">
                 {submitting
                   ? editingId
-                    ? "Guardando..."
-                    : "Creando..."
+                    ? texts.savingExisting
+                    : texts.creatingNew
                   : editingId
-                  ? "Guardar"
-                  : "Crear"}
+                  ? texts.save
+                  : texts.create}
               </button>
               {editingId && (
                 <button
@@ -221,7 +321,7 @@ export default function CoursesPage() {
                   onClick={resetForm}
                   className="rounded-lg px-3 py-2 text-sm border border-neutral-300 dark:border-neutral-700"
                 >
-                  Cancelar
+                  {texts.cancel}
                 </button>
               )}
             </div>
@@ -230,16 +330,16 @@ export default function CoursesPage() {
 
         <section className="rounded-2xl border border-neutral-200/60 dark:border-neutral-800 bg-white/70 dark:bg-neutral-900/60 shadow-sm overflow-x-auto">
           {loading ? (
-            <div className="p-6 text-sm text-neutral-500">Cargando...</div>
+            <div className="p-6 text-sm text-neutral-500">{texts.loading}</div>
           ) : (
             <table className="w-full text-sm">
               <thead className="text-left border-b border-neutral-200/60 dark:border-neutral-800">
                 <tr>
                   <th className="p-3">ID</th>
-                  <th className="p-3">Título</th>
-                  <th className="p-3">Profesor</th>
-                  <th className="p-3">Duración</th>
-                  <th className="p-3">Acciones</th>
+                  <th className="p-3">{texts.thTitle}</th>
+                  <th className="p-3">{texts.thTeacher}</th>
+                  <th className="p-3">{texts.thDuration}</th>
+                  <th className="p-3">{texts.thActions}</th>
                 </tr>
               </thead>
               <tbody>
@@ -273,13 +373,13 @@ export default function CoursesPage() {
                         }}
                         className="rounded-lg px-3 py-2 text-sm border border-neutral-300 dark:border-neutral-700"
                       >
-                        Editar
+                        {texts.edit}
                       </button>
                       <button
                         onClick={() => remove(c.course_id)}
                         className="btn-danger"
                       >
-                        Eliminar
+                        {texts.remove}
                       </button>
                     </td>
                   </tr>

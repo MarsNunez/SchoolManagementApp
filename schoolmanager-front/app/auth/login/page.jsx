@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useLanguage } from "@/lib/languageContext";
 
 export default function AuthLoginPage() {
   const router = useRouter();
@@ -10,6 +11,38 @@ export default function AuthLoginPage() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const { language } = useLanguage();
+
+  const texts =
+    language === "en"
+      ? {
+          title: "Welcome back",
+          subtitle: "Sign in to your school account",
+          emailLabel: "Email",
+          emailPlaceholder: "you@school.edu",
+          passwordLabel: "Password",
+          remember: "Remember me",
+          forgot: "Forgot password?",
+          submitLoading: "Signing in...",
+          submit: "Sign in",
+          noAccount: "Don't have an account?",
+          createOne: "Create one",
+          fallbackError: "Login failed",
+        }
+      : {
+          title: "Bienvenido de nuevo",
+          subtitle: "Inicia sesión en tu cuenta del colegio",
+          emailLabel: "Correo electrónico",
+          emailPlaceholder: "tu@colegio.edu",
+          passwordLabel: "Contraseña",
+          remember: "Recordarme",
+          forgot: "¿Olvidaste tu contraseña?",
+          submitLoading: "Ingresando...",
+          submit: "Iniciar sesión",
+          noAccount: "¿No tienes una cuenta?",
+          createOne: "Crea una",
+          fallbackError: "Error al iniciar sesión",
+        };
 
   const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
@@ -26,7 +59,7 @@ export default function AuthLoginPage() {
 
       const data = await res.json();
       if (!res.ok)
-        throw new Error(data?.message || "Error al iniciar sesión");
+        throw new Error(data?.message || texts.fallbackError);
 
       if (typeof window !== "undefined") {
         localStorage.setItem("authToken", data.token);
@@ -48,23 +81,21 @@ export default function AuthLoginPage() {
             <span className="text-2xl font-semibold text-blue-600">SM</span>
           </div>
           <h1 className="text-2xl font-semibold tracking-tight">
-            Bienvenido de nuevo
+            {texts.title}
           </h1>
-          <p className="text-sm text-neutral-500">
-            Inicia sesión en tu cuenta del colegio
-          </p>
+          <p className="text-sm text-neutral-500">{texts.subtitle}</p>
         </div>
 
         <div className="rounded-2xl border border-neutral-200/60 bg-white/70 dark:bg-neutral-900/60 dark:border-neutral-800 shadow-sm backdrop-blur">
           <form className="p-6 space-y-4" onSubmit={onSubmit}>
             <div className="space-y-2">
               <label htmlFor="email" className="block text-sm font-medium">
-                Correo electrónico
+                {texts.emailLabel}
               </label>
               <input
                 id="email"
                 type="email"
-                placeholder="tu@colegio.edu"
+                placeholder={texts.emailPlaceholder}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full rounded-lg border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500"
@@ -73,7 +104,7 @@ export default function AuthLoginPage() {
 
             <div className="space-y-2">
               <label htmlFor="password" className="block text-sm font-medium">
-                Contraseña
+                {texts.passwordLabel}
               </label>
               <input
                 id="password"
@@ -91,10 +122,10 @@ export default function AuthLoginPage() {
                   type="checkbox"
                   className="size-4 rounded border-neutral-300 dark-border-neutral-700"
                 />
-                Recordarme
+                {texts.remember}
               </label>
               <a className="text-blue-600 hover:underline" href="#">
-                ¿Olvidaste tu contraseña?
+                {texts.forgot}
               </a>
             </div>
 
@@ -109,15 +140,15 @@ export default function AuthLoginPage() {
               disabled={loading}
               className="w-full rounded-lg bg-blue-600 text-white py-2.5 font-medium hover:bg-blue-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              {loading ? "Ingresando..." : "Iniciar sesión"}
+              {loading ? texts.submitLoading : texts.submit}
             </button>
           </form>
         </div>
 
         <p className="mt-6 text-center text-sm text-neutral-600 dark:text-neutral-400">
-          ¿No tienes una cuenta?{" "}
+          {texts.noAccount}{" "}
           <Link href="/auth/register" className="text-blue-600 hover:underline">
-            Crea una
+            {texts.createOne}
           </Link>
         </p>
       </div>

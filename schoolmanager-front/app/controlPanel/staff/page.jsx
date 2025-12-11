@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { fetchJSON, authHeaders } from "@/lib/api";
 import Link from "next/link";
+import { useLanguage } from "@/lib/languageContext";
+import * as XLSX from "xlsx";
 
 export default function StaffPage() {
   const [items, setItems] = useState([]);
@@ -26,6 +28,21 @@ export default function StaffPage() {
   const isEditing = Boolean(editingId);
   const disableSensitive =
     role === "secretary" && isEditing && editingTargetRole !== "admin";
+  const [menuOpen, setMenuOpen] = useState(false);
+  const { language } = useLanguage();
+
+  const texts =
+    language === "en"
+      ? {
+          title: "Staff",
+          subtitle: "Admins and secretaries management",
+          exportExcel: "Export to Excel",
+        }
+      : {
+          title: "Personal",
+          subtitle: "Gestión de administradores y secretarias",
+          exportExcel: "Exportar a Excel",
+        };
 
   const load = async () => {
     try {
@@ -93,6 +110,26 @@ export default function StaffPage() {
     }
   };
 
+  const exportToExcel = () => {
+    try {
+      const rows = items.map((s) => ({
+        ID: s.staff_id,
+        Nombre: `${s.name || ""} ${s.lastname || ""}`.trim(),
+        DNI: s.dni ?? "",
+        Correo: s.email || "",
+        Rol: s.role || "",
+        Activo: s.state ? "Sí" : "No",
+      }));
+
+      const worksheet = XLSX.utils.json_to_sheet(rows);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Staff");
+      XLSX.writeFile(workbook, "staff.xlsx");
+    } catch (e) {
+      console.error("Error al exportar personal a Excel:", e);
+    }
+  };
+
   return (
     <main className="min-h-dvh p-6">
       <div className="mx-auto max-w-6xl space-y-6">
@@ -102,9 +139,35 @@ export default function StaffPage() {
             Volver
           </Link>
         </div>
-        <header>
-          <h1 className="text-2xl font-semibold">Personal</h1>
-          <p className="text-sm text-neutral-500">Gestión de administradores y secretarias</p>
+        <header className="flex items-start justify-between gap-3">
+          <div>
+            <h1 className="text-2xl font-semibold">{texts.title}</h1>
+            <p className="text-sm text-neutral-500">{texts.subtitle}</p>
+          </div>
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => setMenuOpen((v) => !v)}
+              className="h-9 w-9 rounded-xl border border-neutral-300 dark:border-neutral-700 bg-white/80 dark:bg-neutral-900/80 flex items-center justify-center shadow-sm hover:bg-neutral-100 dark:hover:bg-neutral-800"
+              aria-label="More actions"
+            >
+              <i className="fa-solid fa-ellipsis-vertical text-neutral-600 dark:text-neutral-200"></i>
+            </button>
+            {menuOpen && (
+              <div className="absolute right-0 mt-2 w-44 rounded-xl border border-neutral-200/60 dark:border-neutral-800 bg-white dark:bg-neutral-900 shadow-lg py-1 z-20">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMenuOpen(false);
+                    exportToExcel();
+                  }}
+                  className="w-full px-3 py-2 text-left text-sm hover:bg-neutral-100 dark:hover:bg-neutral-800"
+                >
+                  {texts.exportExcel}
+                </button>
+              </div>
+            )}
+          </div>
         </header>
 
         <section className="rounded-2xl border border-neutral-200/60 dark:border-neutral-800 bg-white/70 dark:bg-neutral-900/60 shadow-sm">

@@ -2,9 +2,11 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { useLanguage } from "@/lib/languageContext";
 
 export default function ControlPanel() {
   const [role, setRole] = useState("");
+  const { language } = useLanguage();
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -20,52 +22,100 @@ export default function ControlPanel() {
     }
   }, []);
 
-  const cards = [
-    {
-      href: "/controlPanel/teachers",
-      title: "Profesores",
-      desc: "Gestionar registros de profesores",
-      color: "bg-indigo-600",
-      tint: "bg-indigo-600/10",
-    },
-    {
-      href: "/controlPanel/courses",
-      title: "Cursos",
-      desc: "Crear y editar cursos",
-      color: "bg-blue-600",
-      tint: "bg-blue-600/10",
-      roles: ["admin"],
-    },
-    {
-      href: "/controlPanel/staff",
-      title: "Personal",
-      desc: "Administradores y secretarias",
-      color: "bg-emerald-600",
-      tint: "bg-emerald-600/10",
-    },
-    {
-      href: "/controlPanel/students",
-      title: "Estudiantes",
-      desc: "Gestionar registros de estudiantes",
-      color: "bg-rose-600",
-      tint: "bg-rose-600/10",
-    },
-    {
-      href: "/controlPanel/study-plans",
-      title: "Planes de estudio",
-      desc: "Gestionar planes curriculares",
-      color: "bg-violet-600",
-      tint: "bg-violet-600/10",
-      roles: ["admin"],
-    },
-    {
-      href: "/controlPanel/sections",
-      title: "Secciones",
-      desc: "Gestionar secciones de clase",
-      color: "bg-amber-600",
-      tint: "bg-amber-600/10",
-    },
-  ];
+  const cards =
+    language === "en"
+      ? [
+          {
+            href: "/controlPanel/teachers",
+            title: "Teachers",
+            desc: "Manage teacher records",
+            color: "bg-indigo-600",
+            tint: "bg-indigo-600/10",
+          },
+          {
+            href: "/controlPanel/courses",
+            title: "Courses",
+            desc: "Create and edit courses",
+            color: "bg-blue-600",
+            tint: "bg-blue-600/10",
+            roles: ["admin"],
+          },
+          {
+            href: "/controlPanel/staff",
+            title: "Staff",
+            desc: "Admins and secretaries",
+            color: "bg-emerald-600",
+            tint: "bg-emerald-600/10",
+          },
+          {
+            href: "/controlPanel/students",
+            title: "Students",
+            desc: "Manage student records",
+            color: "bg-rose-600",
+            tint: "bg-rose-600/10",
+          },
+          {
+            href: "/controlPanel/study-plans",
+            title: "Study plans",
+            desc: "Manage curriculum plans",
+            color: "bg-violet-600",
+            tint: "bg-violet-600/10",
+            roles: ["admin"],
+          },
+          {
+            href: "/controlPanel/sections",
+            title: "Sections",
+            desc: "Manage class sections",
+            color: "bg-amber-600",
+            tint: "bg-amber-600/10",
+          },
+        ]
+      : [
+          {
+            href: "/controlPanel/teachers",
+            title: "Profesores",
+            desc: "Gestionar registros de profesores",
+            color: "bg-indigo-600",
+            tint: "bg-indigo-600/10",
+          },
+          {
+            href: "/controlPanel/courses",
+            title: "Cursos",
+            desc: "Crear y editar cursos",
+            color: "bg-blue-600",
+            tint: "bg-blue-600/10",
+            roles: ["admin"],
+          },
+          {
+            href: "/controlPanel/staff",
+            title: "Personal",
+            desc: "Administradores y secretarias",
+            color: "bg-emerald-600",
+            tint: "bg-emerald-600/10",
+          },
+          {
+            href: "/controlPanel/students",
+            title: "Estudiantes",
+            desc: "Gestionar registros de estudiantes",
+            color: "bg-rose-600",
+            tint: "bg-rose-600/10",
+          },
+          {
+            href: "/controlPanel/study-plans",
+            title: "Planes de estudio",
+            desc: "Gestionar planes curriculares",
+            color: "bg-violet-600",
+            tint: "bg-violet-600/10",
+            roles: ["admin"],
+          },
+          {
+            href: "/controlPanel/sections",
+            title: "Secciones",
+            desc: "Gestionar secciones de clase",
+            color: "bg-amber-600",
+            tint: "bg-amber-600/10",
+          },
+        ];
 
   return (
     <main className="min-h-dvh p-6">
@@ -75,10 +125,12 @@ export default function ControlPanel() {
             <span className="text-2xl font-semibold">SM</span>
           </div>
           <h1 className="text-3xl font-semibold tracking-tight">
-            Panel de control
+            {language === "en" ? "Control Panel" : "Panel de control"}
           </h1>
           <p className="text-sm text-neutral-500">
-            Acceso rápido a los recursos del colegio
+            {language === "en"
+              ? "Quick access to school resources"
+              : "Acceso rápido a los recursos del colegio"}
           </p>
         </header>
 

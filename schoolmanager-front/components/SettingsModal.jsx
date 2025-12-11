@@ -5,15 +5,162 @@ import {
   getStoredTheme,
   getStoredLanguage,
   applyThemePreference,
-  applyLanguagePreference,
   saveThemePreference,
-  saveLanguagePreference,
 } from "@/lib/preferences";
+import { useLanguage } from "@/lib/languageContext";
 
 export default function SettingsModal({ onClose }) {
   const [theme, setTheme] = useState("system");
   const [language, setLanguage] = useState("es");
   const [saving, setSaving] = useState(false);
+  const { language: appLanguage, setLanguage: setGlobalLanguage } =
+    useLanguage();
+
+  const isEn = appLanguage === "en";
+
+  const ui = isEn
+    ? {
+        sidebarAccount: "Account",
+        sidebarPreferences: "Preferences",
+        sidebarNotifications: "Notifications",
+        sidebarConnections: "Connections",
+        headerTitle: "Preferences",
+        headerSubtitle: "Customize your experience",
+        closeAria: "Close settings",
+        prefSectionTitle: "Preferences",
+        appearanceLabel: "Appearance",
+        appearanceDesc:
+          "Choose between light or dark mode, or follow your system theme.",
+        themeSystem: "Use system theme",
+        themeLight: "Light",
+        themeDark: "Dark",
+        langSectionTitle: "Language & time",
+        languageLabel: "Language",
+        languageDesc: "Change the language used in the interface.",
+        languageEsOption: "Spanish",
+        languageEnOption: "English",
+        otherSections: [
+          {
+            title: "Language & time",
+            items: [
+              {
+                label: "Start week on Monday",
+                desc: "This will change how all calendars in your app look.",
+                control: "Toggle",
+              },
+              {
+                label: "Set timezone automatically",
+                desc: "Reminders, notifications and emails are delivered based on your time zone.",
+                control: "Toggle",
+              },
+              {
+                label: "Timezone",
+                desc: "Current timezone setting.",
+                control: "(GMT-5:00) Lima",
+              },
+            ],
+          },
+          {
+            title: "Notifications",
+            items: [
+              {
+                label: "Email updates",
+                desc: "Receive summaries of changes in courses, sections and study plans.",
+                control: "Toggle",
+              },
+              {
+                label: "Mentions & alerts",
+                desc: "Notify me when I’m assigned or tagged in items.",
+                control: "Toggle",
+              },
+            ],
+          },
+          {
+            title: "Data & export",
+            items: [
+              {
+                label: "Export CSV",
+                desc: "Download tables for students, teachers, sections and study plans.",
+                control: "Actions",
+              },
+            ],
+          },
+        ],
+        toggleOff: "Off",
+        savingLabel: "Saving...",
+        saveChanges: "Save changes",
+      }
+    : {
+        sidebarAccount: "Cuenta",
+        sidebarPreferences: "Preferencias",
+        sidebarNotifications: "Notificaciones",
+        sidebarConnections: "Conexiones",
+        headerTitle: "Preferencias",
+        headerSubtitle: "Personaliza tu experiencia",
+        closeAria: "Cerrar configuración",
+        prefSectionTitle: "Preferencias",
+        appearanceLabel: "Apariencia",
+        appearanceDesc:
+          "Elige entre tema claro u oscuro, o sigue el tema del sistema.",
+        themeSystem: "Usar tema del sistema",
+        themeLight: "Claro",
+        themeDark: "Oscuro",
+        langSectionTitle: "Idioma y tiempo",
+        languageLabel: "Idioma",
+        languageDesc: "Cambia el idioma que se usa en la interfaz.",
+        languageEsOption: "Español",
+        languageEnOption: "English",
+        otherSections: [
+          {
+            title: "Idioma y tiempo",
+            items: [
+              {
+                label: "Iniciar la semana en lunes",
+                desc: "Esto cambiará cómo se ven todos los calendarios en la aplicación.",
+                control: "Toggle",
+              },
+              {
+                label: "Definir zona horaria automáticamente",
+                desc: "Recordatorios, notificaciones y correos se envían según tu zona horaria.",
+                control: "Toggle",
+              },
+              {
+                label: "Zona horaria",
+                desc: "Zona horaria actual.",
+                control: "(GMT-5:00) Lima",
+              },
+            ],
+          },
+          {
+            title: "Notificaciones",
+            items: [
+              {
+                label: "Actualizaciones por correo",
+                desc: "Recibe resúmenes de cambios en cursos, secciones y planes de estudio.",
+                control: "Toggle",
+              },
+              {
+                label: "Menciones y alertas",
+                desc: "Avísame cuando me asignen o etiqueten en elementos.",
+                control: "Toggle",
+              },
+            ],
+          },
+          {
+            title: "Datos y exportación",
+            items: [
+              {
+                label: "Exportar CSV",
+                desc: "Descarga tablas de estudiantes, profesores, secciones y planes de estudio.",
+                control: "Acciones",
+              },
+            ],
+          },
+        ],
+        toggleOff: "Desactivado",
+        savingLabel: "Guardando...",
+        saveChanges: "Guardar cambios",
+      };
 
   useEffect(() => {
     const handler = (e) => {
@@ -31,61 +178,16 @@ export default function SettingsModal({ onClose }) {
     setLanguage(currentLanguage);
   }, []);
 
-  const otherSections = [
-    {
-      title: "Idioma y tiempo",
-      items: [
-        {
-          label: "Iniciar la semana en lunes",
-          desc: "Esto cambiará cómo se ven todos los calendarios en la aplicación.",
-          control: "Toggle",
-        },
-        {
-          label: "Definir zona horaria automáticamente",
-          desc: "Recordatorios, notificaciones y correos se envían según tu zona horaria.",
-          control: "Toggle",
-        },
-        {
-          label: "Zona horaria",
-          desc: "Zona horaria actual.",
-          control: "(GMT-5:00) Lima",
-        },
-      ],
-    },
-    {
-      title: "Notificaciones",
-      items: [
-        {
-          label: "Actualizaciones por correo",
-          desc: "Recibe resúmenes de cambios en cursos, secciones y planes de estudio.",
-          control: "Toggle",
-        },
-        {
-          label: "Menciones y alertas",
-          desc: "Avísame cuando me asignen o etiqueten en elementos.",
-          control: "Toggle",
-        },
-      ],
-    },
-    {
-      title: "Datos y exportación",
-      items: [
-        {
-          label: "Exportar CSV",
-          desc: "Descarga tablas de estudiantes, profesores, secciones y planes de estudio.",
-          control: "Acciones",
-        },
-      ],
-    },
-  ];
+  const otherSections = ui.otherSections;
 
   const onSave = () => {
     setSaving(true);
     try {
       saveThemePreference(theme);
-      saveLanguagePreference(language);
       applyThemePreference(theme);
-      applyLanguagePreference(language);
+      if (setGlobalLanguage) {
+        setGlobalLanguage(language);
+      }
     } finally {
       setSaving(false);
     }
@@ -101,16 +203,16 @@ export default function SettingsModal({ onClose }) {
         {/* Sidebar */}
         <aside className="w-64 bg-neutral-100/80 dark:bg-neutral-950/80 border-r border-neutral-200/60 dark:border-neutral-800 p-4 flex flex-col gap-2">
           <div className="text-sm font-semibold text-neutral-600 dark:text-neutral-300 mb-2">
-            Cuenta
+            {ui.sidebarAccount}
           </div>
           <button className="w-full text-left px-3 py-2 rounded-lg bg-neutral-200 text-neutral-900 dark:bg-neutral-800 dark:text-white">
-            Preferencias
+            {ui.sidebarPreferences}
           </button>
           <button className="w-full text-left px-3 py-2 rounded-lg text-neutral-600 dark:text-neutral-300 hover:bg-neutral-200/60 dark:hover:bg-neutral-800/60">
-            Notificaciones
+            {ui.sidebarNotifications}
           </button>
           <button className="w-full text-left px-3 py-2 rounded-lg text-neutral-600 dark:text-neutral-300 hover:bg-neutral-200/60 dark:hover:bg-neutral-800/60">
-            Conexiones
+            {ui.sidebarConnections}
           </button>
         </aside>
 
@@ -118,15 +220,15 @@ export default function SettingsModal({ onClose }) {
         <div className="flex-1 overflow-y-auto p-6 space-y-6">
           <div className="flex justify-between items-start">
             <div>
-              <h2 className="text-xl font-semibold">Preferencias</h2>
+              <h2 className="text-xl font-semibold">{ui.headerTitle}</h2>
               <p className="text-sm text-neutral-600 dark:text-neutral-400">
-                Personaliza tu experiencia
+                {ui.headerSubtitle}
               </p>
             </div>
             <button
               onClick={onClose}
               className="text-neutral-400 hover:text-neutral-700 dark:hover:text-white"
-              aria-label="Cerrar configuración"
+              aria-label={ui.closeAria}
             >
               <i className="fa-solid fa-xmark text-lg"></i>
             </button>
@@ -136,15 +238,17 @@ export default function SettingsModal({ onClose }) {
           <div className="space-y-4">
             <div className="flex justify-between items-center border-b border-neutral-200 dark:border-neutral-800 pb-2">
               <h3 className="text-sm font-semibold text-neutral-700 dark:text-neutral-200 uppercase tracking-wide">
-                Preferencias
+                {ui.prefSectionTitle}
               </h3>
             </div>
             <div className="space-y-4">
               <div className="flex justify-between items-start gap-6">
                 <div>
-                  <div className="text-sm font-medium">Apariencia</div>
+                  <div className="text-sm font-medium">
+                    {ui.appearanceLabel}
+                  </div>
                   <div className="text-xs text-neutral-600 dark:text-neutral-400 max-w-sm">
-                    Elige entre tema claro u oscuro, o sigue el tema del sistema.
+                    {ui.appearanceDesc}
                   </div>
                 </div>
                 <div className="text-xs text-neutral-700 dark:text-neutral-300">
@@ -153,9 +257,9 @@ export default function SettingsModal({ onClose }) {
                     value={theme}
                     onChange={(e) => setTheme(e.target.value)}
                   >
-                    <option value="system">Usar tema del sistema</option>
-                    <option value="light">Claro</option>
-                    <option value="dark">Oscuro</option>
+                    <option value="system">{ui.themeSystem}</option>
+                    <option value="light">{ui.themeLight}</option>
+                    <option value="dark">{ui.themeDark}</option>
                   </select>
                 </div>
               </div>
@@ -166,15 +270,15 @@ export default function SettingsModal({ onClose }) {
           <div className="space-y-4">
             <div className="flex justify-between items-center border-b border-neutral-200 dark:border-neutral-800 pb-2">
               <h3 className="text-sm font-semibold text-neutral-700 dark:text-neutral-200 uppercase tracking-wide">
-                Idioma y tiempo
+                {ui.langSectionTitle}
               </h3>
             </div>
             <div className="space-y-4">
               <div className="flex justify-between items-start gap-6">
                 <div>
-                  <div className="text-sm font-medium">Idioma</div>
+                  <div className="text-sm font-medium">{ui.languageLabel}</div>
                   <div className="text-xs text-neutral-600 dark:text-neutral-400 max-w-sm">
-                    Cambia el idioma que se usa en la interfaz.
+                    {ui.languageDesc}
                   </div>
                 </div>
                 <div className="text-xs text-neutral-700 dark:text-neutral-300">
@@ -183,8 +287,8 @@ export default function SettingsModal({ onClose }) {
                     value={language}
                     onChange={(e) => setLanguage(e.target.value)}
                   >
-                    <option value="es">Español (predeterminado)</option>
-                    <option value="en">English</option>
+                    <option value="es">{ui.languageEsOption}</option>
+                    <option value="en">{ui.languageEnOption}</option>
                   </select>
                 </div>
               </div>
@@ -211,7 +315,7 @@ export default function SettingsModal({ onClose }) {
                               <div className="w-10 h-5 rounded-full bg-neutral-300 dark:bg-neutral-700 relative">
                                 <div className="absolute left-0.5 top-0.5 w-4 h-4 rounded-full bg-white dark:bg-neutral-400"></div>
                               </div>
-                              <span>Desactivado</span>
+                              <span>{ui.toggleOff}</span>
                             </div>
                           ) : (
                             item.control
@@ -232,7 +336,7 @@ export default function SettingsModal({ onClose }) {
               className="btn-primary text-sm disabled:opacity-60 disabled:cursor-not-allowed"
               disabled={saving}
             >
-              {saving ? "Guardando..." : "Guardar cambios"}
+              {saving ? ui.savingLabel : ui.saveChanges}
             </button>
           </div>
         </div>

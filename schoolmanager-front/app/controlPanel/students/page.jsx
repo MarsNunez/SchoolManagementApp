@@ -1,14 +1,31 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { fetchJSON, authHeaders } from "@/lib/api";
+import { useLanguage } from "@/lib/languageContext";
+import * as XLSX from "xlsx";
 
 export default function StudentsPage() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [query, setQuery] = useState("");
+  const [menuOpen, setMenuOpen] = useState(false);
+  const { language } = useLanguage();
+
+  const texts =
+    language === "en"
+      ? {
+          title: "Students",
+          subtitle: "List and manage students",
+          exportExcel: "Export to Excel",
+        }
+      : {
+          title: "Estudiantes",
+          subtitle: "Listar y gestionar estudiantes",
+          exportExcel: "Exportar a Excel",
+        };
 
   const load = async () => {
     try {
@@ -22,7 +39,39 @@ export default function StudentsPage() {
     }
   };
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    load();
+  }, []);
+
+  const filteredItems = useMemo(() => {
+    return items.filter((s) => {
+      if (!query.trim()) return true;
+      const q = query.toLowerCase();
+      const name = `${s.name || ""} ${s.lastname || ""}`.toLowerCase();
+      const id = String(s.student_id || "").toLowerCase();
+      const dni = String(s.dni || "");
+      return name.includes(q) || id.includes(q) || dni.includes(q);
+    });
+  }, [items, query]);
+
+  const exportToExcel = () => {
+    try {
+      const rows = filteredItems.map((s) => ({
+        ID: s.student_id,
+        Nombre: `${s.name || ""} ${s.lastname || ""}`.trim(),
+        DNI: s.dni ?? "",
+        Correo: s.email || "",
+        Sección: s.section_id || "",
+      }));
+
+      const worksheet = XLSX.utils.json_to_sheet(rows);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Students");
+      XLSX.writeFile(workbook, "students.xlsx");
+    } catch (e) {
+      console.error("Error al exportar estudiantes a Excel:", e);
+    }
+  };
 
   return (
     <main className="min-h-dvh p-6">
@@ -44,11 +93,35 @@ export default function StudentsPage() {
           </Link>
         </div>
 
-        <header>
-          <h1 className="text-2xl font-semibold">Estudiantes</h1>
-          <p className="text-sm text-neutral-500">
-            Listar y gestionar estudiantes
-          </p>
+        <header className="flex items-start justify-between gap-3">
+          <div>
+            <h1 className="text-2xl font-semibold">{texts.title}</h1>
+            <p className="text-sm text-neutral-500">{texts.subtitle}</p>
+          </div>
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => setMenuOpen((v) => !v)}
+              className="h-9 w-9 rounded-xl border border-neutral-300 dark:border-neutral-700 bg-white/80 dark:bg-neutral-900/80 flex items-center justify-center shadow-sm hover:bg-neutral-100 dark:hover:bg-neutral-800"
+              aria-label="More actions"
+            >
+              <i className="fa-solid fa-ellipsis-vertical text-neutral-600 dark:text-neutral-200"></i>
+            </button>
+            {menuOpen && (
+              <div className="absolute right-0 mt-2 w-44 rounded-xl border border-neutral-200/60 dark:border-neutral-800 bg-white dark:bg-neutral-900 shadow-lg py-1 z-20">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMenuOpen(false);
+                    exportToExcel();
+                  }}
+                  className="w-full px-3 py-2 text-left text-sm hover:bg-neutral-100 dark:hover:bg-neutral-800"
+                >
+                  {texts.exportExcel}
+                </button>
+              </div>
+            )}
+          </div>
         </header>
 
         {error && <div className="text-sm text-red-600">{error}</div>}
@@ -77,20 +150,7 @@ export default function StudentsPage() {
                 </tr>
               </thead>
               <tbody>
-                {items
-                  .filter((s) => {
-                    if (!query.trim()) return true;
-                    const q = query.toLowerCase();
-                    const name = `${s.name || ""} ${s.lastname || ""}`.toLowerCase();
-                    const id = String(s.student_id || "").toLowerCase();
-                    const dni = String(s.dni || "");
-                    return (
-                      name.includes(q) ||
-                      id.includes(q) ||
-                      dni.includes(q)
-                    );
-                  })
-                  .map((s) => (
+                {filteredItems.map((s) => (
                   <tr key={s.student_id} className="border-b last:border-none border-neutral-100 dark:border-neutral-800">
                     <td className="p-3 whitespace-nowrap">{s.student_id}</td>
                     <td className="p-3 whitespace-nowrap">{s.name} {s.lastname}</td>

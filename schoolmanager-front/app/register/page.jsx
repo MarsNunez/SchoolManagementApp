@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useLanguage } from "@/lib/languageContext";
 
 // export const metadata = {
 //   title: "SchoolManager | Register",
@@ -8,6 +9,7 @@ import { useState } from "react";
 // };
 
 export default function RegisterPage() {
+  const { language } = useLanguage();
   const [form, setForm] = useState({
     staff_id: "",
     name: "",
@@ -42,7 +44,9 @@ export default function RegisterPage() {
           : null;
       if (!token)
         throw new Error(
-          "Se requiere el token de administrador. Inicia sesión como administrador primero."
+          language === "en"
+            ? "Admin token required. Please log in as admin first."
+            : "Se requiere el token de administrador. Inicia sesión como administrador primero."
         );
 
       const payload = { ...form, dni: Number(form.dni) };
@@ -58,9 +62,18 @@ export default function RegisterPage() {
 
       const data = await res.json();
       if (!res.ok)
-        throw new Error(data?.message || "Error al registrar al personal");
+        throw new Error(
+          data?.message ||
+            (language === "en"
+              ? "Failed to register staff"
+              : "Error al registrar al personal")
+        );
 
-      setSuccess("Personal creado correctamente");
+      setSuccess(
+        language === "en"
+          ? "Staff created successfully"
+          : "Personal creado correctamente"
+      );
       // Nota: no reemplazamos el token vigente (admin) con el del usuario creado.
     } catch (err) {
       setError(err.message);
@@ -77,10 +90,12 @@ export default function RegisterPage() {
             <span className="text-2xl font-semibold text-emerald-600">SM</span>
           </div>
           <h1 className="text-2xl font-semibold tracking-tight">
-            Crear una cuenta
+            {language === "en" ? "Create an account" : "Crear una cuenta"}
           </h1>
           <p className="text-sm text-neutral-500">
-            Registra personal para acceder al panel
+            {language === "en"
+              ? "Register staff to access the dashboard"
+              : "Registra personal para acceder al panel"}
           </p>
         </div>
 
@@ -88,7 +103,7 @@ export default function RegisterPage() {
           <form className="p-6 grid gap-4 sm:grid-cols-2" onSubmit={onSubmit}>
             <div className="space-y-2 sm:col-span-2">
               <label htmlFor="staff_id" className="block text-sm font-medium">
-                ID del personal
+                {language === "en" ? "Staff ID" : "ID del personal"}
               </label>
               <input
                 id="staff_id"
@@ -102,7 +117,7 @@ export default function RegisterPage() {
 
             <div className="space-y-2">
               <label htmlFor="name" className="block text-sm font-medium">
-                Nombres
+                {language === "en" ? "Name" : "Nombres"}
               </label>
               <input
                 id="name"
@@ -115,7 +130,7 @@ export default function RegisterPage() {
             </div>
             <div className="space-y-2">
               <label htmlFor="lastname" className="block text-sm font-medium">
-                Apellidos
+                {language === "en" ? "Lastname" : "Apellidos"}
               </label>
               <input
                 id="lastname"
@@ -142,21 +157,23 @@ export default function RegisterPage() {
             </div>
             <div className="space-y-2">
               <label htmlFor="email" className="block text-sm font-medium">
-                Correo electrónico
+                {language === "en" ? "Email" : "Correo electrónico"}
               </label>
               <input
                 id="email"
                 type="email"
                 value={form.email}
                 onChange={update("email")}
-                placeholder="tu@colegio.edu"
+                placeholder={
+                  language === "en" ? "you@school.edu" : "tu@colegio.edu"
+                }
                 className="w-full rounded-lg border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 px-3 py-2 outline-none focus:ring-2 focus:ring-emerald-500"
               />
             </div>
 
             <div className="space-y-2">
               <label htmlFor="password" className="block text-sm font-medium">
-                Contraseña
+                {language === "en" ? "Password" : "Contraseña"}
               </label>
               <input
                 id="password"
@@ -169,7 +186,7 @@ export default function RegisterPage() {
             </div>
             <div className="space-y-2">
               <label htmlFor="role" className="block text-sm font-medium">
-                Rol
+                {language === "en" ? "Role" : "Rol"}
               </label>
               <select
                 id="role"
@@ -177,9 +194,15 @@ export default function RegisterPage() {
                 onChange={update("role")}
                 className="w-full rounded-lg border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 px-3 py-2 outline-none focus:ring-2 focus:ring-emerald-500"
               >
-                <option value="admin">Administrador</option>
-                <option value="secretary">Secretaria</option>
-                <option value="teacher">Profesor</option>
+                <option value="admin">
+                  {language === "en" ? "Admin" : "Administrador"}
+                </option>
+                <option value="secretary">
+                  {language === "en" ? "Secretary" : "Secretaria"}
+                </option>
+                <option value="teacher">
+                  {language === "en" ? "Teacher" : "Profesor"}
+                </option>
               </select>
             </div>
 
@@ -191,10 +214,12 @@ export default function RegisterPage() {
                   onChange={update("state")}
                   className="size-4 rounded border-neutral-300 dark:border-neutral-700"
                 />
-                Estado activo
+                {language === "en" ? "Active state" : "Estado activo"}
               </label>
               <a className="text-emerald-600 hover:underline" href="/auth/login">
-                ¿Ya tienes una cuenta?
+                {language === "en"
+                  ? "Already have an account?"
+                  : "¿Ya tienes una cuenta?"}
               </a>
             </div>
 
@@ -215,7 +240,13 @@ export default function RegisterPage() {
                 disabled={loading}
                 className="w-full rounded-lg bg-emerald-600 text-white py-2.5 font-medium hover:bg-emerald-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
               >
-                {loading ? "Creando..." : "Crear cuenta"}
+                {loading
+                  ? language === "en"
+                    ? "Creating..."
+                    : "Creando..."
+                  : language === "en"
+                  ? "Create account"
+                  : "Crear cuenta"}
               </button>
             </div>
           </form>
