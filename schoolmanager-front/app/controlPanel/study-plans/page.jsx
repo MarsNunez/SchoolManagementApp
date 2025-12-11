@@ -27,6 +27,8 @@ export default function StudyPlansPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
+  const [planToDelete, setPlanToDelete] = useState(null);
+  const [deleteError, setDeleteError] = useState("");
   const { language } = useLanguage();
 
   const texts =
@@ -60,16 +62,23 @@ export default function StudyPlansPage() {
     load();
   }, []);
 
-  const remove = async (studyPlan_id) => {
-    if (!confirm(`¿Eliminar ${studyPlan_id}?`)) return;
+  const deletePlan = async () => {
+    if (!planToDelete) return;
+    setDeleteError("");
     try {
-      await fetchJSON(`/study-plans/${studyPlan_id}`, {
+      await fetchJSON(`/study-plans/${planToDelete.studyPlan_id}`, {
         method: "DELETE",
         headers: { ...authHeaders() },
       });
       await load();
+      setPlanToDelete(null);
     } catch (e) {
-      alert(e.message || "Error al eliminar el plan de estudio");
+      setDeleteError(
+        e.message ||
+          (language === "en"
+            ? "Failed to delete study plan"
+            : "Error al eliminar el plan de estudio")
+      );
     }
   };
 
@@ -221,7 +230,10 @@ export default function StudyPlansPage() {
                             Editar
                           </Link>
                           <button
-                            onClick={() => remove(plan.studyPlan_id)}
+                            onClick={() => {
+                              setPlanToDelete(plan);
+                              setDeleteError("");
+                            }}
                             className="btn-danger"
                           >
                             Eliminar
@@ -236,6 +248,45 @@ export default function StudyPlansPage() {
           )}
         </section>
       </div>
+      {planToDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className="w-full max-w-sm rounded-2xl border border-neutral-200/60 dark:border-neutral-800 bg-white dark:bg-neutral-900 shadow-lg p-5 space-y-3">
+            <h2 className="text-lg font-semibold">
+              {language === "en"
+                ? "Delete study plan"
+                : "Eliminar plan de estudio"}
+            </h2>
+            <p className="text-sm text-neutral-600 dark:text-neutral-300">
+              {language === "en"
+                ? "Are you sure you want to delete the study plan "
+                : "¿Seguro que quieres eliminar el plan de estudio "}
+              <span className="font-semibold">{planToDelete.studyPlan_id}</span>
+              ?
+            </p>
+            {deleteError && (
+              <div className="text-xs text-red-600 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-md px-3 py-2">
+                {deleteError}
+              </div>
+            )}
+            <div className="flex justify-end gap-2 pt-2">
+              <button
+                type="button"
+                onClick={() => setPlanToDelete(null)}
+                className="rounded-lg px-3 py-1.5 text-sm border border-neutral-300 dark:border-neutral-700"
+              >
+                {language === "en" ? "Cancel" : "Cancelar"}
+              </button>
+              <button
+                type="button"
+                onClick={deletePlan}
+                className="btn-danger text-sm"
+              >
+                {language === "en" ? "Delete" : "Eliminar"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 }

@@ -12,6 +12,8 @@ export default function CoursesPage() {
   const [error, setError] = useState("");
   const [teachers, setTeachers] = useState([]);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [courseToDelete, setCourseToDelete] = useState(null);
+  const [deleteError, setDeleteError] = useState("");
   const { language } = useLanguage();
 
   const texts =
@@ -157,16 +159,23 @@ export default function CoursesPage() {
     }
   };
 
-  const remove = async (course_id) => {
-    if (!confirm(texts.deleteConfirm(course_id))) return;
+  const confirmDeleteCourse = async () => {
+    if (!courseToDelete) return;
+    setDeleteError("");
     try {
-      await fetchJSON(`/courses/${course_id}`, {
+      await fetchJSON(`/courses/${courseToDelete.course_id}`, {
         method: "DELETE",
         headers: { ...authHeaders() },
       });
       await load();
+      setCourseToDelete(null);
     } catch (e) {
-      alert(e.message);
+      setDeleteError(
+        e.message ||
+          (language === "en"
+            ? "Failed to delete course"
+            : "Error al eliminar el curso")
+      );
     }
   };
 
@@ -376,7 +385,10 @@ export default function CoursesPage() {
                         {texts.edit}
                       </button>
                       <button
-                        onClick={() => remove(c.course_id)}
+                        onClick={() => {
+                          setDeleteError("");
+                          setCourseToDelete(c);
+                        }}
                         className="btn-danger"
                       >
                         {texts.remove}
@@ -389,6 +401,45 @@ export default function CoursesPage() {
           )}
         </section>
       </div>
+      {courseToDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className="w-full max-w-sm rounded-2xl border border-neutral-200/60 dark:border-neutral-800 bg-white dark:bg-neutral-900 shadow-lg p-5 space-y-3">
+            <h2 className="text-lg font-semibold">
+              {language === "en" ? "Delete course" : "Eliminar curso"}
+            </h2>
+            <p className="text-sm text-neutral-600 dark:text-neutral-300">
+              {language === "en"
+                ? "Are you sure you want to delete the course "
+                : "¿Seguro que quieres eliminar el curso "}
+              <span className="font-semibold">
+                {courseToDelete.title || courseToDelete.course_id}
+              </span>
+              ?
+            </p>
+            {deleteError && (
+              <div className="text-xs text-red-600 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-md px-3 py-2">
+                {deleteError}
+              </div>
+            )}
+            <div className="flex justify-end gap-2 pt-2">
+              <button
+                type="button"
+                onClick={() => setCourseToDelete(null)}
+                className="rounded-lg px-3 py-1.5 text-sm border border-neutral-300 dark:border-neutral-700"
+              >
+                {language === "en" ? "Cancel" : "Cancelar"}
+              </button>
+              <button
+                type="button"
+                onClick={confirmDeleteCourse}
+                className="btn-danger text-sm"
+              >
+                {language === "en" ? "Delete" : "Eliminar"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 }

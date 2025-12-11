@@ -21,6 +21,8 @@ export default function SectionsPage() {
   const [error, setError] = useState("");
   const [role, setRole] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
+  const [sectionToDelete, setSectionToDelete] = useState(null);
+  const [deleteError, setDeleteError] = useState("");
   const { language } = useLanguage();
 
   const texts =
@@ -94,16 +96,23 @@ export default function SectionsPage() {
 
   const isAdmin = role === "admin";
 
-  const remove = async (section_id) => {
-    if (!confirm(`¿Eliminar ${section_id}?`)) return;
+  const deleteSection = async () => {
+    if (!sectionToDelete) return;
+    setDeleteError("");
     try {
-      await fetchJSON(`/sections/${section_id}`, {
+      await fetchJSON(`/sections/${sectionToDelete.section_id}`, {
         method: "DELETE",
         headers: { ...authHeaders() },
       });
       await load();
+      setSectionToDelete(null);
     } catch (e) {
-      alert(e.message);
+      setDeleteError(
+        e.message ||
+          (language === "en"
+            ? "Failed to delete section"
+            : "Error al eliminar la sección")
+      );
     }
   };
 
@@ -257,7 +266,10 @@ export default function SectionsPage() {
                           </Link>
                           {isAdmin && (
                             <button
-                              onClick={() => remove(section.section_id)}
+                              onClick={() => {
+                                setSectionToDelete(section);
+                                setDeleteError("");
+                              }}
                               className="btn-danger"
                             >
                               Eliminar
@@ -273,6 +285,45 @@ export default function SectionsPage() {
           )}
         </section>
       </div>
+      {sectionToDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className="w-full max-w-sm rounded-2xl border border-neutral-200/60 dark:border-neutral-800 bg-white dark:bg-neutral-900 shadow-lg p-5 space-y-3">
+            <h2 className="text-lg font-semibold">
+              {language === "en" ? "Delete section" : "Eliminar sección"}
+            </h2>
+            <p className="text-sm text-neutral-600 dark:text-neutral-300">
+              {language === "en"
+                ? "Are you sure you want to delete section "
+                : "¿Seguro que quieres eliminar la sección "}
+              <span className="font-semibold">
+                {sectionToDelete.section_id}
+              </span>
+              ?
+            </p>
+            {deleteError && (
+              <div className="text-xs text-red-600 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-md px-3 py-2">
+                {deleteError}
+              </div>
+            )}
+            <div className="flex justify-end gap-2 pt-2">
+              <button
+                type="button"
+                onClick={() => setSectionToDelete(null)}
+                className="rounded-lg px-3 py-1.5 text-sm border border-neutral-300 dark:border-neutral-700"
+              >
+                {language === "en" ? "Cancel" : "Cancelar"}
+              </button>
+              <button
+                type="button"
+                onClick={deleteSection}
+                className="btn-danger text-sm"
+              >
+                {language === "en" ? "Delete" : "Eliminar"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 }

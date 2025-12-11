@@ -29,6 +29,8 @@ export default function StaffPage() {
   const disableSensitive =
     role === "secretary" && isEditing && editingTargetRole !== "admin";
   const [menuOpen, setMenuOpen] = useState(false);
+  const [staffToDelete, setStaffToDelete] = useState(null);
+  const [deleteError, setDeleteError] = useState("");
   const { language } = useLanguage();
 
   const texts =
@@ -100,13 +102,23 @@ export default function StaffPage() {
     }
   };
 
-  const remove = async (staff_id) => {
-    if (!confirm(`Delete ${staff_id}?`)) return;
+  const deleteStaff = async () => {
+    if (!staffToDelete) return;
+    setDeleteError("");
     try {
-      await fetchJSON(`/staff/${staff_id}`, { method: "DELETE", headers: { ...authHeaders() } });
+      await fetchJSON(`/staff/${staffToDelete.staff_id}`, {
+        method: "DELETE",
+        headers: { ...authHeaders() },
+      });
       await load();
+      setStaffToDelete(null);
     } catch (e) {
-      alert(e.message);
+      setDeleteError(
+        e.message ||
+          (language === "en"
+            ? "Failed to delete staff member"
+            : "Error al eliminar al miembro del personal")
+      );
     }
   };
 
@@ -275,8 +287,33 @@ export default function StaffPage() {
                     <td className="p-3 whitespace-nowrap">{String(s.state)}</td>
                     {canManage && !(role === "secretary" && s.role === "admin") ? (
                       <td className="p-3 flex gap-2">
-                        <button onClick={() => { setEditingId(s.staff_id); setEditingTargetRole(s.role || "secretary"); setForm({ name:s.name||"", lastname:s.lastname||"", dni:String(s.dni||""), email:s.email||"", password:"", role:s.role||"secretary", state:!!s.state }); }} className="rounded-lg px-3 py-2 text-sm border border-neutral-300 dark:border-neutral-700">Editar</button>
-                        <button onClick={() => remove(s.staff_id)} className="btn-danger">Eliminar</button>
+                        <button
+                          onClick={() => {
+                            setEditingId(s.staff_id);
+                            setEditingTargetRole(s.role || "secretary");
+                            setForm({
+                              name: s.name || "",
+                              lastname: s.lastname || "",
+                              dni: String(s.dni || ""),
+                              email: s.email || "",
+                              password: "",
+                              role: s.role || "secretary",
+                              state: !!s.state,
+                            });
+                          }}
+                          className="rounded-lg px-3 py-2 text-sm border border-neutral-300 dark:border-neutral-700"
+                        >
+                          Editar
+                        </button>
+                        <button
+                          onClick={() => {
+                            setStaffToDelete(s);
+                            setDeleteError("");
+                          }}
+                          className="btn-danger"
+                        >
+                          Eliminar
+                        </button>
                       </td>
                     ) : (
                       <td className="p-3 text-sm text-neutral-500">—</td>
@@ -288,6 +325,45 @@ export default function StaffPage() {
           )}
         </section>
       </div>
+      {staffToDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className="w-full max-w-sm rounded-2xl border border-neutral-200/60 dark:border-neutral-800 bg-white dark:bg-neutral-900 shadow-lg p-5 space-y-3">
+            <h2 className="text-lg font-semibold">
+              {language === "en" ? "Delete staff member" : "Eliminar personal"}
+            </h2>
+            <p className="text-sm text-neutral-600 dark:text-neutral-300">
+              {language === "en"
+                ? "Are you sure you want to delete "
+                : "¿Seguro que quieres eliminar a "}
+              <span className="font-semibold">
+                {staffToDelete.name} {staffToDelete.lastname}
+              </span>
+              ?
+            </p>
+            {deleteError && (
+              <div className="text-xs text-red-600 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-md px-3 py-2">
+                {deleteError}
+              </div>
+            )}
+            <div className="flex justify-end gap-2 pt-2">
+              <button
+                type="button"
+                onClick={() => setStaffToDelete(null)}
+                className="rounded-lg px-3 py-1.5 text-sm border border-neutral-300 dark:border-neutral-700"
+              >
+                {language === "en" ? "Cancel" : "Cancelar"}
+              </button>
+              <button
+                type="button"
+                onClick={deleteStaff}
+                className="btn-danger text-sm"
+              >
+                {language === "en" ? "Delete" : "Eliminar"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 }
