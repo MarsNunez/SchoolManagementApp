@@ -47,13 +47,21 @@ export default function ControlPanel() {
             color: "bg-emerald-600",
             tint: "bg-emerald-600/10",
           },
-          {
-            href: "/controlPanel/students",
-            title: "Students",
-            desc: "Manage student records",
-            color: "bg-rose-600",
-            tint: "bg-rose-600/10",
-          },
+    {
+      href: "/controlPanel/students",
+      title: "Students",
+      desc: "Manage student records",
+      color: "bg-rose-600",
+      tint: "bg-rose-600/10",
+    },
+    {
+      href: "/controlPanel/supply-lists",
+      title: "Supply Lists",
+      desc: "Manage school supply lists",
+      color: "bg-cyan-600",
+      tint: "bg-cyan-600/10",
+      roles: ["admin", "secretary"],
+    },
           {
             href: "/controlPanel/study-plans",
             title: "Study plans",
