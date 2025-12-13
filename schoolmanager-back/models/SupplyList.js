@@ -30,6 +30,31 @@ const SupplyListSchema = new Schema(
       required: true,
       trim: true,
     },
+    template: {
+      type: String,
+      trim: true,
+      default: "default",
+    },
+    paddingTop: {
+      type: Number,
+      default: 80,
+      min: 0,
+    },
+    paddingRight: {
+      type: Number,
+      default: 80,
+      min: 0,
+    },
+    paddingBottom: {
+      type: Number,
+      default: 80,
+      min: 0,
+    },
+    paddingLeft: {
+      type: Number,
+      default: 80,
+      min: 0,
+    },
     items: {
       type: [SupplyItemSchema],
       default: [],

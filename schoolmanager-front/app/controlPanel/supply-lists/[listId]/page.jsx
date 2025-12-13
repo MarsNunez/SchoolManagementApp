@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { authHeaders, fetchJSON } from "@/lib/api";
 import * as XLSX from "xlsx";
+import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 
 export default function SupplyListDetailPage() {
   const params = useParams();
@@ -58,6 +59,128 @@ export default function SupplyListDetailPage() {
     }
   };
 
+  const downloadPdf = () => {
+    if (!list) return;
+    (async () => {
+      try {
+        const pdfDoc = await PDFDocument.create();
+        let page = pdfDoc.addPage([595, 842]); // A4
+        let { width, height } = page.getSize();
+        const padLeft = Number(list.paddingLeft ?? 80);
+        const padRight = Number(list.paddingRight ?? 80);
+        const padTop = Number(list.paddingTop ?? 80);
+        const padBottom = Number(list.paddingBottom ?? 80);
+
+        const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+        const fontRegular = await pdfDoc.embedFont(StandardFonts.Helvetica);
+
+        const drawBackground = async (targetPage) => {
+          const { width: w, height: h } = targetPage.getSize();
+          try {
+            const templateId = list.template || "default";
+            const templatePath =
+              templateId === "default"
+                ? "/supply-template.jpg"
+                : `/supply-templates/${templateId}.jpg`;
+            const templateBytes = await fetch(templatePath).then((r) =>
+              r.arrayBuffer()
+            );
+            const templateImage = await pdfDoc.embedJpg(templateBytes);
+            const scale = Math.min(
+              w / templateImage.width,
+              h / templateImage.height
+            );
+            const imgWidth = templateImage.width * scale;
+            const imgHeight = templateImage.height * scale;
+            const x = (w - imgWidth) / 2;
+            const y = (h - imgHeight) / 2;
+            targetPage.drawImage(templateImage, {
+              x,
+              y,
+              width: imgWidth,
+              height: imgHeight,
+            });
+          } catch (e) {
+            targetPage.drawRectangle({
+              x: padLeft,
+              y: h - padTop - 60,
+              width: w - padLeft - padRight,
+              height: 100,
+              color: rgb(0.95, 0.96, 1),
+            });
+          }
+        };
+
+        await drawBackground(page);
+        // Header text centered (no section/ID)
+        const title = list.title || "Supply List";
+        const titleSize = 22;
+        const titleWidth = fontBold.widthOfTextAtSize(title, titleSize) || 0;
+        const titleX = (width - titleWidth) / 2;
+        page.drawText(title, {
+          x: titleX,
+          y: height - padTop - 30,
+          size: titleSize,
+          font: fontBold,
+          color: rgb(0, 0, 0),
+        });
+
+        // Items with pagination and background on each page
+        let y = height - padTop - 110;
+        const rowGap = 24;
+        let currentPage = page;
+        let currentWidth = width;
+        const items = list.items || [];
+        for (const it of items) {
+          if (y < padBottom + 80) {
+            currentPage = pdfDoc.addPage([595, 842]);
+            const sz = currentPage.getSize();
+            currentWidth = sz.width;
+            height = sz.height;
+            await drawBackground(currentPage);
+            y = height - padTop - 40; // start closer to top since no header on subsequent pages
+          }
+          const qtyText = `(x${it.quantity ?? ""})`;
+          currentPage.drawText(it.name || "", {
+            x: padLeft,
+            y,
+            size: 12,
+            font: fontRegular,
+            color: rgb(0.1, 0.1, 0.1),
+          });
+          currentPage.drawText(qtyText, {
+            x: currentWidth - padRight - 100,
+            y,
+            size: 11,
+            font: fontRegular,
+            color: rgb(0.1, 0.1, 0.1),
+          });
+          if (it.note) {
+            currentPage.drawText(it.note, {
+              x: padLeft,
+              y: y - 16,
+              size: 10,
+              font: fontRegular,
+              color: rgb(0.2, 0.2, 0.2),
+            });
+          }
+          y -= rowGap;
+        }
+
+        const pdfBytes = await pdfDoc.save();
+        const blob = new Blob([pdfBytes], { type: "application/pdf" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `supply-list-${list.list_id || "export"}.pdf`;
+        link.click();
+        URL.revokeObjectURL(url);
+      } catch (e) {
+        console.error("Failed to export PDF:", e);
+      }
+    })();
+  };
+
   return (
     <main className="min-h-dvh p-6">
       <div className="mx-auto max-w-5xl space-y-6">
@@ -79,32 +202,42 @@ export default function SupplyListDetailPage() {
             >
               Edit
             </button>
-            <div className="relative">
-              <button
-                type="button"
-                onClick={() => setMenuOpen((v) => !v)}
-                className="h-9 w-9 rounded-xl border border-neutral-300 dark:border-neutral-700 bg-white/80 dark:bg-neutral-900/80 flex items-center justify-center shadow-sm hover:bg-neutral-100 dark:hover:bg-neutral-800"
-                aria-label="More actions"
-              >
-                <i className="fa-solid fa-ellipsis-vertical text-neutral-600 dark:text-neutral-200"></i>
-              </button>
-              {menuOpen && (
-                <div className="absolute right-0 mt-2 w-44 rounded-xl border border-neutral-200/60 dark:border-neutral-800 bg-white dark:bg-neutral-900 shadow-lg py-1 z-20">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setMenuOpen(false);
-                      downloadCsv();
-                    }}
-                    className="w-full px-3 py-2 text-left text-sm hover:bg-neutral-100 dark:hover:bg-neutral-800"
-                  >
-                    Download Excel
-                  </button>
-                </div>
-              )}
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => setMenuOpen((v) => !v)}
+                  className="h-9 w-9 rounded-xl border border-neutral-300 dark:border-neutral-700 bg-white/80 dark:bg-neutral-900/80 flex items-center justify-center shadow-sm hover:bg-neutral-100 dark:hover:bg-neutral-800"
+                  aria-label="More actions"
+                >
+                  <i className="fa-solid fa-ellipsis-vertical text-neutral-600 dark:text-neutral-200"></i>
+                </button>
+                {menuOpen && (
+                  <div className="absolute right-0 mt-2 w-44 rounded-xl border border-neutral-200/60 dark:border-neutral-800 bg-white dark:bg-neutral-900 shadow-lg py-1 z-20">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setMenuOpen(false);
+                        downloadCsv();
+                      }}
+                      className="w-full px-3 py-2 text-left text-sm hover:bg-neutral-100 dark:hover:bg-neutral-800"
+                    >
+                      Download Excel
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setMenuOpen(false);
+                        downloadPdf();
+                      }}
+                      className="w-full px-3 py-2 text-left text-sm hover:bg-neutral-100 dark:hover:bg-neutral-800"
+                    >
+                      Download PDF
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
-        </div>
 
         <header>
           <h1 className="text-2xl font-semibold">Supply List</h1>
@@ -122,6 +255,18 @@ export default function SupplyListDetailPage() {
             <div className="text-sm text-red-600">List not found</div>
           ) : (
             <>
+              <div className="flex items-center justify-between text-sm">
+                <div>
+                  <div className="text-neutral-500">Template</div>
+                  <div className="font-medium">{list.template || "default"}</div>
+                </div>
+                <Link
+                  href={`/controlPanel/supply-lists/${listId}/template`}
+                  className="rounded-lg px-3 py-2 text-sm border border-neutral-300 dark:border-neutral-700"
+                >
+                  Edit template
+                </Link>
+              </div>
               <div className="grid sm:grid-cols-2 gap-4 text-sm">
                 <div>
                   <div className="text-neutral-500">ID</div>

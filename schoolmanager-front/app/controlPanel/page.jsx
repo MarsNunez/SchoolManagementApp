@@ -109,6 +109,14 @@ export default function ControlPanel() {
             tint: "bg-rose-600/10",
           },
           {
+            href: "/controlPanel/supply-lists",
+            title: "Listas de útiles",
+            desc: "Gestionar listas de útiles",
+            color: "bg-cyan-600",
+            tint: "bg-cyan-600/10",
+            roles: ["admin", "secretary"],
+          },
+          {
             href: "/controlPanel/study-plans",
             title: "Planes de estudio",
             desc: "Gestionar planes curriculares",

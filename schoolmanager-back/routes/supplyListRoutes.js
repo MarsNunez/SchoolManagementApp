@@ -49,7 +49,23 @@ router.get("/:listId", requireRole("admin", "secretary"), async (req, res) => {
 router.post("/", requireRole("admin", "secretary"), async (req, res) => {
   try {
     const list_id = await generateUniqueListId();
-    const payload = { ...req.body, list_id };
+    const payload = {
+      ...req.body,
+      list_id,
+      template: req.body.template || "default",
+      paddingTop: Number.isFinite(Number(req.body.paddingTop))
+        ? Number(req.body.paddingTop)
+        : 80,
+      paddingRight: Number.isFinite(Number(req.body.paddingRight))
+        ? Number(req.body.paddingRight)
+        : 80,
+      paddingBottom: Number.isFinite(Number(req.body.paddingBottom))
+        ? Number(req.body.paddingBottom)
+        : 80,
+      paddingLeft: Number.isFinite(Number(req.body.paddingLeft))
+        ? Number(req.body.paddingLeft)
+        : 80,
+    };
     const list = await SupplyListModel.create(payload);
     res.status(201).json(list);
   } catch (error) {
@@ -63,9 +79,28 @@ router.post("/", requireRole("admin", "secretary"), async (req, res) => {
 // UPDATE SUPPLY LIST
 router.put("/:listId", requireRole("admin", "secretary"), async (req, res) => {
   try {
+    const payload = { ...req.body };
+    const numOr = (v, fallback) =>
+      Number.isFinite(Number(v)) ? Number(v) : fallback;
+    if (Object.prototype.hasOwnProperty.call(payload, "paddingTop")) {
+      payload.paddingTop = numOr(payload.paddingTop, 80);
+    }
+    if (Object.prototype.hasOwnProperty.call(payload, "paddingRight")) {
+      payload.paddingRight = numOr(payload.paddingRight, 80);
+    }
+    if (Object.prototype.hasOwnProperty.call(payload, "paddingBottom")) {
+      payload.paddingBottom = numOr(payload.paddingBottom, 80);
+    }
+    if (Object.prototype.hasOwnProperty.call(payload, "paddingLeft")) {
+      payload.paddingLeft = numOr(payload.paddingLeft, 80);
+    }
+    if (payload.template === undefined || payload.template === null) {
+      delete payload.template;
+    }
+
     const list = await SupplyListModel.findOneAndUpdate(
       { list_id: req.params.listId },
-      req.body,
+      payload,
       { new: true, runValidators: true }
     );
     if (!list) {
