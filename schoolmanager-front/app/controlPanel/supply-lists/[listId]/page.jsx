@@ -6,11 +6,13 @@ import { useParams, useRouter } from "next/navigation";
 import { authHeaders, fetchJSON } from "@/lib/api";
 import * as XLSX from "xlsx";
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
+import { useLanguage } from "@/lib/languageContext";
 
 export default function SupplyListDetailPage() {
   const params = useParams();
   const router = useRouter();
   const listId = params?.listId;
+  const { language } = useLanguage();
 
   const [list, setList] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -26,13 +28,13 @@ export default function SupplyListDetailPage() {
         });
         setList(listData);
       } catch (e) {
-        setError(e.message || "Failed to load supply list");
+        setError(e.message || (language === "en" ? "Failed to load supply list" : "Error al cargar la lista"));
       } finally {
         setLoading(false);
       }
     };
     if (listId) load();
-  }, [listId]);
+  }, [listId, language]);
 
   const handleBack = () => {
     router.push("/controlPanel/supply-lists");
@@ -42,9 +44,9 @@ export default function SupplyListDetailPage() {
     if (!list) return;
     try {
       const rows = (list.items || []).map((it) => ({
-        Item: it.name || "",
-        Cantidad: it.quantity ?? "",
-        Nota: it.note || "",
+        [language === "en" ? "Item" : "Ítem"]: it.name || "",
+        [language === "en" ? "Quantity" : "Cantidad"]: it.quantity ?? "",
+        [language === "en" ? "Note" : "Nota"]: it.note || "",
       }));
       const worksheet = XLSX.utils.json_to_sheet(rows);
       const workbook = XLSX.utils.book_new();
@@ -110,7 +112,7 @@ export default function SupplyListDetailPage() {
 
         await drawBackground(page);
         // Header text centered (no section/ID)
-        const title = list.title || "Supply List";
+        const title = list.title || (language === "en" ? "Supply List" : "Lista de útiles");
         const titleSize = 22;
         const titleWidth = fontBold.widthOfTextAtSize(title, titleSize) || 0;
         const titleX = (width - titleWidth) / 2;
@@ -188,7 +190,7 @@ export default function SupplyListDetailPage() {
             className="inline-flex items-center gap-2 rounded-lg border border-neutral-300 dark:border-neutral-700 px-3 py-1.5 text-sm hover:bg-neutral-100 dark:hover:bg-neutral-800"
           >
             <i className="fa-solid fa-arrow-left"></i>
-            Back
+            {language === "en" ? "Back" : "Volver"}
           </button>
           <div className="flex items-center gap-2">
             <button
@@ -197,7 +199,7 @@ export default function SupplyListDetailPage() {
               }
               className="rounded-lg px-3 py-2 text-sm border border-neutral-300 dark:border-neutral-700"
             >
-              Edit
+              {language === "en" ? "Edit" : "Editar"}
             </button>
               <div className="relative">
                 <button
@@ -218,7 +220,7 @@ export default function SupplyListDetailPage() {
                       }}
                       className="w-full px-3 py-2 text-left text-sm hover:bg-neutral-100 dark:hover:bg-neutral-800"
                     >
-                      Download Excel
+                    {language === "en" ? "Download Excel" : "Descargar Excel"}
                     </button>
                     <button
                       type="button"
@@ -228,7 +230,7 @@ export default function SupplyListDetailPage() {
                       }}
                       className="w-full px-3 py-2 text-left text-sm hover:bg-neutral-100 dark:hover:bg-neutral-800"
                     >
-                      Download PDF
+                    {language === "en" ? "Download PDF" : "Descargar PDF"}
                     </button>
                   </div>
                 )}
@@ -247,21 +249,27 @@ export default function SupplyListDetailPage() {
 
         <section className="rounded-2xl border border-neutral-200/60 dark:border-neutral-800 bg-white/70 dark:bg-neutral-900/60 shadow-sm p-4 space-y-3">
           {loading ? (
-            <div className="text-sm text-neutral-500">Loading...</div>
+            <div className="text-sm text-neutral-500">
+              {language === "en" ? "Loading..." : "Cargando..."}
+            </div>
           ) : !list ? (
-            <div className="text-sm text-red-600">List not found</div>
+            <div className="text-sm text-red-600">
+              {language === "en" ? "List not found" : "Lista no encontrada"}
+            </div>
           ) : (
             <>
               <div className="flex items-center justify-between text-sm">
                 <div>
-                  <div className="text-neutral-500">Template</div>
+                  <div className="text-neutral-500">
+                    {language === "en" ? "Template" : "Plantilla"}
+                  </div>
                   <div className="font-medium">{list.template || "default"}</div>
                 </div>
                 <Link
                   href={`/controlPanel/supply-lists/${listId}/template`}
                   className="rounded-lg px-3 py-2 text-sm border border-neutral-300 dark:border-neutral-700"
                 >
-                  Edit template
+                  {language === "en" ? "Edit template" : "Editar plantilla"}
                 </Link>
               </div>
               <div className="grid sm:grid-cols-2 gap-4 text-sm">
@@ -270,11 +278,15 @@ export default function SupplyListDetailPage() {
                   <div className="font-mono">{list.list_id}</div>
                 </div>
                 <div>
-                  <div className="text-neutral-500">Section</div>
+                  <div className="text-neutral-500">
+                    {language === "en" ? "Section" : "Sección"}
+                  </div>
                   <div className="font-medium">{list.section_id}</div>
                 </div>
                 <div className="sm:col-span-2">
-                  <div className="text-neutral-500">Title</div>
+                  <div className="text-neutral-500">
+                    {language === "en" ? "Title" : "Título"}
+                  </div>
                   <div className="font-medium">{list.title}</div>
                 </div>
               </div>

@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { authHeaders, fetchJSON } from "@/lib/api";
+import { useLanguage } from "@/lib/languageContext";
 
 const TEMPLATE_OPTIONS = [
   {
@@ -30,6 +31,7 @@ export default function SupplyListTemplatePage() {
   const params = useParams();
   const router = useRouter();
   const listId = params?.listId;
+  const { language } = useLanguage();
 
   const [template, setTemplate] = useState("default");
   const [padding, setPadding] = useState({
@@ -59,13 +61,13 @@ export default function SupplyListTemplatePage() {
           left: data?.paddingLeft ?? 80,
         });
       } catch (e) {
-        setError(e.message || "Failed to load list");
+        setError(e.message || (language === "en" ? "Failed to load list" : "Error al cargar la lista"));
       } finally {
         setLoading(false);
       }
     };
     if (listId) load();
-  }, [listId]);
+  }, [listId, language]);
 
   const handlePaddingChange = (key) => (e) =>
     setPadding((prev) => ({ ...prev, [key]: clampPadding(e.target.value) }));
@@ -126,7 +128,7 @@ export default function SupplyListTemplatePage() {
             className="inline-flex items-center gap-2 rounded-lg border border-neutral-300 dark:border-neutral-700 px-3 py-1.5 text-sm hover:bg-neutral-100 dark:hover:bg-neutral-800"
           >
             <i className="fa-solid fa-arrow-left"></i>
-            Back
+            {language === "en" ? "Back" : "Volver"}
           </button>
           <div className="text-xs text-neutral-500">
             {listId && <span className="font-mono">ID: {listId}</span>}
@@ -134,9 +136,13 @@ export default function SupplyListTemplatePage() {
         </div>
 
         <header>
-          <h1 className="text-2xl font-semibold">Template & Padding</h1>
+          <h1 className="text-2xl font-semibold">
+            {language === "en" ? "Template & Padding" : "Plantilla y márgenes"}
+          </h1>
           <p className="text-sm text-neutral-500">
-            Choose the image frame and adjust the padding for this list
+            {language === "en"
+              ? "Choose the image frame and adjust the padding for this list"
+              : "Elige la imagen de marco y ajusta los márgenes de esta lista"}
           </p>
         </header>
 
@@ -144,7 +150,9 @@ export default function SupplyListTemplatePage() {
 
         <div className="grid gap-4 lg:grid-cols-3">
           <section className="rounded-2xl border border-neutral-200/60 dark:border-neutral-800 bg-white/70 dark:bg-neutral-900/60 shadow-sm p-4 space-y-4">
-            <h2 className="text-sm font-medium">Template</h2>
+            <h2 className="text-sm font-medium">
+              {language === "en" ? "Template" : "Plantilla"}
+            </h2>
             <div className="grid gap-3">
               {TEMPLATE_OPTIONS.map((opt) => (
                 <button
@@ -173,10 +181,14 @@ export default function SupplyListTemplatePage() {
           </section>
 
           <section className="rounded-2xl border border-neutral-200/60 dark:border-neutral-800 bg-white/70 dark:bg-neutral-900/60 shadow-sm p-4 space-y-3">
-            <h2 className="text-sm font-medium">Padding</h2>
+            <h2 className="text-sm font-medium">
+              {language === "en" ? "Padding" : "Márgenes"}
+            </h2>
             <div className="grid grid-cols-2 gap-3 text-sm">
               <label className="space-y-1">
-                <span className="text-neutral-500">Top</span>
+                <span className="text-neutral-500">
+                  {language === "en" ? "Top" : "Arriba"}
+                </span>
                 <input
                   className="input w-full"
                   type="number"
@@ -187,7 +199,9 @@ export default function SupplyListTemplatePage() {
                 />
               </label>
               <label className="space-y-1">
-                <span className="text-neutral-500">Right</span>
+                <span className="text-neutral-500">
+                  {language === "en" ? "Right" : "Derecha"}
+                </span>
                 <input
                   className="input w-full"
                   type="number"
@@ -198,7 +212,9 @@ export default function SupplyListTemplatePage() {
                 />
               </label>
               <label className="space-y-1">
-                <span className="text-neutral-500">Bottom</span>
+                <span className="text-neutral-500">
+                  {language === "en" ? "Bottom" : "Abajo"}
+                </span>
                 <input
                   className="input w-full"
                   type="number"
@@ -209,7 +225,9 @@ export default function SupplyListTemplatePage() {
                 />
               </label>
               <label className="space-y-1">
-                <span className="text-neutral-500">Left</span>
+                <span className="text-neutral-500">
+                  {language === "en" ? "Left" : "Izquierda"}
+                </span>
                 <input
                   className="input w-full"
                   type="number"
@@ -226,7 +244,13 @@ export default function SupplyListTemplatePage() {
                 onClick={save}
                 disabled={saving}
               >
-                {saving ? "Saving..." : "Save"}
+                {saving
+                  ? language === "en"
+                    ? "Saving..."
+                    : "Guardando..."
+                  : language === "en"
+                  ? "Save"
+                  : "Guardar"}
               </button>
               <button
                 type="button"
@@ -241,20 +265,22 @@ export default function SupplyListTemplatePage() {
                 }}
                 className="rounded-lg px-3 py-2 text-sm border border-neutral-300 dark:border-neutral-700"
               >
-                Reset
+                {language === "en" ? "Reset" : "Reiniciar"}
               </button>
             </div>
           </section>
 
           <section className="rounded-2xl border border-neutral-200/60 dark:border-neutral-800 bg-white/70 dark:bg-neutral-900/60 shadow-sm p-4 space-y-3 lg:col-span-1 lg:row-span-2">
-            <h2 className="text-sm font-medium">Preview</h2>
+            <h2 className="text-sm font-medium">
+              {language === "en" ? "Preview" : "Vista previa"}
+            </h2>
             <div className="relative bg-neutral-50 dark:bg-neutral-800 rounded-xl border border-neutral-200/60 dark:border-neutral-700 overflow-hidden h-96">
               <div
                 className="absolute inset-0 flex flex-col text-black"
                 style={previewStyle}
               >
                 <div className="text-lg font-semibold mb-2 text-center">
-                  {list?.title || "Supply List"}
+                  {list?.title || (language === "en" ? "Supply List" : "Lista de útiles")}
                 </div>
                 <div className="space-y-1 text-sm">
                   {(list?.items || [])
@@ -271,9 +297,9 @@ export default function SupplyListTemplatePage() {
               </div>
             </div>
             <p className="text-xs text-neutral-500">
-              Usa el selector y el padding para ajustar el marco. La descarga en
-              PDF intentará usar la imagen seleccionada; si no se encuentra, se
-              usará un fondo sencillo.
+              {language === "en"
+                ? "Use the selector and padding to adjust the frame. The PDF download will try to use the selected image; if not found, a simple background is used."
+                : "Usa el selector y los márgenes para ajustar el marco. La descarga en PDF intentará usar la imagen seleccionada; si no se encuentra, se usará un fondo sencillo."}
             </p>
           </section>
         </div>

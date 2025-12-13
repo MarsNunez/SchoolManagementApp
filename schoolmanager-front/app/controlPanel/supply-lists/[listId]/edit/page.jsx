@@ -4,11 +4,13 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { authHeaders, fetchJSON } from "@/lib/api";
+import { useLanguage } from "@/lib/languageContext";
 
 export default function EditSupplyListPage() {
   const params = useParams();
   const router = useRouter();
   const listId = params?.listId;
+  const { language } = useLanguage();
 
   const [form, setForm] = useState({
     title: "",
@@ -41,13 +43,13 @@ export default function EditSupplyListPage() {
         });
         setSections(Array.isArray(sectionData) ? sectionData : []);
       } catch (e) {
-        setError(e.message || "Failed to load supply list");
+        setError(e.message || (language === "en" ? "Failed to load supply list" : "Error al cargar la lista"));
       } finally {
         setLoading(false);
       }
     };
     if (listId) load();
-  }, [listId]);
+  }, [listId, language]);
 
   const updateItem = (idx, key, value) => {
     setForm((prev) => {
@@ -123,7 +125,7 @@ export default function EditSupplyListPage() {
             className="inline-flex items-center gap-2 rounded-lg border border-neutral-300 dark:border-neutral-700 px-3 py-1.5 text-sm hover:bg-neutral-100 dark:hover:bg-neutral-800"
           >
             <i className="fa-solid fa-arrow-left"></i>
-            Back
+            {language === "en" ? "Back" : "Volver"}
           </button>
           {listId && (
             <div className="text-xs text-neutral-500">
@@ -133,9 +135,13 @@ export default function EditSupplyListPage() {
         </div>
 
         <header>
-          <h1 className="text-2xl font-semibold">Edit Supply List</h1>
+          <h1 className="text-2xl font-semibold">
+            {language === "en" ? "Edit Supply List" : "Editar lista de útiles"}
+          </h1>
           <p className="text-sm text-neutral-500">
-            Update items and assignment for this list
+            {language === "en"
+              ? "Update items and assignment for this list"
+              : "Actualiza los ítems y la asignación de esta lista"}
           </p>
         </header>
 
@@ -145,26 +151,32 @@ export default function EditSupplyListPage() {
           ) : (
             <form onSubmit={onSubmit} className="p-4 space-y-4">
               <div className="grid gap-3 sm:grid-cols-2">
-                <div>
-                  <label className="block text-sm mb-1">Title</label>
-                  <input
-                    className="input w-full"
-                    value={form.title}
-                    onChange={(e) =>
-                      setForm((prev) => ({ ...prev, title: e.target.value }))
-                    }
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm mb-1">Section</label>
-                  <select
-                    className="input w-full"
-                    value={form.section_id}
-                    onChange={(e) =>
-                      setForm((prev) => ({ ...prev, section_id: e.target.value }))
-                    }
-                  >
-                    <option value="">Select section</option>
+              <div>
+                <label className="block text-sm mb-1">
+                  {language === "en" ? "Title" : "Título"}
+                </label>
+                <input
+                  className="input w-full"
+                  value={form.title}
+                  onChange={(e) =>
+                    setForm((prev) => ({ ...prev, title: e.target.value }))
+                  }
+                />
+              </div>
+              <div>
+                <label className="block text-sm mb-1">
+                  {language === "en" ? "Section" : "Sección"}
+                </label>
+                <select
+                  className="input w-full"
+                  value={form.section_id}
+                  onChange={(e) =>
+                    setForm((prev) => ({ ...prev, section_id: e.target.value }))
+                  }
+                >
+                  <option value="">
+                    {language === "en" ? "Select section" : "Selecciona sección"}
+                  </option>
                     {sections.map((s) => (
                       <option key={s.section_id} value={s.section_id}>
                         {s.section_id}
@@ -174,45 +186,49 @@ export default function EditSupplyListPage() {
                 </div>
               </div>
 
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <h2 className="text-sm font-medium">Items</h2>
-                  <button
-                    type="button"
-                    onClick={addItem}
-                    className="rounded-lg px-3 py-1.5 text-sm border border-neutral-300 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-800"
-                  >
-                    Add item
-                  </button>
-                </div>
-                {form.items.map((item, idx) => (
-                  <div
-                    key={idx}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <h2 className="text-sm font-medium">
+                  {language === "en" ? "Items" : "Ítems"}
+                </h2>
+                <button
+                  type="button"
+                  onClick={addItem}
+                  className="rounded-lg px-3 py-1.5 text-sm border border-neutral-300 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-800"
+                >
+                  {language === "en" ? "Add item" : "Agregar ítem"}
+                </button>
+              </div>
+              {form.items.map((item, idx) => (
+                <div
+                  key={idx}
                     className="grid gap-2 sm:grid-cols-3 items-center"
                   >
+                  <input
+                    className="input"
+                    placeholder={language === "en" ? "Item name" : "Nombre del ítem"}
+                    value={item.name}
+                    onChange={(e) => updateItem(idx, "name", e.target.value)}
+                  />
+                  <input
+                    className="input"
+                    type="number"
+                    min={1}
+                    placeholder={language === "en" ? "Quantity" : "Cantidad"}
+                    value={item.quantity}
+                    onChange={(e) =>
+                      updateItem(idx, "quantity", e.target.value)
+                    }
+                  />
+                  <div className="flex gap-2 sm:col-span-1">
                     <input
-                      className="input"
-                      placeholder="Item name"
-                      value={item.name}
-                      onChange={(e) => updateItem(idx, "name", e.target.value)}
-                    />
-                    <input
-                      className="input"
-                      type="number"
-                      min={1}
-                      placeholder="Quantity"
-                      value={item.quantity}
-                      onChange={(e) =>
-                        updateItem(idx, "quantity", e.target.value)
+                      className="input flex-1"
+                      placeholder={
+                        language === "en" ? "Note (optional)" : "Nota (opcional)"
                       }
+                      value={item.note}
+                      onChange={(e) => updateItem(idx, "note", e.target.value)}
                     />
-                    <div className="flex gap-2 sm:col-span-1">
-                      <input
-                        className="input flex-1"
-                        placeholder="Note (optional)"
-                        value={item.note}
-                        onChange={(e) => updateItem(idx, "note", e.target.value)}
-                      />
                       {form.items.length > 1 && (
                         <button
                           type="button"
@@ -231,17 +247,23 @@ export default function EditSupplyListPage() {
                 <div className="text-sm text-red-600">{error}</div>
               )}
 
-              <div className="flex gap-2">
-                <button disabled={saving} className="btn-primary">
-                  {saving ? "Saving..." : "Save"}
-                </button>
-                <button
-                  type="button"
-                  onClick={handleBack}
-                  className="rounded-lg px-3 py-2 text-sm border border-neutral-300 dark:border-neutral-700"
-                >
-                  Cancel
-                </button>
+            <div className="flex gap-2">
+              <button disabled={saving} className="btn-primary">
+                {saving
+                  ? language === "en"
+                    ? "Saving..."
+                    : "Guardando..."
+                  : language === "en"
+                  ? "Save"
+                  : "Guardar"}
+              </button>
+              <button
+                type="button"
+                onClick={handleBack}
+                className="rounded-lg px-3 py-2 text-sm border border-neutral-300 dark:border-neutral-700"
+              >
+                {language === "en" ? "Cancel" : "Cancelar"}
+              </button>
               </div>
             </form>
           )}
