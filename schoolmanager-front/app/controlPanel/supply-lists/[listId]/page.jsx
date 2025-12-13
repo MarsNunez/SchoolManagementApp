@@ -35,11 +35,7 @@ export default function SupplyListDetailPage() {
   }, [listId]);
 
   const handleBack = () => {
-    if (typeof window !== "undefined" && window.history.length > 1) {
-      router.back();
-    } else {
-      router.push("/controlPanel/supply-lists");
-    }
+    router.push("/controlPanel/supply-lists");
   };
 
   const downloadCsv = () => {
@@ -76,16 +72,22 @@ export default function SupplyListDetailPage() {
 
         const drawBackground = async (targetPage) => {
           const { width: w, height: h } = targetPage.getSize();
+          const templateId = list.template || "default";
+          const templatePath =
+            templateId === "default"
+              ? "/supply-template.jpg"
+              : `/supply-templates/${templateId}.jpg`;
+          const templateBytes = await fetch(templatePath)
+            .then((r) => r.arrayBuffer())
+            .catch(() => null);
+          if (!templateBytes) return;
           try {
-            const templateId = list.template || "default";
-            const templatePath =
-              templateId === "default"
-                ? "/supply-template.jpg"
-                : `/supply-templates/${templateId}.jpg`;
-            const templateBytes = await fetch(templatePath).then((r) =>
-              r.arrayBuffer()
-            );
-            const templateImage = await pdfDoc.embedJpg(templateBytes);
+            let templateImage;
+            if (templatePath.toLowerCase().endsWith(".png")) {
+              templateImage = await pdfDoc.embedPng(templateBytes);
+            } else {
+              templateImage = await pdfDoc.embedJpg(templateBytes);
+            }
             const scale = Math.min(
               w / templateImage.width,
               h / templateImage.height
@@ -100,14 +102,9 @@ export default function SupplyListDetailPage() {
               width: imgWidth,
               height: imgHeight,
             });
-          } catch (e) {
-            targetPage.drawRectangle({
-              x: padLeft,
-              y: h - padTop - 60,
-              width: w - padLeft - padRight,
-              height: 100,
-              color: rgb(0.95, 0.96, 1),
-            });
+          } catch (err) {
+            // If embedding fails, silently skip background
+            console.warn("Failed to embed template image", err);
           }
         };
 
